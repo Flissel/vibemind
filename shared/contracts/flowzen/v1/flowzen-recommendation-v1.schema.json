@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:flowzen-recommendation:v1",
+  "title": "FlowzenRecommendationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "recommendation_id", "checkin_id", "subject_ref", "task_brief_ref", "intent_ref", "trace_id", "generated_at", "expires_at", "operation_class", "status", "recommendation_kind", "title", "summary", "evidence_refs", "cost"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "recommendation_id": {"$ref": "#/$defs/recommendationRef"},
+    "checkin_id": {"$ref": "#/$defs/checkinRef"},
+    "subject_ref": {"$ref": "#/$defs/subjectRef"},
+    "task_brief_ref": {"$ref": "#/$defs/taskRef"},
+    "intent_ref": {"$ref": "#/$defs/intentRef"},
+    "trace_id": {"$ref": "#/$defs/traceRef"},
+    "generated_at": {"$ref": "#/$defs/timestamp"},
+    "expires_at": {"$ref": "#/$defs/timestamp"},
+    "operation_class": {"const": "readonly"},
+    "status": {"const": "proposed"},
+    "recommendation_kind": {"enum": ["focus", "plan", "recovery", "review"]},
+    "title": {"type": "string", "minLength": 1, "maxLength": 120},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 500},
+    "evidence_refs": {"type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": {"$ref": "#/$defs/evidenceRef"}},
+    "cost": {"$ref": "#/$defs/cost"}
+  },
+  "$defs": {
+    "recommendationRef": {"type": "string", "pattern": "^recommendation_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "checkinRef": {"type": "string", "pattern": "^checkin_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "subjectRef": {"type": "string", "pattern": "^subject_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskRef": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "intentRef": {"type": "string", "pattern": "^intent_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceRef": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "evidenceRef": {"type": "string", "pattern": "^evidence_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "quoteRef": {"type": "string", "pattern": "^quote_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"},
+    "cost": {"type": "object", "additionalProperties": false, "required": ["actual_cost_minor", "currency", "quote_ref", "evidence_ref"], "properties": {"actual_cost_minor": {"type": "integer", "minimum": 0, "maximum": 10000000}, "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "quote_ref": {"$ref": "#/$defs/quoteRef"}, "evidence_ref": {"$ref": "#/$defs/evidenceRef"}}}
+  }
+}

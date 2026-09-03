@@ -1,0 +1,23 @@
+{
+  "contract_version": "v1",
+  "recommendation_id": "recommendation_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "checkin_id": "checkin_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "subject_ref": "subject_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent_ref": "intent_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "generated_at": "2026-07-31T09:00:01Z",
+  "expires_at": "2026-07-31T09:15:00Z",
+  "operation_class": "readonly",
+  "status": "proposed",
+  "recommendation_kind": "focus",
+  "title": "Ordne den nächsten Schritt.",
+  "summary": "Wähle genau eine klar abgegrenzte Aufgabe für den aktuellen Fokusblock.",
+  "evidence_refs": ["evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"],
+  "cost": {
+    "actual_cost_minor": 0,
+    "currency": "EUR",
+    "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "evidence_ref": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  }
+}

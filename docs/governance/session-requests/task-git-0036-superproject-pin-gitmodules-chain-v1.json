@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0036-superproject-pin-gitmodules-chain-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0036-superproject-pin-gitmodules-chain-v1",
+  "objective": "Stage 2 of the gitmodules pin chain, and unlike the previous chains this stage must land as ONE coherent commit because task-coding-0006 documented a pin-lift trap: lifting the coding-engine pin invalidates three artefacts at once, and splitting them leaves the governance suite red in between. In the superproject, lift the vibemind-os gitlink to the vibemind-os master commit that carries the lifted coding-engine gitlink from stage 1, and in the same commit (1) drop the repo-manifest.yaml entries coding-engine-nemoclaw and coding-engine-free-llm-api-resources, whose gitlinks no longer exist after the two authorised retirements, (2) update expected_gitlink_pin for vibemind-os and coding-engine plus the evidence.parent_pin chain across the vibemind-os children, (3) re-measure the coding-engine record in tests/v1_governance/fixtures/observed_gitlinks.yaml at the new pin - three gitlinks, not five - and (4) advance tests/v1_governance/test_gitlink_coverage.py, whose CODING_ENGINE_GITLINKS constant hardcodes the five old paths and pins and whose coverage test asserts both the old parent_pin and a specific unmapped set that is now empty. Determine every target commit repo-first rather than assuming it. Advance the tests deliberately: understand what each assertion claims and carry the claim forward, never relax one to reach green. Note that KNOWN_UNREADABLE_PINS for coding-engine-la-fungus-search stays valid, because that dangling pin is deliberately untouched. Amended by the orchestrator after the task-git-0035 handoff exposed a gap in the original wording: besides the coding-engine record, the vibemind-os observation record in observed_gitlinks.yaml also goes stale - its parent_pin 731288b must advance to the new vibemind-os merge commit d2c92d0 and its {path: coding-engine, pin: 81ab938} entry must advance to 352a858. Missing this leaves the fixture internally inconsistent. Two further measurements from that handoff, to be verified rather than trusted: pin the vibemind-os merge commit d2c92d0 and not the pin commit 4b2c9bb, and KEEP expected_gitlink_pin unchanged for coding-engine-automation-ui, coding-engine-minibook and coding-engine-la-fungus-search, because those child pins genuinely did not move - only their evidence.parent_pin advances and only their .gitmodules mapping changed. Finally, test_coding_engine_gitlinks_are_declared_and_only_one_is_mapped asserts an unmapped set that is now empty, so its NAME is false as well as its body: rename it to carry the successor claim that the mapping gap is closed, and do not weaken the assertion that a one-path fix cannot masquerade as a full one.",
+  "repositories": [
+    "vibemind-v1"
+  ],
+  "allowed_paths": [
+    "vibemind-os",
+    "repo-manifest.yaml",
+    "tests/v1_governance/",
+    "docs/operations/"
+  ],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0036-superproject-pin-gitmodules-chain-v1",
+  "risk_class": "code",
+  "dependencies": [
+    "task-git-0035-coding-engine-pin-352a858-v1"
+  ],
+  "merge_position": 8
+}

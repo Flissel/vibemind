@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0034-coding-engine-external-gitlink-coverage-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0034-coding-engine-external-gitlink-coverage-v1",
+  "objective": "Finding B2 has now reproduced in three consecutive pin chains and blocks a second gate, and the shorthand it is carried under is wrong in a way that matters. Three sessions recorded it as a missing .gitmodules url for vibemind-os/coding-engine/external/Automation_ui. Repo-first at pin 81ab938 the picture is different: coding-engine carries four gitlinks under external/ - Automation_ui, NemoClaw, free-llm-api-resources, minibook - while its .gitmodules maps only la_fungus_search, so all four are unmapped and git merely aborts at the alphabetically first. Mapping Automation_ui alone would move the abort to NemoClaw, not fix it. Separately and more consequentially, repo-manifest.yaml declares no children of coding-engine at all, so the readiness contract is blind to four real gitlinks and manifest validate passes because it only inspects declared paths, never undeclared ones - which is why three pin chains never surfaced this. Ground both layers, correct the B2 record, and deliver an evidenced proposal per unmapped gitlink on whether it should be mapped, declared, or retired. Declaring the four gitlinks in repo-manifest.yaml and closing the undeclared-gitlink blind spot with a test are in scope. Expressly out of scope without separate authority: any edit to a .gitmodules file and any removal of a gitlink, because adding a url asserts an intended remote and removing a gitlink is destructive - both are decisions to present, not to take.",
+  "repositories": ["vibemind-v1", "coding-engine"],
+  "allowed_paths": ["repo-manifest.yaml", "tests/v1_governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0034-coding-engine-external-gitlink-coverage-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0033-vibemind-os-pin-n8n-chain-v1"],
+  "merge_position": 7
+}

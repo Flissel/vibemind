@@ -1,0 +1,21 @@
+schema_version: 2
+session_id: task-coding-1042
+session_type: task
+space: coding
+parent_cockpit: cockpit-coding
+request_reference: task-request:task-coding-1042-v1
+objective: Add the async code-generation start endpoint
+repositories:
+  - vibemind-v1
+allowed_paths:
+  - services/coding/**
+  - tests/coding/**
+writes_allowed: true
+approval_status: approved
+# Routine docs/code: standing-autonomy:v1. High risk: codex-user-message:<thread-UUID>@<RFC3339 timestamp>.
+approval_reference: standing-autonomy:v1
+base_ref: origin/master
+branch: codex/coding/task-coding-1042-codegen-start
+risk_class: code
+dependencies: []
+merge_position: 1

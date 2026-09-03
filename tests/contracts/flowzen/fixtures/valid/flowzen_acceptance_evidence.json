@@ -1,0 +1,25 @@
+{
+  "contract_version": "v1",
+  "acceptance_id": "acceptance_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "recommendation_id": "recommendation_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "checkin_id": "checkin_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "subject_ref": "subject_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent_ref": "intent_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "started_at": "2026-07-31T09:00:02Z",
+  "completed_at": "2026-07-31T09:00:03Z",
+  "outcome": "succeeded",
+  "readback": {
+    "status": "accepted",
+    "observed_at": "2026-07-31T09:00:03Z",
+    "evidence_ref": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  },
+  "cost": {
+    "actual_cost_minor": 0,
+    "currency": "EUR",
+    "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "evidence_ref": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  }
+}

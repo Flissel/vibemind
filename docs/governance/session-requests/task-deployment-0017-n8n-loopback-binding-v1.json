@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-deployment-0017-n8n-loopback-binding-v1",
+  "session_type": "task",
+  "space": "deployment",
+  "parent_cockpit": "cockpit-deployment",
+  "request_reference": "task-request:task-deployment-0017-n8n-loopback-binding-v1",
+  "objective": "Implement architecture decision E6: restrict the n8n port publication from the interface-wide form 15678:5678 to the loopback form 127.0.0.1:15678:5678 in infra/swarm/vibemind-stack.yml and infra/proxmox/phase2a-docker-compose.yml. Repository change only: verify repo-first that every known consumer addresses the loopback address, document the residual risk that an undiscovered off-host consumer may depend on the open binding, and provide a short apply-and-rollback runbook. Expressly no live action: the redeploy or restart on the Proxmox host stays with the user and is not covered by this request.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["infra/swarm/", "infra/proxmox/", "docs/runbooks/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-15T11:38:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/deployment/task-deployment-0017-n8n-loopback-binding-v1",
+  "risk_class": "deployment",
+  "dependencies": [],
+  "merge_position": 9
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0027-brain-researcher-scope-fixture-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0027-brain-researcher-scope-fixture-v1",
+  "objective": "Close the openfang test that task-openfang-0026 measured red, in the openfang repository on its default branch main. cargo test -p openfang-types test_vibemind_brain_manifests_use_top_level_mcp_servers FAILS at pin ef9d73f, panicking at crates/openfang-types/src/agent.rs:1699 with the message that agents/brain-researcher/agent.toml has an unexpected mcp_servers scope, left [fetch, spaces-ideas, qdrant] against right [vibemind-db, fetch, qdrant]. This is a measurement, not an inference: task-openfang-0025 could only compare statically and reported so honestly, and task-openfang-0026 found that cargo 1.94.1 is in fact present and executed the test read-only. The orchestrator repeated 0025's environment note as a general claim that no session environment has a Rust toolchain, which was wrong, and this task exists because that was checked. FIRST establish which side of the assertion is the file and which is the expectation. The orchestrator's reading is that agents/brain-researcher/agent.toml already carries the E9-compliant scope while the test's expectation still names the broad vibemind-db server, which would make the expectation the stale side - but that is a reading of a panic message, not a measurement, and reading it backwards would revert a user decision. Read the assertion in context at agent.rs:1699 and determine the direction from the code. THEN, if the expectation is the stale side, advance it to the scope E9 mandates and the registry declares, and say what evidence settled the direction. IF THE FILE IS THE STALE SIDE INSTEAD - that is, if agent.toml still names vibemind-db and the expectation is already correct - FAIL CLOSED and report it: the repair would then be a manifest regeneration, which is a different task with different risks, and task-openfang-0010 exists precisely because regenerating those manifests is its own piece of work. The governing decision is E9 in docs/governance/architecture-decisions-2026-08-16-v1.md, verified at source by task-openfang-0025 through four independent records including the user decision itself: the write path moves to spaces-ideas, one write authority per data domain. Do not reinterpret it; if your measurement appears to contradict it, that is a finding for the user rather than a licence to choose. Run the single named test before and after and report both results, and run the surrounding test module to show you broke nothing; do not run or repair openfang's full suite, which is out of scope. Deliberately out of scope: the superproject gitlink, the vibemind-os gitlink, repo-manifest.yaml, the observed_gitlinks fixture and shared/contracts/ - a pin lift carrying this change is a separate task in the established two-stage pattern and the orchestrator will derive it. Also out of scope: docs/contracts/openfang-mcp-authority-v1.md, whose stale source locators task-openfang-0028 owns.",
+  "repositories": ["vibemind-v1", "openfang", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0027-brain-researcher-scope-fixture-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0026-normative-document-scope-agreement-v1"],
+  "merge_position": 17
+}

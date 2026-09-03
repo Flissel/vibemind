@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:flowzen-checkin:v1",
+  "title": "FlowzenCheckinV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "checkin_id", "subject_ref", "task_brief_ref", "intent_ref", "trace_id", "observed_at", "expires_at", "operation_class", "signal_band", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "checkin_id": {"$ref": "#/$defs/checkinRef"},
+    "subject_ref": {"$ref": "#/$defs/subjectRef"},
+    "task_brief_ref": {"$ref": "#/$defs/taskRef"},
+    "intent_ref": {"$ref": "#/$defs/intentRef"},
+    "trace_id": {"$ref": "#/$defs/traceRef"},
+    "observed_at": {"$ref": "#/$defs/timestamp"},
+    "expires_at": {"$ref": "#/$defs/timestamp"},
+    "operation_class": {"const": "readonly"},
+    "signal_band": {"enum": ["focus", "neutral", "recovery", "unknown"]},
+    "idempotency_key": {"type": "string", "pattern": "^checkin:checkin_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}
+  },
+  "$defs": {
+    "checkinRef": {"type": "string", "pattern": "^checkin_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "subjectRef": {"type": "string", "pattern": "^subject_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskRef": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "intentRef": {"type": "string", "pattern": "^intent_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceRef": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"}
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MiroFishSimulationRequestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "project_ref", "task_ref", "trace_id", "space_id", "objective", "requested_outputs", "input_artifact_refs", "input_evidence_refs", "request_hash", "requested_at", "clarification", "hard_bounds", "quote_ref", "approval_ref", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "v1"}, "request_id": {"$ref": "#/$defs/id"}, "project_ref": {"$ref": "#/$defs/id"}, "task_ref": {"$ref": "#/$defs/id"}, "trace_id": {"$ref": "#/$defs/id"}, "space_id": {"const": "mirofish"},
+    "objective": {"type": "string", "minLength": 1, "maxLength": 10000}, "requested_outputs": {"type": "array", "items": {"enum": ["graph_artifact", "simulation_artifact", "forecast_artifact"]}, "minItems": 3, "maxItems": 3, "uniqueItems": true},
+    "input_artifact_refs": {"$ref": "#/$defs/nonempty_ids"}, "input_evidence_refs": {"$ref": "#/$defs/nonempty_ids"}, "request_hash": {"$ref": "#/$defs/hash"}, "requested_at": {"type": "string", "format": "date-time"},
+    "clarification": {"type": "object", "additionalProperties": false, "required": ["status", "questions", "resolved_at"], "properties": {"status": {"enum": ["resolved", "required"]}, "questions": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 2000}, "maxItems": 20}, "resolved_at": {"type": "string", "format": "date-time"}}},
+    "hard_bounds": {"$ref": "#/$defs/bounds"}, "quote_ref": {"$ref": "#/$defs/id"}, "approval_ref": {"$ref": "#/$defs/id"}, "idempotency_key": {"type": "string", "pattern": "^mirofish:request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z_]*_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "nonempty_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}, "minItems": 1, "maxItems": 20, "uniqueItems": true}, "hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "bounds": {"type": "object", "additionalProperties": false, "required": ["timeout_seconds", "max_steps", "max_retries", "max_agents", "max_rounds", "max_artifacts", "max_cost_minor", "currency"], "properties": {"timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 3600}, "max_steps": {"type": "integer", "minimum": 3, "maximum": 100}, "max_retries": {"type": "integer", "minimum": 0, "maximum": 10}, "max_agents": {"type": "integer", "minimum": 1, "maximum": 1000}, "max_rounds": {"type": "integer", "minimum": 1, "maximum": 1000}, "max_artifacts": {"type": "integer", "minimum": 3, "maximum": 100}, "max_cost_minor": {"type": "integer", "minimum": 0, "maximum": 10000000}, "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}}}
+  }
+}

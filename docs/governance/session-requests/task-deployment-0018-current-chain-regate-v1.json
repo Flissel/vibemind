@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "session_id": "task-deployment-0018-current-chain-regate-v1",
+  "session_type": "task",
+  "space": "deployment",
+  "parent_cockpit": "cockpit-deployment",
+  "request_reference": "task-request:task-deployment-0018-current-chain-regate-v1",
+  "objective": "Re-gate the static deployment-readiness contract to the committed Outer-to-Child-to-OpenFang chain at Child 731288b4 and OpenFang 75067d8c, retain the unchanged Voice pin, preserve the strict no-model-on-Proxmox rules, and verify the full Pester contract without performing a deployment or contacting Proxmox.",
+  "repositories": [
+    "vibemind-v1",
+    "vibemind-os",
+    "openfang"
+  ],
+  "allowed_paths": [
+    "docs/governance/session-requests/task-deployment-0018-current-chain-regate-v1.json",
+    "scripts/deployment-readiness.ps1",
+    "tests/deployment/deployment-readiness.Tests.ps1",
+    "docs/superpowers/plans/2026-08-17-current-chain-deployment-regate-v1.md",
+    "docs/operations/2026-08-17-current-chain-deployment-regate-handoff.md"
+  ],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "standing-autonomy:v1",
+  "base_ref": "origin/master",
+  "branch": "codex/deployment/task-deployment-0018-current-chain-regate-v1",
+  "risk_class": "code",
+  "dependencies": [
+    "task-observability-0012-current-chain-reconciliation-v1",
+    "task-git-0032-openfang-pin-75067d8-v1",
+    "task-git-0033-vibemind-os-pin-n8n-chain-v1"
+  ],
+  "merge_position": 9
+}

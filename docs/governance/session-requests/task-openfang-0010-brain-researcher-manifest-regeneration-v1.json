@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0010-brain-researcher-manifest-regeneration-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0010-brain-researcher-manifest-regeneration-v1",
+  "objective": "Commit the regenerated brain-researcher agent manifest in the openfang repository so the registry change merged as vibemind-os#140 takes effect at the manifest level. Run the generator sync_openfang_agents.py from the merged vibemind-os master, verify that the regenerated agents/brain-researcher/agent.toml carries the intended tools and the new model dimensioning, and verify that no other agent manifest drifts as a side effect of the per-space model override. Service commit in the Flissel/openfang repository on a codex branch; superproject writes limited to evidence documentation. No live registration and no runtime action; the gitlink pin chain that follows is a separate task.",
+  "repositories": ["vibemind-v1", "openfang"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0010-brain-researcher-manifest-regeneration-v1",
+  "risk_class": "code",
+  "dependencies": ["task-research-0001-agent-tool-enablement-v1"],
+  "merge_position": 6
+}

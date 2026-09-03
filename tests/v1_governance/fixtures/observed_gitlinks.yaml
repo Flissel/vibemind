@@ -1,0 +1,153 @@
+# Recorded gitlink inventory for every pinned parent in repo-manifest.yaml.
+#
+# Why this file exists
+# --------------------
+# `validate_manifest` derives its submodule-coverage check from `.gitmodules`
+# (tools/v1_governance/manifest.py, the `undeclared-submodule` loop). A gitlink
+# that exists in a tree but has no `.gitmodules` entry is therefore invisible to
+# it, and a pinned child tree cannot be read at all under the hermetic policy
+# `submodule_policy.validator_network_access: forbidden`. That combination is why
+# finding B2 -- five gitlinks under `coding-engine`, only one of them mapped, none
+# of them declared -- survived three consecutive pin chains with green gates.
+#
+# This file closes that gap by recording, per parent pin, the gitlinks the pinned
+# tree actually carries, measured with `git ls-tree -r <pin>` filtered on mode
+# `160000`. `tests/v1_governance/test_gitlink_coverage.py` then checks the
+# manifest against this record offline, with no network access.
+#
+# What makes it a claim rather than a snapshot
+# -------------------------------------------
+# Every record is keyed to the pin it was observed at. When a pin lift changes a
+# parent's `expected_gitlink_pin`, the corresponding record goes stale and the
+# test fails until the tree is re-measured at the new pin. Freezing the current
+# state is therefore not an option the file permits: a pin lift forces a fresh
+# observation, which is exactly the step the three earlier pin chains skipped.
+#
+# How to refresh a record
+# -----------------------
+# Out-of-tree, without initializing any submodule in the superproject:
+#
+#   git init /tmp/probe && cd /tmp/probe
+#   git fetch --depth 1 <remote> <pin>
+#   git ls-tree -r <pin> | awk '$1=="160000"{print $3, $4}'
+#
+# `tree_available: false` records that the pinned tree could not be read at all.
+# It is an explicit admission of a blind spot, not a pass: the test pins that set
+# to a known literal list so a new unreadable pin cannot join it silently.
+schema_version: 1
+observations:
+  - parent: vibemind-os
+    parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83
+    tree_available: true
+    gitlinks:
+      - {path: brain/the_brain/tribe, pin: 72399081ed3f1040c4d996cefb2864a4c46f5b8e}
+      - {path: coding-engine, pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80}
+      - {path: la-fungus-search, pin: 22011ea9c437c13f771337516c7f432ceb8be236}
+      - {path: openclaude, pin: 20d570b33ed627d5ccb8ae75ac380006bcd78616}
+      - {path: openclaw, pin: 65e35a6771b4a8be81867d2384df50d5666c608d}
+      - {path: openfang, pin: 8a4904b3ff622d7ffda1e8cb01a509d2db430904}
+      - {path: shared, pin: fe9c31d257c551568794c44098bf75e92f327e7f}
+      - {path: spaces/captain_cook, pin: 644a5c3b827ea8345c29a5256425117f8e117cc4}
+      - {path: spaces/desktop/Automation_ui, pin: d8ffe30b3a97fd5f5360e68f5bfb74267b87b69d}
+      - {path: spaces/shuttles/swe_desgine, pin: 73331177678f715c2077c146ccde565e033fcf7a}
+      - {path: spaces/video/laura, pin: 909a43d499ffe00f4fd3d779127da45debf64f0c}
+      - {path: spaces/video/vibevideo, pin: bf0315f33435ece5f13e379f4138e28a3fa59ecb}
+      - {path: spaces/video/vibevideo_deepfake, pin: 3c67511d9eaa9e7c921f0815d63324c6eeab1ece}
+      - {path: voice, pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015}
+
+  # The gitlink da2a29a..760da81 added. Captain_cook is not a leaf: it carries
+  # `hermes-agent` in its own tree and maps it in its own `.gitmodules`, so the
+  # declaration chain continues one level down rather than stopping here.
+  - parent: captain-cook
+    parent_pin: 644a5c3b827ea8345c29a5256425117f8e117cc4
+    tree_available: true
+    gitlinks:
+      - {path: hermes-agent, pin: fcbdeca1ebedf1d1ee7f0199f4df7bf3f39619a0}
+
+  - parent: hermes-agent
+    parent_pin: fcbdeca1ebedf1d1ee7f0199f4df7bf3f39619a0
+    tree_available: true
+    gitlinks: []
+
+  # The B2 parent, re-measured at 352a858. Three gitlinks now, not the five this
+  # record held at 81ab938: task-coding-0006 retired `external/NemoClaw` and
+  # `external/free-llm-api-resources`, so those paths carry no gitlink here and
+  # their entries are removed rather than kept at a stale pin. The two survivors
+  # keep the pins they had at 81ab938 -- only their `.gitmodules` mapping is new --
+  # and all three are now mapped in coding-engine's own `.gitmodules`, so the
+  # mapping half of B2 is closed. `la_fungus_search` still pins the dangling
+  # f731c19a, which is why a recursive init still aborts (see that record below).
+  - parent: coding-engine
+    parent_pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80
+    tree_available: true
+    gitlinks:
+      - {path: external/Automation_ui, pin: 3a413ae2886e2b83379e0eea9e4729cc1d3a4573}
+      - {path: external/minibook, pin: b19c61e27bb3ac2ca8a4f06addb541819bfbe9a0}
+      - {path: la_fungus_search, pin: f731c19afa08ddc84874669fb96faef9bd6d1a69}
+
+  - parent: automation-ui
+    parent_pin: d8ffe30b3a97fd5f5360e68f5bfb74267b87b69d
+    tree_available: true
+    gitlinks:
+      - {path: moire_tracker, pin: 436fbff95b2b04db1b7c5d66cbd9b9a2eddc9948}
+
+  - parent: swe-desgine
+    parent_pin: 73331177678f715c2077c146ccde565e033fcf7a
+    tree_available: true
+    gitlinks:
+      - {path: external/arch_team, pin: 70d9856fd1059fb4bae8cffbdde1586cd0b1be1f}
+
+  - parent: voice
+    parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015
+    tree_available: true
+    gitlinks:
+      - {path: electron-app/clawport-ui, pin: ac5740f61a50aef9ff671f55dbe52cc0654fc6cc}
+      - {path: external/Autogen_AgentFarm, pin: 73b00888d31486df3e3fad3dfc5cd953bbd26bd4}
+      - {path: external/openclaw, pin: 3cf06f7939578541120712947a7d6b30561b4477}
+      - {path: external/zeroclaw, pin: e4fc97f5f272b1c530b9c22f03db4cface16b933}
+
+  # Fourth level, reached only through coding-engine's unmapped external/ gitlinks.
+  - parent: coding-engine-automation-ui
+    parent_pin: 3a413ae2886e2b83379e0eea9e4729cc1d3a4573
+    tree_available: true
+    gitlinks:
+      - {path: moire_tracker, pin: 7a11bbb421b9607667330cf8e9adebb1e0057018}
+
+  # `coding-engine/la_fungus_search` pins a commit that is not reachable from any
+  # ref on https://github.com/Flissel/la_fungus_search.git, so its tree cannot be
+  # fetched and its own gitlinks are unknown. The vibemind-os-level pin of the
+  # same upstream (22011ea9) fetches fine, so this is a dangling pin rather than
+  # an access problem. Consequence: adding the missing `.gitmodules` entries would
+  # still not make a recursive checkout succeed at this pin.
+  - parent: coding-engine-la-fungus-search
+    parent_pin: f731c19afa08ddc84874669fb96faef9bd6d1a69
+    tree_available: false
+    unavailable_reason: pin-not-reachable-from-any-ref-on-remote
+    gitlinks: []
+
+  # Observed and empty. Recording an empty set at a specific pin is a claim too:
+  # it says the tree was read at that pin and carried no gitlink.
+  - {parent: tribe, parent_pin: 72399081ed3f1040c4d996cefb2864a4c46f5b8e, tree_available: true, gitlinks: []}
+  - {parent: la-fungus-search, parent_pin: 22011ea9c437c13f771337516c7f432ceb8be236, tree_available: true, gitlinks: []}
+  - {parent: openclaude, parent_pin: 20d570b33ed627d5ccb8ae75ac380006bcd78616, tree_available: true, gitlinks: []}
+  - {parent: openclaw, parent_pin: 65e35a6771b4a8be81867d2384df50d5666c608d, tree_available: true, gitlinks: []}
+  - {parent: openfang, parent_pin: 8a4904b3ff622d7ffda1e8cb01a509d2db430904, tree_available: true, gitlinks: []}
+  - {parent: shared, parent_pin: fe9c31d257c551568794c44098bf75e92f327e7f, tree_available: true, gitlinks: []}
+  - {parent: vibevideo, parent_pin: bf0315f33435ece5f13e379f4138e28a3fa59ecb, tree_available: true, gitlinks: []}
+  - {parent: vibevideo-deepfake, parent_pin: 3c67511d9eaa9e7c921f0815d63324c6eeab1ece, tree_available: true, gitlinks: []}
+  - {parent: laura, parent_pin: 909a43d499ffe00f4fd3d779127da45debf64f0c, tree_available: true, gitlinks: []}
+  - {parent: arch-team, parent_pin: 70d9856fd1059fb4bae8cffbdde1586cd0b1be1f, tree_available: true, gitlinks: []}
+  - {parent: automation-ui-moire-tracker, parent_pin: 436fbff95b2b04db1b7c5d66cbd9b9a2eddc9948, tree_available: true, gitlinks: []}
+  - {parent: clawport-ui, parent_pin: ac5740f61a50aef9ff671f55dbe52cc0654fc6cc, tree_available: true, gitlinks: []}
+  - {parent: autogen-agentfarm, parent_pin: 73b00888d31486df3e3fad3dfc5cd953bbd26bd4, tree_available: true, gitlinks: []}
+  - {parent: voice-openclaw, parent_pin: 3cf06f7939578541120712947a7d6b30561b4477, tree_available: true, gitlinks: []}
+  - {parent: zeroclaw, parent_pin: e4fc97f5f272b1c530b9c22f03db4cface16b933, tree_available: true, gitlinks: []}
+  # `coding-engine-nemoclaw` (3ba517dd) and `coding-engine-free-llm-api-resources`
+  # (c3ac9113) had records here while coding-engine@81ab938 still carried their
+  # gitlinks. Both gitlinks were retired in task-coding-0006, so the manifest no
+  # longer declares those parents and an observation of them would be a record of a
+  # tree nothing points at -- which
+  # test_every_pinned_manifest_repository_has_a_gitlink_observation reports as a
+  # duplicate-or-orphan mismatch. Removed with the declarations, not retained.
+  - {parent: coding-engine-minibook, parent_pin: b19c61e27bb3ac2ca8a4f06addb541819bfbe9a0, tree_available: true, gitlinks: []}
+  - {parent: coding-engine-automation-ui-moire-tracker, parent_pin: 7a11bbb421b9607667330cf8e9adebb1e0057018, tree_available: true, gitlinks: []}

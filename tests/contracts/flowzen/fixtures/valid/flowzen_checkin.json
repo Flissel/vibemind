@@ -1,0 +1,13 @@
+{
+  "contract_version": "v1",
+  "checkin_id": "checkin_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "subject_ref": "subject_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent_ref": "intent_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "observed_at": "2026-07-31T09:00:00Z",
+  "expires_at": "2026-07-31T09:15:00Z",
+  "operation_class": "readonly",
+  "signal_band": "neutral",
+  "idempotency_key": "checkin:checkin_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+}

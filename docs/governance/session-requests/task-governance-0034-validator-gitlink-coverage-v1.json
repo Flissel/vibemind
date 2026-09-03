@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0034-validator-gitlink-coverage-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0034-validator-gitlink-coverage-v1",
+  "objective": "Close the validator blind spot that let finding B2 survive three pin chains, as proposed in the task-git-0034 handoff and now unblocked because task-git-0036 released tests/v1_governance/. The undeclared-submodule check in tools/v1_governance/manifest.py builds its candidate set from .gitmodules entries only, so a gitlink with no mapping contributes nothing for the set difference to find. There is a second half the handoff did not separate out and the orchestrator found while grounding this request: local_modules_by_parent is populated only as a side effect of iterating declared repositories, so a parent with zero declared children never enters the dict at all - which is precisely the coding-engine case before its children were declared. A fix that only unions the two path sources still misses that parent. Key the check on the union of .gitmodules paths and mode-160000 index entries, and make it reach every locally available parent rather than only those that already have declared children. Determine repo-first what the check can and cannot see, and state the limits honestly rather than overselling the fix: the check runs only for parents whose evidence.source is local-git, submodule_policy.validator_network_access forbids reading a pinned child tree, and in the canonical CI state vibemind-os is uninitialized - so establish exactly which parents this now covers and which remain the province of submodule_readiness.py, which reads index entries directly and never had the blind spot. Invert tests/v1_governance/test_gitlink_coverage.py::test_validator_is_blind_to_a_gitlink_absent_from_gitmodules in the same commit: its own docstring says it characterises current behaviour and is expected to fail when this fix lands. Carry its claim forward as the successor assertion rather than deleting it. No existing finding may change for the three known declared-without-gitlink legacy warnings; if the fix would alter them, stop fail-closed and report instead.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["tools/v1_governance/", "tests/v1_governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0034-validator-gitlink-coverage-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0036-superproject-pin-gitmodules-chain-v1"],
+  "merge_position": 8
+}

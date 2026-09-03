@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0028-normative-document-source-pins-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0028-normative-document-source-pins-v1",
+  "objective": "Do for docs/contracts/openfang-mcp-authority-v1.md what task-openfang-0024 did for the JSON: re-pin its header and re-verify every source locator it carries against the trees the new pins name. Lines 10-13 ground every claim in the document at vibemind-os 9ee1cc4240 and openfang 33be359c, while the JSON's source_pins are da2a29a and ef9d73f - which are also repo-manifest.yaml's expected_gitlink_pin values and the trees the enforcing tests actually read. task-openfang-0026 found at least four locators that no longer resolve to what they cite, verified against the populated tree: line 55 cites spaces-ideas at 386-392 where the entry runs 387-394, and vibemind-db at 352-358 where it runs 352-359, and it lists further imprecise references at lines 114, 134 and 33 that it could not cleanly resolve. Treat four as a lower bound and not a total, as every count in this document has been: it was two before task-openfang-0023, which found a third, then 0025 found three more of another kind, and 0026 found a fourth class older than all of them. COUNT BEFORE YOU REPAIR. Report how many locators the document carries and how many still resolve, before changing anything. If a careful pass over all of them is not achievable in one session, FAIL CLOSED: repair nothing, report the count and the sample you verified, and let the orchestrator split it. task-openfang-0026 declined to patch the four provable ones for exactly the right reason and it is repeated here as the standard: patching four while the header still points at 9ee1cc42 would make the document internally inconsistent, which is worse than the current state because it would look checked. THEN, if the count is manageable, advance the header pins and every locator together in one coherent commit. A guard belongs with this repair rather than before it, and 0026 deliberately did not build one because it would have merged red with nothing in its scope able to green it - so decide, and say why, whether the tests/contracts/ guard can be extended to compare the markdown's header pins against the JSON's source_pins, which is a cheap assertion that would have caught this. If you add it, make it red first against the current header. Note that tests/contracts/ is NOT collected by the required CI checks, which run only tests/architecture/test_v1_ci_contract.py and tests/v1_governance/test_manifest.py: say plainly that this is a local guard rather than a gate, and do not change any workflow file. You will need vibemind-os and the nested vibemind-os/openfang populated to verify a single locator; an initialised submodule can still have an empty working tree, and --recursive aborts on vibemind-os/coding-engine/la_fungus_search. Out of scope: the JSON, which is correct and whose integration suite is green at 18 passed; and openfang's brain-researcher scope fixture, which task-openfang-0027 owns.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["docs/contracts/", "tests/contracts/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0028-normative-document-source-pins-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0026-normative-document-scope-agreement-v1"],
+  "merge_position": 18
+}

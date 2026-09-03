@@ -1,0 +1,3 @@
+[submodule "vibemind-os"]
+	path = vibemind-os
+	url = https://github.com/vibemind-space/vibemind-os.git

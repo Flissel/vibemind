@@ -1,0 +1,18 @@
+[
+  [
+    "infra/swarm/supabase/initdb/00-bootstrap.sql",
+    "supabase_bootstrap_v1.sql"
+  ],
+  [
+    "infra/swarm/supabase/initdb/01-restore.sql",
+    "supabase_restore_v1.sql"
+  ],
+  [
+    "infra/swarm/supabase/initdb/02-restore-internal.sql",
+    "supabase_restore_internal_v1.sql"
+  ],
+  [
+    "infra/swarm/supabase/kong.yml",
+    "supabase_kong_yml_v1.yml"
+  ]
+]

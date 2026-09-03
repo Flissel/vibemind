@@ -1,0 +1,26 @@
+[
+  [
+    "infra/swarm/logging/loki-config.yml",
+    "loki_config_v1.yml"
+  ],
+  [
+    "infra/swarm/logging/grafana-datasources.yml",
+    "grafana_datasources_v2.yml"
+  ],
+  [
+    "infra/swarm/logging/grafana-dashboards.yml",
+    "grafana_dashboards_v1.yml"
+  ],
+  [
+    "infra/swarm/logging/dashboards/brain-overview.json",
+    "grafana_dash_brain_v2.json"
+  ],
+  [
+    "infra/swarm/logging/dashboards/vibemind-services.json",
+    "grafana_dash_services_v2.json"
+  ],
+  [
+    "infra/swarm/logging/dashboards/incident-timeline.json",
+    "grafana_dash_incident_v2.json"
+  ]
+]

@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0025-research-space-contract-registry-alignment-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0025-research-space-contract-registry-alignment-v1",
+  "objective": "Close the last red assertions in tests/integration/test_openfang_mcp_authority_contract_v1.py by bringing the research space's entry in shared/contracts/openfang-mcp-authority-v1.json into agreement with vibemind-os/config/space_agent_registry.yml, which the contract itself declares to be the source of truth. task-openfang-0022 measured the drift and left it deliberately: contract research.mcp_servers reads [vibemind-db, fetch, qdrant] against registry [fetch, spaces-ideas, qdrant]; contract research.mcp_tools is empty against a registry declaring fetch [fetch] and spaces-ideas [idea_create, idea_update]; and the registry declares MCP events research.summarize and research.to_idea that the contract does not carry at all. Three failing tests, one defect seen from three angles. Re-measure all of it yourself at the pins the contract now declares - task-openfang-0024 advanced source_pins to vibemind-os da2a29a and openfang ef9d73f and added a manifest-tied guard, so the contract's coordinates are current for the first time in this chain and you should not inherit any line number from an earlier handoff. THE INTENT QUESTION IS THE HEART OF THIS TASK AND IT IS A HYPOTHESIS, NOT A LICENCE. task-openfang-0022 attributed the drift to vibemind-os commit 00a28ff from task-research-0001-agent-tool-enablement-v1, whose own request states the purpose as making lookup events reach fetch and idea writes reach the spaces-ideas authority instead of the broad vibemind-db server - which is exactly the observed delta and reads as a deliberate narrowing rather than an accident. Verify that reading at its source: read that request and its merged handoff, and confirm that the removal of vibemind-db from the research scope was intended and recorded. If it was, align the contract to the registry and say what evidence settled it. IF THE INTENT IS NOT DOCUMENTED THERE, OR IF THE EVIDENCE POINTS THE OTHER WAY, FAIL CLOSED: change nothing, report what you found, and let the user decide whether vibemind-db losing research scope is intended. Encoding an unintended narrowing into the authority contract would be worse than leaving three tests red, because the contract is what later work will trust. Bounded by 0022's own check: exactly one space drifts, the other twelve match the registry - confirm that independently rather than assuming it, because a second drifting space would mean the cause is not the one attributed. Out of scope and to be reported rather than acted on: docs/contracts/openfang-mcp-authority-v1.md, whose research-space statements at and around line 92 mirror the same drift and which task-openfang-0023 has just aligned for registration status only; the requires_submodule decorator; and any workflow file, since changing which checks are required is not routine work.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["shared/contracts/", "tests/integration/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0025-research-space-contract-registry-alignment-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0024-authority-contract-source-pins-v1"],
+  "merge_position": 15
+}

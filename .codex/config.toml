@@ -1,0 +1,16 @@
+[mcp_servers.fungus-search]
+command = "cmd"
+args = [
+    "/c",
+    "cd",
+    "/d",
+    'C:\Users\User\Desktop\Vibemind_V1\vibemind-os\la-fungus-search',
+    "&&",
+    "python",
+    "mcp_server.py",
+]
+
+[mcp_servers.fungus-search.env]
+FUNGUS_CODEBASE = 'C:\Users\User\Desktop\Vibemind_V1\vibemind-os'
+FUNGUS_EMBED_MODEL = "Qwen/Qwen3-Embedding-0.6B"
+FUNGUS_DEVICE = "cuda"

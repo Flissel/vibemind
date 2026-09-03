@@ -1,0 +1,671 @@
+{
+  "contract_version": "v1",
+  "declaration_id": "research-service-tiers-v1",
+  "title": "Research service tiers, subjects, and degradation policy (draft)",
+  "status": "draft",
+  "binding": "none",
+  "notes": [
+    "Data-only declaration. It routes nothing, executes nothing, and is deliberately not registered in shared/contracts/validate.py.",
+    "Derived from decisions E11, E12, and E13 of docs/governance/architecture-decisions-2026-08-16-v1.md, which was not merged at authoring time; see the handoff for the recorded assumption.",
+    "Registry mutation is owned by task-research-0001 and must not be performed from this declaration.",
+    "2026-08-17, task-research-0003: open decision D1 is recorded as resolved by E14 and the report_persistence block was added. The migration that block names is written but NOT applied to any database; applying it is a separate user action.",
+    "2026-08-17, task-research-0003: D3 was opened. It is the sync-chain question the linked-artifact shape raises and does not itself answer.",
+    "2026-08-17, task-research-0004: no assertion of this declaration changed. Only the way its upstream references express their provenance did - every reference now names a ref id and a role, the two references that carried no anchor at all were anchored, and a verification pass was appended. No cited pin was rewritten.",
+    "2026-08-17, task-research-0006: no assertion of this declaration changed and no cited pin was rewritten. A second verification pass was appended, re-checking all twelve references at vibemind-os da2a29a and openfang ef9d73f - the pins the superproject and vibemind-os actually carry after task-git-0036 and task-git-0038. All twelve hold; every cited path is blob-identical to what the previous pass read at 731288b and 75067d8, so the only recorded change is the freshness of the check."
+  ],
+  "provenance": {
+    "authored_by_task": "task-research-0002-space-definition-contract-v1",
+    "authored_on": "2026-08-16",
+    "pin_convention": {
+      "rule": "frozen_at_observation_with_additive_re_verification",
+      "document": "docs/spaces/research/provenance-pin-convention-v1.md",
+      "decided_by_task": "task-research-0004-provenance-pin-convention-v1",
+      "pin_field": "write_once",
+      "summary": "A pin records the commit at which a claim was actually read. It is never rewritten - not by a pin lift, not by a refresh pass. A later re-reading is appended to verifications, which carries strictly more than a replaced SHA would.",
+      "roles": {
+        "observation": "A historical record of where a claim was read. It carries no standing obligation; the immutable SHA keeps it checkable forever.",
+        "binding": "A present-tense claim about what upstream currently says. The pin still records where it was read, and the reference additionally carries a standing re-verification obligation."
+      }
+    },
+    "amended_by_tasks": [
+      {
+        "task": "task-research-0003-report-artifact-migration-v1",
+        "amended_on": "2026-08-17",
+        "scope": ["report_persistence", "open_decisions.D1", "open_decisions.D3"]
+      },
+      {
+        "task": "task-research-0004-provenance-pin-convention-v1",
+        "amended_on": "2026-08-17",
+        "scope": ["provenance.pin_convention", "provenance.sources[*].ref", "provenance.sources[*].role", "provenance.verifications", "settings.*.bound_to", "context_policy.registry_evidence", "evidence_policy.precedent", "report_persistence.artifact_side"],
+        "asserts_nothing_new": true
+      },
+      {
+        "task": "task-research-0006-provenance-reverification-da2a29a-v1",
+        "amended_on": "2026-08-17",
+        "scope": ["provenance.verifications"],
+        "asserts_nothing_new": true
+      }
+    ],
+    "sources": [
+      {
+        "ref": "registry-research-block",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "c5cba961126523bed39d0d94e8fd0c982cb9cbe2",
+        "path": "config/space_agent_registry.yml",
+        "locator": "lines 162-176",
+        "used_for": "today's research events, their ad-hoc parameters, default_context"
+      },
+      {
+        "ref": "execution-target-fail-closed",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "c5cba961126523bed39d0d94e8fd0c982cb9cbe2",
+        "path": "spaces/research/execution_target.py",
+        "locator": "ResearchTarget.call",
+        "used_for": "the existing fail-closed evidence precedent"
+      },
+      {
+        "ref": "ideas-table-and-bubble",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "c5cba961126523bed39d0d94e8fd0c982cb9cbe2",
+        "path": "supabase/migrations/20260411_init_vibemind.sql",
+        "locator": "lines 11-31, 129, 156",
+        "used_for": "the ideas table and the idea-backed meaning of a bubble"
+      },
+      {
+        "ref": "hand-settings",
+        "role": "observation",
+        "repo": "Flissel/openfang",
+        "pin": "5d38662f9fa596c8f145e4f6a45a09edf4504837",
+        "path": "crates/openfang-hands/bundled/researcher/HAND.toml",
+        "locator": "settings research_depth, output_style",
+        "used_for": "the depth and output_style value sets and defaults"
+      },
+      {
+        "ref": "swe-design-artifacts",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "a9a48af05cf509009775a7d5d144e2200f827f02",
+        "path": "supabase/migrations/20260521_swe_design.sql",
+        "locator": "lines 60-105",
+        "used_for": "swe_design_artifacts, the only comparable artifact table; column, index, RLS, and realtime conventions the new migration follows",
+        "added_by_task": "task-research-0003-report-artifact-migration-v1"
+      },
+      {
+        "ref": "ideas-sync-triggers",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "a9a48af05cf509009775a7d5d144e2200f827f02",
+        "path": "supabase/migrations/20260610_ideas_sync_triggers.sql",
+        "locator": "emit_ideas_sync_event, trg_emit_ideas_sync",
+        "used_for": "the sync chain the artifact deliberately stays outside of; the trigger is bound to public.ideas alone and writes the complete row",
+        "added_by_task": "task-research-0003-report-artifact-migration-v1"
+      },
+      {
+        "ref": "ideas-sync-columns",
+        "role": "observation",
+        "repo": "Flissel/vibemind-os",
+        "pin": "a9a48af05cf509009775a7d5d144e2200f827f02",
+        "path": "supabase/migrations/20260610_ideas_sync_columns.sql",
+        "locator": "last_synced_at comment, trg_ideas_touch_updated_at",
+        "used_for": "the DB->FS markdown render that only public.ideas rows reach today",
+        "added_by_task": "task-research-0003-report-artifact-migration-v1"
+      }
+    ],
+    "verifications": [
+      {
+        "verified_by_task": "task-research-0004-provenance-pin-convention-v1",
+        "verified_on": "2026-08-17",
+        "checked_pins": {
+          "Flissel/vibemind-os": "731288b4e36ac172dfb902e22627c6f937760a3e",
+          "Flissel/openfang": "75067d8c6b375fb70fe677daf78918164caaff41"
+        },
+        "checked_pin_origin": "repo-manifest.yaml expected_gitlink_pin, matching the superproject gitlink at origin/master",
+        "method": "Per reference: blob-hash comparison of the cited path between the observed pin and the checked pin, then a direct read of the cited locator at the checked pin. No SHA in this declaration was rewritten as a result.",
+        "outcome_vocabulary": {
+          "holds": "the cited locator resolves at the checked pin and says what the reference says it says",
+          "holds_with_locator_drift": "the claim still holds, but the line range moved; the observed locator remains correct at the observed pin",
+          "diverged": "the claim no longer holds at the checked pin - a finding, not a licence to edit the assertion"
+        },
+        "references": [
+          {
+            "ref": "registry-research-block",
+            "outcome": "holds_with_locator_drift",
+            "locator_at_checked_pin": "lines 162-203",
+            "evidence": "The file moved between c5cba96 and a9a48af (blob 0dba22a -> 6eca9a2) and is unchanged from there to 731288b. All three cited claims survive: research.web and research.scrape are still the declared lookup events (lines 190-191); the ad-hoc parameters query, url, idea_id and title are all still required (lines 190, 191, 194, 199); default_context is still [current_space, current_bubble] (line 188). The block grew from 15 to 42 lines when E9/E10 rebound the write events to spaces-ideas, which is why the range moved."
+          },
+          {
+            "ref": "execution-target-fail-closed",
+            "outcome": "holds",
+            "evidence": "Blob 4460d631 at c5cba96, a9a48af and 731288b alike. ResearchTarget.call is at line 50; line 74 returns _unverified('source evidence is missing') when _urls(result) is empty, and _unverified (line 143) formats it as 'unverified research result: <reason>' with ok False."
+          },
+          {
+            "ref": "ideas-table-and-bubble",
+            "outcome": "holds",
+            "evidence": "Blob 3f461be0 at all three pins. Lines 11-26 are the ideas table (title, description, tags, metadata, parent_id self-reference, embedding_vector), 28-31 its indexes; line 129 is shuttles.bubble_id REFERENCES ideas(id), line 156 exploration_sessions.root_bubble_id REFERENCES ideas(id)."
+          },
+          {
+            "ref": "hand-settings",
+            "outcome": "holds",
+            "evidence": "Blob b2afbfca at openfang 5d38662, 3b7bdb6 and 75067d8 alike. research_depth at line 11 with default 'thorough' and options quick/thorough/exhaustive in that order; output_style at line 30 with default 'detailed' and options brief/detailed/academic/executive in that order. The six keys under settings_not_surfaced are all still present (lines 53, 60, 83, 90, 97, 120), and max_iterations 25 / heartbeat_interval_secs 120 still stand at lines 164 and 167."
+          },
+          {
+            "ref": "swe-design-artifacts",
+            "outcome": "holds",
+            "evidence": "Blob 20bf76c2 at all three pins. Line 60 opens CREATE TABLE IF NOT EXISTS swe_design_artifacts; the range ends at the realtime ALTER PUBLICATION pair on lines 104-105, so 60-105 still spans exactly the table, its indexes, its RLS policy and its realtime registration."
+          },
+          {
+            "ref": "ideas-sync-triggers",
+            "outcome": "holds",
+            "evidence": "Blob bd86db52 at all three pins. emit_ideas_sync_event is defined at line 48 and writes to_jsonb(NEW) (line 68) into public.ideas_sync_outbox (line 75); trg_emit_ideas_sync is created at lines 86-89 on public.ideas alone."
+          },
+          {
+            "ref": "ideas-sync-columns",
+            "outcome": "holds",
+            "evidence": "Blob 7f736bc2 at all three pins. last_synced_at is added at line 26 and commented at lines 52-54 as the DB->FS markdown render into ~/.rowboat/knowledge/Projects/; trg_ideas_touch_updated_at is created at lines 44-45."
+          },
+          {
+            "ref": "hand-depth-binding",
+            "outcome": "holds",
+            "evidence": "Same blob and same lines as hand-settings. The closed set and its order are what settings.depth.invention_policy binds to, and they are unchanged at 75067d8."
+          },
+          {
+            "ref": "hand-output-style-binding",
+            "outcome": "holds",
+            "evidence": "Same blob and same lines as hand-settings. The closed set and its order are what settings.output_style.invention_policy binds to, and they are unchanged at 75067d8."
+          },
+          {
+            "ref": "evidence-precedent",
+            "outcome": "holds",
+            "evidence": "Same blob and lines as execution-target-fail-closed. The behaviour recorded in evidence_policy.precedent matches the source verbatim at 731288b."
+          },
+          {
+            "ref": "registry-default-context",
+            "outcome": "holds",
+            "evidence": "First anchored by this pass. research.default_context reads [current_space, current_bubble] at c5cba96 line 169 and at 731288b line 188, so the recorded value is correct at both. Before this pass the reference named a path and a value with no commit at all, which made it the one live claim here that nothing could have checked."
+          },
+          {
+            "ref": "report-artifact-migration",
+            "outcome": "holds",
+            "evidence": "First anchored by this pass, and only anchorable now. The file did not exist at c5cba96 or a9a48af; it entered vibemind-os in 3be78f6 and is first reachable from a pinned commit at 731288b. tests/contracts/research/test_research_report_artifact_migration_v1.py reads it from whatever checkout is present, so this reference is re-verified on every test run rather than only by a pass like this one."
+          }
+        ]
+      },
+      {
+        "verified_by_task": "task-research-0006-provenance-reverification-da2a29a-v1",
+        "verified_on": "2026-08-17",
+        "checked_pins": {
+          "Flissel/vibemind-os": "da2a29aa6a0630ed96c5b4d9bd7dd324424a3aa1",
+          "Flissel/openfang": "ef9d73f51bd0a1bc65525233bd3ad9ca49c84259"
+        },
+        "checked_pin_origin": "repo-manifest.yaml expected_gitlink_pin, each confirmed against the gitlink it declares: da2a29a is the superproject's gitlink for vibemind-os at origin/master, and ef9d73f is vibemind-os's own gitlink for openfang at da2a29a. openfang is a nested submodule, so its manifest entry is checked one level down rather than at the superproject.",
+        "method": "Per reference: blob-hash comparison of the cited path between the observed pin and the checked pin, then a direct read of the cited locator at the checked pin. No SHA in this declaration was rewritten as a result.",
+        "outcome_vocabulary": {
+          "holds": "the cited locator resolves at the checked pin and says what the reference says it says",
+          "holds_with_locator_drift": "the claim still holds, but the line range moved; the observed locator remains correct at the observed pin",
+          "diverged": "the claim no longer holds at the checked pin - a finding, not a licence to edit the assertion"
+        },
+        "references": [
+          {
+            "ref": "registry-research-block",
+            "outcome": "holds_with_locator_drift",
+            "locator_at_checked_pin": "lines 162-203",
+            "evidence": "Blob 6eca9a2 at a9a48af, 731288b and da2a29a alike, so the file has not moved since the previous pass; the drift remains the single c5cba96 -> a9a48af change (0dba22a -> 6eca9a2) that task-research-0004 recorded, and the drifted locator is unchanged at 162-203. Re-read at da2a29a: the research block opens at line 162 and ends at openclaw.compare on line 203, with the rowboat block opening at 205. All three cited claims still stand: research.web and research.scrape are the declared lookup events (lines 190-191); the ad-hoc parameters query, url, idea_id and title are all still required (lines 190, 191, 194, 199); default_context is still [current_space, current_bubble] (line 188)."
+          },
+          {
+            "ref": "execution-target-fail-closed",
+            "outcome": "holds",
+            "evidence": "Blob 4460d631 at c5cba96, a9a48af, 731288b and da2a29a alike - byte-identical to the observation pin across both intervening pin chains. Re-read at da2a29a: class ResearchTarget is declared at line 35 and call at line 50; line 72 collects sources = _urls(result) and line 74 returns _unverified('source evidence is missing') when that is empty; _unverified is defined at line 143 and returns at line 144 with ok False and error 'unverified research result: <reason>'."
+          },
+          {
+            "ref": "ideas-table-and-bubble",
+            "outcome": "holds",
+            "evidence": "Blob 3f461be0 at all four pins. Re-read at da2a29a: lines 11-26 are the ideas table (title 13, description 14, tags 20, metadata 21, parent_id self-reference 23, embedding_vector 24) and 28-31 its four indexes; line 129 is shuttles.bubble_id TEXT NOT NULL REFERENCES ideas(id) ON DELETE CASCADE inside the shuttles table opened at 126, and line 156 is exploration_sessions.root_bubble_id REFERENCES ideas(id) inside the table opened at 154. The idea-backed meaning of a bubble is unchanged."
+          },
+          {
+            "ref": "hand-settings",
+            "outcome": "holds",
+            "evidence": "Blob b2afbfca at openfang 5d38662, 75067d8 and ef9d73f alike - byte-identical to the observation pin. Re-read at ef9d73f: research_depth at line 11 with default 'thorough' (line 15) and options quick/thorough/exhaustive at lines 18, 22, 26 in that order; output_style at line 30 with default 'detailed' (line 34) and options brief/detailed/academic/executive at lines 37, 41, 45, 49 in that order. The six keys under settings_not_surfaced are all still present (lines 53, 60, 83, 90, 97, 120), and max_iterations 25 / heartbeat_interval_secs 120 still stand at lines 164 and 167."
+          },
+          {
+            "ref": "swe-design-artifacts",
+            "outcome": "holds",
+            "evidence": "Blob 20bf76c2 at all four pins. Re-read at da2a29a: line 60 opens CREATE TABLE IF NOT EXISTS swe_design_artifacts, which closes at 82; its indexes are at 84-85; RLS is enabled at 91 with the allow-all policy at 97-99; and the range ends at the realtime ALTER PUBLICATION pair on lines 104-105. So 60-105 still spans exactly the table, its indexes, its RLS policy and its realtime registration."
+          },
+          {
+            "ref": "ideas-sync-triggers",
+            "outcome": "holds",
+            "evidence": "Blob bd86db52 at all four pins. Re-read at da2a29a: emit_ideas_sync_event is defined at line 48 and writes to_jsonb(NEW) (line 68) into public.ideas_sync_outbox (line 75); trg_emit_ideas_sync is created at lines 86-89 AFTER INSERT OR UPDATE OR DELETE ON public.ideas alone. The trigger is still bound to public.ideas and to nothing else, which is the fact report_persistence.sync_chain rests on."
+          },
+          {
+            "ref": "ideas-sync-columns",
+            "outcome": "holds",
+            "evidence": "Blob 7f736bc2 at all four pins. Re-read at da2a29a: last_synced_at is added at line 26 and commented at lines 52-54 as the DB->FS markdown render into ~/.rowboat/knowledge/Projects/, with NULL meaning never rendered; trg_ideas_touch_updated_at is created at lines 44-45."
+          },
+          {
+            "ref": "hand-depth-binding",
+            "outcome": "holds",
+            "evidence": "Same blob b2afbfca and same lines as hand-settings at ef9d73f. research_depth still declares exactly quick, thorough and exhaustive in that order (lines 18, 22, 26) with default 'thorough' (line 15). That closed set and its order are what settings.depth.invention_policy binds to, and neither has changed at the new checked pin."
+          },
+          {
+            "ref": "hand-output-style-binding",
+            "outcome": "holds",
+            "evidence": "Same blob b2afbfca and same lines as hand-settings at ef9d73f. output_style still declares exactly brief, detailed, academic and executive in that order (lines 37, 41, 45, 49) with default 'detailed' (line 34). That closed set and its order are what settings.output_style.invention_policy binds to, and neither has changed at the new checked pin."
+          },
+          {
+            "ref": "evidence-precedent",
+            "outcome": "holds",
+            "evidence": "Same blob 4460d631 and same lines as execution-target-fail-closed at da2a29a. The behaviour recorded in evidence_policy.precedent - ok=false with 'unverified research result: source evidence is missing' when no source URL is present - matches the source verbatim at lines 74 and 143-144, so the present-tense 'already refuses' claim still holds at the checked pin."
+          },
+          {
+            "ref": "registry-default-context",
+            "outcome": "holds",
+            "evidence": "Same blob 6eca9a2 as registry-research-block at da2a29a. research.default_context reads [current_space, current_bubble] at line 188, so the value recorded in context_policy.registry_evidence is still correct at the checked pin. This reference's locator is symbolic rather than a line range, so the block's growth does not drift it; it is recorded as holds while registry-research-block, which cites lines, is recorded as drift."
+          },
+          {
+            "ref": "report-artifact-migration",
+            "outcome": "holds",
+            "evidence": "Blob da9f7bf6 at 731288b and da2a29a alike - unchanged since the observation pin, which is the first pinned commit at which this file exists. Re-read at da2a29a: public.research_report_artifacts is created at line 62; artifact_ref is declared at 69, made UNIQUE at 133 and constrained to the artifact_v1_<ULID> grammar at 139-140; idea_id cascades and bubble_id sets null at 88-89; the citation_count >= 1 guard is at 153-154 and the context-disclosure guard at 157-158. The migration still creates no trigger on the new table, so the D3-neutral sync-chain claim stands."
+          }
+        ]
+      },
+      {
+        "verified_by_task": "task-research-0007-provenance-reverification-760da81-v1",
+        "verified_on": "2026-08-18",
+        "checked_pins": {
+          "Flissel/vibemind-os": "760da8105c1cdca407dc5904b6e1e0e42af4d265",
+          "Flissel/openfang": "ef9d73f51bd0a1bc65525233bd3ad9ca49c84259"
+        },
+        "checked_pin_origin": "repo-manifest.yaml expected_gitlink_pin, each confirmed against the gitlink it declares rather than taken from the manifest on trust: 760da81 is the superproject's gitlink for vibemind-os at origin/master d96ec35 (git ls-files --stage vibemind-os), and ef9d73f is vibemind-os's own gitlink for openfang, read with git ls-tree at both da2a29a and 760da81 and identical at each. openfang is a nested submodule, so its manifest entry is checked one level down rather than at the superproject. Only vibemind-os advanced this pass; the openfang checked pin is the same one task-research-0006 checked, so its three references are re-read at an unmoved pin.",
+        "method": "Per reference: blob-hash comparison of the cited path between the observed pin and the checked pin, then a direct read of the cited locator at the checked pin. No SHA in this declaration was rewritten as a result.",
+        "outcome_vocabulary": {
+          "holds": "the cited locator resolves at the checked pin and says what the reference says it says",
+          "holds_with_locator_drift": "the claim still holds, but the line range moved; the observed locator remains correct at the observed pin",
+          "diverged": "the claim no longer holds at the checked pin - a finding, not a licence to edit the assertion"
+        },
+        "references": [
+          {
+            "ref": "registry-research-block",
+            "outcome": "holds_with_locator_drift",
+            "locator_at_checked_pin": "lines 162-203",
+            "evidence": "The one cited file the da2a29a..760da81 interval touched: blob 6eca9a23 at a9a48af, 731288b and da2a29a alike, then c02f60eb at 760da81. The change does not reach this reference. First divergent line between da2a29a and 760da81 is 290; lines 1-286 are byte-identical at both ends (sha256 61ac7203a1b7f33a), and the cited range 162-203 is byte-identical at a9a48af, da2a29a and 760da81 alike (sha256 4d80d7db092b23f3). The whole edit is the agentfarm block below, which shrank the file 372 -> 370 lines entirely beneath the research block. So the drift recorded here is NOT new: it is still the single c5cba96 -> a9a48af widening from lines 162-176 to 162-203 that task-research-0004 first recorded, carried forward unchanged. Re-read at 760da81: the research block opens at line 162 and ends at openclaw.compare on line 203, with the rowboat header at 205. All three cited claims still stand: research.web and research.scrape are the declared lookup events (lines 190-191); the ad-hoc parameters query, url, idea_id and title are all still required (lines 190, 191, 194, 199); default_context is still [current_space, current_bubble] (line 188)."
+          },
+          {
+            "ref": "execution-target-fail-closed",
+            "outcome": "holds",
+            "evidence": "Blob 4460d631 at c5cba96, a9a48af, 731288b, da2a29a and 760da81 alike - byte-identical to the observation pin across all three intervening pin chains. Re-read at 760da81: class ResearchTarget is declared at line 35 and call at line 50; line 72 collects sources = _urls(result) and line 74 returns _unverified('source evidence is missing') when that is empty; _unverified is defined at line 143 and returns at line 144 with ok False and error 'unverified research result: <reason>'."
+          },
+          {
+            "ref": "ideas-table-and-bubble",
+            "outcome": "holds",
+            "evidence": "Blob 3f461be0 at all five pins. Re-read at 760da81: lines 11-26 are the ideas table (title 13, description 14, tags 20, metadata 21, parent_id self-reference 23, embedding_vector 24) and 28-31 its four indexes; line 129 is shuttles.bubble_id TEXT NOT NULL REFERENCES ideas(id) ON DELETE CASCADE inside the shuttles table opened at 126, and line 156 is exploration_sessions.root_bubble_id REFERENCES ideas(id) inside the table opened at 154. The idea-backed meaning of a bubble is unchanged."
+          },
+          {
+            "ref": "hand-settings",
+            "outcome": "holds",
+            "evidence": "Blob b2afbfca at openfang 5d38662, 75067d8 and ef9d73f alike - byte-identical to the observation pin. The openfang gitlink did not move this pass (ef9d73f at both da2a29a and 760da81), so this is a re-read at an unmoved checked pin, not a new interval. Re-read at ef9d73f: research_depth at line 11 with default 'thorough' (line 15) and options quick/thorough/exhaustive at lines 18, 22, 26 in that order; output_style at line 30 with default 'detailed' (line 34) and options brief/detailed/academic/executive at lines 37, 41, 45, 49 in that order. The six keys under settings_not_surfaced are all still present (lines 53, 60, 83, 90, 97, 120), and max_iterations 25 / heartbeat_interval_secs 120 still stand at lines 164 and 167."
+          },
+          {
+            "ref": "swe-design-artifacts",
+            "outcome": "holds",
+            "evidence": "Blob 20bf76c2 at all five pins. Re-read at 760da81: line 60 opens CREATE TABLE IF NOT EXISTS swe_design_artifacts, which closes at 82; its indexes are at 84-85; RLS is enabled at 91 with the allow-all policy at 97-99; and the range ends at the realtime ALTER PUBLICATION pair on lines 104-105. So 60-105 still spans exactly the table, its indexes, its RLS policy and its realtime registration."
+          },
+          {
+            "ref": "ideas-sync-triggers",
+            "outcome": "holds",
+            "evidence": "Blob bd86db52 at all five pins. Re-read at 760da81: emit_ideas_sync_event is defined at line 48 and writes to_jsonb(NEW) (line 68) into public.ideas_sync_outbox (line 75); trg_emit_ideas_sync is created at lines 86-89 AFTER INSERT OR UPDATE OR DELETE ON public.ideas alone. The trigger is still bound to public.ideas and to nothing else, which is the fact report_persistence.sync_chain rests on."
+          },
+          {
+            "ref": "ideas-sync-columns",
+            "outcome": "holds",
+            "evidence": "Blob 7f736bc2 at all five pins. Re-read at 760da81: last_synced_at is added at line 26 and commented at lines 52-54 as the DB->FS markdown render into ~/.rowboat/knowledge/Projects/, with NULL meaning never rendered; trg_ideas_touch_updated_at is created at lines 44-45."
+          },
+          {
+            "ref": "hand-depth-binding",
+            "outcome": "holds",
+            "evidence": "Same blob b2afbfca and same lines as hand-settings at ef9d73f, which is the same openfang pin the previous pass checked. research_depth still declares exactly quick, thorough and exhaustive in that order (lines 18, 22, 26) with default 'thorough' (line 15). That closed set and its order are what settings.depth.invention_policy binds to, and neither has changed at the checked pin."
+          },
+          {
+            "ref": "hand-output-style-binding",
+            "outcome": "holds",
+            "evidence": "Same blob b2afbfca and same lines as hand-settings at ef9d73f, which is the same openfang pin the previous pass checked. output_style still declares exactly brief, detailed, academic and executive in that order (lines 37, 41, 45, 49) with default 'detailed' (line 34). That closed set and its order are what settings.output_style.invention_policy binds to, and neither has changed at the checked pin."
+          },
+          {
+            "ref": "registry-default-context",
+            "outcome": "holds",
+            "evidence": "Same blob c02f60eb as registry-research-block at 760da81, so this reference sits in the one cited file that changed this interval - and is unaffected by the change. research.default_context reads [current_space, current_bubble] at line 188, inside the byte-identical 1-286 region, so the value recorded in context_policy.registry_evidence is still correct at the checked pin. This reference's locator is symbolic rather than a line range, so neither the block's earlier growth nor this interval's two-line shrink drifts it; it is recorded as holds while registry-research-block, which cites lines, carries the drift."
+          },
+          {
+            "ref": "evidence-precedent",
+            "outcome": "holds",
+            "evidence": "Same blob 4460d631 and same lines as execution-target-fail-closed at 760da81. The behaviour recorded in evidence_policy.precedent - ok=false with 'unverified research result: source evidence is missing' when no source URL is present - matches the source verbatim at lines 74 and 143-144, so the present-tense 'already refuses' claim still holds at the checked pin."
+          },
+          {
+            "ref": "report-artifact-migration",
+            "outcome": "holds",
+            "evidence": "Blob da9f7bf6 at 731288b, da2a29a and 760da81 alike - unchanged since the observation pin, which is the first pinned commit at which this file exists. Re-read at 760da81: public.research_report_artifacts is created at line 62; artifact_ref is declared at 69, made UNIQUE at 133 and constrained to the artifact_v1_<ULID> grammar at 139-140; idea_id cascades and bubble_id sets null at 88-89; the citation_count >= 1 guard is at 153-154 and the context-disclosure guard at 157-158. The migration still creates no trigger on the new table, so the D3-neutral sync-chain claim stands."
+          }
+        ]
+      }
+    ]
+  },
+
+  "supersedes_legacy_params": ["query", "title", "idea_id"],
+
+  "tiers": {
+    "lookup": {
+      "summary": "One synchronous tool call that answers now and keeps nothing.",
+      "execution_form": "synchronous_tool_call",
+      "job_identity": false,
+      "persistence": "none",
+      "carrier": {
+        "kind": "registry_event_to_mcp_tool",
+        "agent": "brain-researcher"
+      },
+      "today_events": ["research.web", "research.scrape"],
+      "settings": [],
+      "evidence_requirement": "at_least_one_source_url",
+      "bounded_by": "the caller's request/response turn"
+    },
+    "deep_research": {
+      "summary": "A long-running autonomous investigation that produces a cited report.",
+      "execution_form": "asynchronous_job",
+      "job_identity": true,
+      "persistence": "report_artifact",
+      "carrier": {
+        "kind": "openfang_bundled_hand",
+        "hand_id": "researcher"
+      },
+      "today_events": [],
+      "settings": ["depth", "output_style"],
+      "evidence_requirement": "at_least_one_citation_with_source_url",
+      "bounded_by": "the job lifecycle, not the caller's turn"
+    }
+  },
+
+  "tier_separation_rationale": {
+    "claim": "A synchronous tool call and a long-running autonomous job are incompatible execution forms and cannot share one service grade.",
+    "grounds": [
+      "A synchronous call must return inside the caller's turn; the Hand declares max_iterations 25 and a 120s heartbeat because its calls routinely outlive one turn.",
+      "A synchronous call has no identity to ask about afterwards; a job needs an addressable id for status, result, and cancellation.",
+      "A synchronous call keeps nothing; a deep run produces a report artifact that must live somewhere and be referenced.",
+      "depth and output_style are meaningless for a single fetch: there is no multi-pass budget to spend and no report to format."
+    ]
+  },
+
+  "settings": {
+    "depth": {
+      "bound_to": {
+        "ref": "hand-depth-binding",
+        "role": "binding",
+        "repo": "Flissel/openfang",
+        "pin": "5d38662f9fa596c8f145e4f6a45a09edf4504837",
+        "path": "crates/openfang-hands/bundled/researcher/HAND.toml",
+        "setting_key": "research_depth"
+      },
+      "values": ["quick", "thorough", "exhaustive"],
+      "default": "thorough",
+      "applies_to_tiers": ["deep_research"],
+      "value_semantics": {
+        "quick": "5-10 sources, 1 pass",
+        "thorough": "20-30 sources, cross-referenced",
+        "exhaustive": "50+ sources, multi-pass, fact-checked"
+      },
+      "invention_policy": "closed set; no step may be added, renamed, or reordered without changing the Hand first"
+    },
+    "output_style": {
+      "bound_to": {
+        "ref": "hand-output-style-binding",
+        "role": "binding",
+        "repo": "Flissel/openfang",
+        "pin": "5d38662f9fa596c8f145e4f6a45a09edf4504837",
+        "path": "crates/openfang-hands/bundled/researcher/HAND.toml",
+        "setting_key": "output_style"
+      },
+      "values": ["brief", "detailed", "academic", "executive"],
+      "default": "detailed",
+      "applies_to_tiers": ["deep_research"],
+      "value_semantics": {
+        "brief": "executive summary, 1-2 pages",
+        "detailed": "structured report, 5-10 pages",
+        "academic": "formal paper style with citations",
+        "executive": "key findings + recommendations"
+      },
+      "invention_policy": "closed set; no style may be added, renamed, or reordered without changing the Hand first"
+    }
+  },
+
+  "settings_not_surfaced": {
+    "rationale": "The Hand declares further settings. They stay Hand-side configuration and are deliberately not lifted into this contract, because E11 named depth and output_style only.",
+    "keys": [
+      "source_verification",
+      "max_sources",
+      "auto_follow_up",
+      "save_research_log",
+      "citation_style",
+      "language"
+    ]
+  },
+
+  "subjects": {
+    "topic": {
+      "kind": "free_text",
+      "required_fields": ["text"],
+      "question_source": ["text"],
+      "result_disposition": "returned_to_caller",
+      "replaces": ["query"],
+      "applies_to_tiers": ["lookup", "deep_research"]
+    },
+    "idea": {
+      "kind": "reference",
+      "required_fields": ["idea_id"],
+      "question_source": ["title", "description"],
+      "result_disposition": "enriches_subject_idea",
+      "replaces": ["idea_id", "title"],
+      "applies_to_tiers": ["lookup", "deep_research"],
+      "backing_record": "ideas"
+    },
+    "bubble": {
+      "kind": "reference",
+      "required_fields": ["bubble_id"],
+      "question_source": ["member_ideas"],
+      "member_resolution": "ideas.parent_id",
+      "result_disposition": "open_decision:D2",
+      "replaces": [],
+      "applies_to_tiers": ["deep_research"],
+      "backing_record": "ideas"
+    }
+  },
+
+  "proposed_events": {
+    "registration_status": "not_registered",
+    "registry_owner_task": "task-research-0001",
+    "style_precedents": [
+      "mirofish.status keys on job_id",
+      "agentfarm.run starts and agentfarm.results reads back, both keyed on run_id",
+      "code.status carries no parameters"
+    ],
+    "lookup": {
+      "research.web": {
+        "required_params": ["subject_type", "subject_ref"],
+        "result_delivery": "inline",
+        "today_required_params": ["query"],
+        "change": "parameter rename only; behaviour unchanged"
+      },
+      "research.scrape": {
+        "required_params": ["locator"],
+        "result_delivery": "inline",
+        "today_required_params": ["url"],
+        "change": "parameter rename only; behaviour unchanged"
+      }
+    },
+    "deep_research": {
+      "research.deep.start": {
+        "required_params": ["subject_type", "subject_ref"],
+        "optional_params": ["depth", "output_style"],
+        "result_delivery": "job_reference",
+        "returns": ["job_id"]
+      },
+      "research.deep.status": {
+        "required_params": ["job_id"],
+        "result_delivery": "inline",
+        "returns": ["status"]
+      },
+      "research.deep.result": {
+        "required_params": ["job_id"],
+        "result_delivery": "inline",
+        "returns": ["report_ref", "citations", "context_disclosure"]
+      },
+      "research.deep.cancel": {
+        "required_params": ["job_id"],
+        "result_delivery": "inline",
+        "returns": ["status"]
+      }
+    },
+    "lifecycle_alignment": {
+      "reuses": "ResearchJobV1",
+      "path": "shared/contracts/research/v1/research-job-v1.schema.json",
+      "note": "The proposed status values are the ones ResearchJobV1 already allows; this draft introduces no new lifecycle."
+    }
+  },
+
+  "context_policy": {
+    "decision_ref": "E12",
+    "internal_context_source": "rowboat",
+    "mode": "fail_open",
+    "on_unavailable": "continue_web_only",
+    "disclosure_required": true,
+    "disclosure_target": "report",
+    "silent_degradation": "forbidden",
+    "triggers": [
+      "the internal context is absent for the subject",
+      "Rowboat is unreachable",
+      "Rowboat answers but returns nothing for the subject"
+    ],
+    "rationale": "Internal context makes a report better, not true. Losing it must degrade the run, not fail it — but a reader who cannot tell that internal context was missing would over-trust the report, so the omission is stated in the report itself.",
+    "registry_evidence": {
+      "ref": "registry-default-context",
+      "role": "binding",
+      "repo": "Flissel/vibemind-os",
+      "pin": "c5cba961126523bed39d0d94e8fd0c982cb9cbe2",
+      "path": "config/space_agent_registry.yml",
+      "locator": "research.default_context",
+      "value": ["current_space", "current_bubble"]
+    }
+  },
+
+  "evidence_policy": {
+    "decision_ref": "E12",
+    "mode": "fail_closed",
+    "requirement": "at_least_one_citation_with_source_url",
+    "on_violation": "run_marked_failed",
+    "prose_without_source": "rejected",
+    "rationale": "A report without citations is indistinguishable from the model answering from memory, which is the exact failure the existing execution target already refuses to pass off as research.",
+    "precedent": {
+      "ref": "evidence-precedent",
+      "role": "binding",
+      "repo": "Flissel/vibemind-os",
+      "pin": "c5cba961126523bed39d0d94e8fd0c982cb9cbe2",
+      "path": "spaces/research/execution_target.py",
+      "symbol": "ResearchTarget.call",
+      "behaviour": "returns ok=false with 'unverified research result: source evidence is missing' when no source URL is present"
+    }
+  },
+
+  "report_persistence": {
+    "decision_ref": "E14",
+    "resolves": "D1",
+    "shape": "short_idea_plus_linked_artifact",
+    "state": "written_not_applied",
+    "authored_by_task": "task-research-0003-report-artifact-migration-v1",
+    "idea_side": {
+      "record": "ideas",
+      "field": "description",
+      "content": "summary",
+      "max_length": 4000,
+      "bound_to_contract": "ResearchIdeaHandoffV1.idea_summary",
+      "migration_required": false,
+      "rationale": "The merged contract family already caps the idea-facing text at 4000 characters and keeps the report itself behind ResearchResultV1.artifact_refs. The idea side needs no schema change at all."
+    },
+    "artifact_side": {
+      "record": "research_report_artifacts",
+      "ref": "report-artifact-migration",
+      "role": "binding",
+      "repo": "Flissel/vibemind-os",
+      "pin": "731288b4e36ac172dfb902e22627c6f937760a3e",
+      "pin_note": "The first pinned commit at which this file exists. It was absent at c5cba96 and a9a48af, so this reference could not be anchored before the n8n pin chain landed; it is anchored at its first observation, not refreshed from an earlier one.",
+      "migration": "supabase/migrations/20260817_research_report_artifacts.sql",
+      "applied": false,
+      "write_once": true,
+      "re_run_semantics": "a second run on the same subject inserts a new row; rows are never updated in place",
+      "join_key": "artifact_ref",
+      "join_source": "ResearchResultV1.artifact_refs",
+      "id_grammar": "artifact_v1_<ULID>",
+      "fail_closed_storage_guards": [
+        "citation_count >= 1, so an uncited report cannot be stored at all",
+        "a report written without internal context must carry a disclosure text"
+      ],
+      "d2_neutral": "The row carries both idea_id and bubble_id, so a single cluster report and a per-member report are both storable without a further migration. D2 stays open."
+    },
+    "link_direction": {
+      "value": "artifact_references_idea",
+      "foreign_key_side": "research_report_artifacts",
+      "ideas_columns_added": 0,
+      "consequence": "public.ideas is untouched, so to_jsonb(NEW) in emit_ideas_sync_event keeps its present shape and the ideas sync workers need no change."
+    },
+    "pointer": {
+      "record": "ideas",
+      "field": "metadata.research_artifact_refs",
+      "content": "a list of artifact_ref values",
+      "migration_required": false,
+      "rationale": "ideas.metadata is an existing JSONB column. Carrying a list of 38-character ids there costs the sync outbox almost nothing, unlike carrying a report-sized body, and it is what lets the Rowboat-rendered idea markdown name the report it summarises.",
+      "status": "proposed"
+    },
+    "on_idea_delete": {
+      "idea_id": "cascade",
+      "bubble_id": "set_null",
+      "rationale": "Matches swe_design_artifacts, which cascades its artifacts from the owning run, and bounds the dangling-reference risk that the linked-artifact shape otherwise carries."
+    },
+    "sync_chain": {
+      "attached": false,
+      "emits_into_ideas_outbox": false,
+      "grounds": "trg_emit_ideas_sync is bound to public.ideas alone, so an insert into research_report_artifacts emits nothing. No trigger on the new table is created by the migration.",
+      "what_still_reaches_rowboat": "the idea summary and the pointer, through the existing DB->FS markdown render",
+      "what_does_not": "the full report body",
+      "open_decision": "D3"
+    }
+  },
+
+  "open_decisions": {
+    "D1": {
+      "question": "Where does a Deep Research report physically live?",
+      "resolved": true,
+      "resolution": "short_idea_plus_linked_artifact",
+      "decided_by": "user",
+      "decision_ref": "E14",
+      "decision_record_status": "pending_governance_entry",
+      "decision_record_note": "E14 is cited by the task brief as a user decision but is not present in docs/governance/architecture-decisions-2026-08-16-v1.md, whose E-series ends at E13. Recording it there is the orchestrator's to do; task-research-0003 holds no authority in docs/governance/ and did not write to it.",
+      "options": ["long_body_in_idea", "short_idea_plus_linked_artifact"],
+      "document": "docs/spaces/research/deep-research-open-decisions-v1.md"
+    },
+    "D2": {
+      "question": "Does a bubble subject produce one report over the cluster or one report per member idea?",
+      "resolved": false,
+      "decided_by": "user",
+      "options": ["single_cluster_report", "report_per_member_idea"],
+      "document": "docs/spaces/research/deep-research-open-decisions-v1.md"
+    },
+    "D3": {
+      "question": "Does the report artifact join the ideas sync chain, or stay outside it?",
+      "resolved": false,
+      "decided_by": "user",
+      "options": ["outside_the_sync_chain", "own_outbox_and_worker", "reuse_the_ideas_outbox"],
+      "recommended_option": "outside_the_sync_chain",
+      "raised_by_task": "task-research-0003-report-artifact-migration-v1",
+      "document": "docs/spaces/research/deep-research-open-decisions-v1.md",
+      "consequence_for_e12": "Rowboat is the internal reference source for a later run. A report that never reaches Rowboat's knowledge base cannot answer 'what do we already know?' the next time. Under the recommended option the idea summary and the artifact pointer do reach it; the report body does not."
+    }
+  }
+}

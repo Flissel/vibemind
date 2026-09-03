@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "membership_source": "docs/governance/session-portfolio-registry-v1.json",
+  "scope": "static-declarative-planning-only",
+  "nonclaims": [
+    "not-a-task-request-or-approval",
+    "does-not-prove-cockpit-activation-interactivity-or-approval",
+    "does-not-prove-admission-execution-handoff-pr-merge-runtime-or-golden-path"
+  ],
+  "rows": [
+    {
+      "cockpit_session_id": "cockpit-brain",
+      "row_type": "planning-gap",
+      "reason": "no new bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-openfang",
+      "row_type": "task-proposal",
+      "task_id": "task-openfang-0007-embedding-dimensions-contract-v1",
+      "objective": "Define the OpenFang embedding dimensions contract.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before a live dimensions change"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-shared",
+      "row_type": "task-proposal",
+      "task_id": "task-shared-0007-openfang-only-provider-policy-v1",
+      "objective": "Enforce the OpenFang-only shared provider policy.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific breaking-contract authority is required before a fail-closed provider-policy change"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-breaking-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-git",
+      "row_type": "planning-gap",
+      "reason": "no bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-deployment",
+      "row_type": "planning-gap",
+      "reason": "no bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-integration",
+      "row_type": "task-proposal",
+      "task_id": "task-integration-0005-openfang-mcp-authority-v1",
+      "objective": "Define and validate durable OpenFang MCP server identity, agent scope, tool allowlists, and registration authority.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before live registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-observability",
+      "row_type": "planning-gap",
+      "reason": "no bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-channels",
+      "row_type": "planning-gap",
+      "reason": "no bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-ideas",
+      "row_type": "task-proposal",
+      "task_id": "task-ideas-0004-openfang-edge-runtime-admission-v1",
+      "objective": "Register and allowlist the merged spaces-ideas idea_connect tool for brain-ideas, then prove one live ID-only Brain-to-OpenFang-to-MCP-to-Supabase edge round trip with independent truth readback.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "live brain-ideas registration and the spaces-ideas MCP server allowlist are not evidenced",
+        "runtime OpenFang and Supabase credentials plus Proxmox reachability are unverified",
+        "request-specific runtime authority is required before registration or activation",
+        "request-specific data authority is required before a live edge mutation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority",
+          "request-specific-data-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-bubbles",
+      "row_type": "task-proposal",
+      "task_id": "task-bubbles-0007-promote-id-cutover-v1",
+      "objective": "Cut Brain bubble promotion over to the MCP tool using durable bubble_id and remove legacy title resolution.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "request-specific breaking-contract authority is required before replacing legacy bubble-name or title input with durable bubble_id",
+        "request-specific runtime authority is required before live OpenFang MCP registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-breaking-authority",
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-coding",
+      "row_type": "task-proposal",
+      "task_id": "task-coding-0002-openfang-codegen-admission-v1",
+      "objective": "Admit code generation through the canonical OpenFang agent.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before live agent-scope activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-desktop",
+      "row_type": "task-proposal",
+      "task_id": "task-desktop-0002-canonical-openfang-screenshot-v1",
+      "objective": "Route canonical screenshots through the OpenFang desktop agent.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before live desktop-agent activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-research",
+      "row_type": "planning-gap",
+      "reason": "no new bounded next implementation task is evidenced",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-n8n",
+      "row_type": "task-proposal",
+      "task_id": "task-n8n-0003-openfang-mcp-hub-cutover-v1",
+      "objective": "Cut n8n deterministic operations over to the OpenFang MCP hub.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before a live MCP-hub cutover"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-agentfarm",
+      "row_type": "task-proposal",
+      "task_id": "task-agentfarm-0008-openfang-llm-role-reservation-v1",
+      "objective": "Bind the existing space_agentfarm LLM role declaratively to the reserved brain-agentfarm OpenFang identity while the Space remains disabled and no agent, Bridge, or runtime state is changed.",
+      "task_dependencies": [],
+      "external_blockers": [],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "standing-autonomy-eligible"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-schedule",
+      "row_type": "task-proposal",
+      "task_id": "task-schedule-0004-vibemind-status-mcp-adapter-v1",
+      "objective": "Define a read-only VibeMind ScheduleRepository status MCP adapter with optional task_id, stable task-or-counts result, and independent Brain readback validator.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific runtime authority is required before live MCP registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-rowboat",
+      "row_type": "task-proposal",
+      "task_id": "task-rowboat-0004-openfang-status-runtime-admission-v1",
+      "objective": "Admit the merged Rowboat status MCP tool to the canonical OpenFang agent with an explicit tool allowlist.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "request-specific runtime authority is required before live OpenFang Rowboat tool admission"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-minibook",
+      "row_type": "task-proposal",
+      "task_id": "task-minibook-0003-openfang-status-runtime-admission-v1",
+      "objective": "Align the Minibook bridge identity to brain-knowledge and admit the status MCP tool to its canonical OpenFang agent.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "the bridge mapping still targets brain-writer instead of canonical brain-knowledge",
+        "request-specific runtime authority is required before live OpenFang MCP registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-video",
+      "row_type": "task-proposal",
+      "task_id": "task-video-0003-status-mcp-cutover-v1",
+      "objective": "Split provider and durable-job status intents, add independent Brain truth readbacks, and cut Video status routing to the spaces-video MCP tool.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "the current video.status capability mixes provider availability and durable job status",
+        "the bridge mapping still targets vibemind instead of canonical brain-video",
+        "a shared versioned read-only Video job store between Brain and OpenFang is not evidenced",
+        "request-specific runtime authority is required before live OpenFang MCP registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-breaking-authority",
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-flowzen",
+      "row_type": "task-proposal",
+      "task_id": "task-flowzen-0003-status-mcp-cutover-v1",
+      "objective": "Add an independent Brain Flowzen-status truth observer, normalize the MCP result envelope, align the bridge identity to brain-wellness, and cut rose.status routing to the spaces-flowzen MCP tool.",
+      "task_dependencies": [
+        "task-integration-0005-openfang-mcp-authority-v1"
+      ],
+      "external_blockers": [
+        "the current rule:flowzen_result validates the claimed envelope instead of an independent truth readback",
+        "the MCP result envelope does not match the legacy direct Flowzen status shape without normalization",
+        "the bridge mapping still targets vibemind instead of canonical brain-wellness",
+        "request-specific runtime authority is required before live OpenFang MCP registration or activation"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-breaking-authority",
+          "request-specific-runtime-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-mirofish",
+      "row_type": "task-proposal",
+      "task_id": "task-mirofish-0003-openfang-embedding-contract-v1",
+      "objective": "Align MiroFish with the OpenFang embedding contract.",
+      "task_dependencies": [
+        "task-openfang-0007-embedding-dimensions-contract-v1"
+      ],
+      "external_blockers": [
+        "request-specific runtime authority is required before consumer migration",
+        "request-specific data authority is required before Qdrant or Neo4j reindex"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-runtime-authority",
+          "request-specific-data-authority"
+        ]
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-marketing",
+      "row_type": "task-proposal",
+      "task_id": "task-marketing-0003-openfang-only-send-gate-v1",
+      "objective": "Gate marketing sends behind OpenFang-only execution.",
+      "task_dependencies": [],
+      "external_blockers": [
+        "request-specific breaking-contract authority is required before a send-gate change",
+        "request-specific outbound authority is required before any external send"
+      ],
+      "authority": {
+        "planning": "standing-autonomy:v1",
+        "implementation_authorities": [
+          "request-specific-breaking-authority",
+          "request-specific-outbound-authority"
+        ]
+      }
+    }
+  ]
+}

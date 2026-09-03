@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0038-superproject-pin-minibook-chain-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0038-superproject-pin-minibook-chain-v1",
+  "objective": "Stage 2 of the minibook pin chain, again as ONE coherent commit because the lift invalidates several artefacts simultaneously. Lift the superproject vibemind-os gitlink to the vibemind-os master commit that carries the lifted openfang gitlink from stage 1, and in the same commit advance exactly four live claims: repo-manifest.yaml expected_gitlink_pin for vibemind-os and for openfang plus the evidence.parent_pin chain across the vibemind-os children; the openfang entry inside the vibemind-os observation record in tests/v1_governance/fixtures/observed_gitlinks.yaml; the openfang parent record in that same fixture; and the openfang_pin literal in tests/v1_governance/test_manifest.py. The orchestrator enumerated these by grepping the outgoing pin, but verify the list yourself rather than trusting it, because a missed artefact turns the suite red and a wrongly included one falsifies a frozen record. Three references to the outgoing pin must expressly NOT be touched, and the reasoning matters more than the list: the historical-openfang-merge entry in tests/v1_governance/test_cockpit_reconciliation_ledger.py is a recorded merge, true as history; the CURRENT_CHAIN_OPENFANG constant in that same file belongs to a frozen chain snapshot whose CURRENT_CHAIN_ROOT already names a superseded superproject commit while the suite stays green, which proves those constants assert against the committed ledger rather than live state; and the pin mentioned in tests/contracts/research/test_research_provenance_pins_v1.py is a provenance citation, frozen at observation under the program-wide convention. Finally, tests/deployment/deployment-readiness.Tests.ps1 references the outgoing openfang pin twice and is expressly OUT OF SCOPE: it is a deployment-space artefact contributed outside this program, no PowerShell runner exists in the session environment so its behaviour cannot be measured, and editing it would be an unauthorised change to another space. Determine whether the lift leaves it asserting a superseded pin and report that as a finding for the user instead of changing it.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["vibemind-os", "repo-manifest.yaml", "tests/v1_governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0038-superproject-pin-minibook-chain-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0037-openfang-pin-ef9d73f-v1"],
+  "merge_position": 8
+}

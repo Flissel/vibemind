@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "session_id": "task-observability-0012-current-chain-reconciliation-v1",
+  "session_type": "task",
+  "space": "observability",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-observability-0012-current-chain-reconciliation-v1",
+  "objective": "Reconcile the append-only cockpit reconciliation ledger from its historical chain-14 boundary through the current committed Outer, vibemind-os and OpenFang integration heads. Mirror the new closed-world facts in the validator, add tamper-negative contract tests, and preserve historical-only evidence semantics without runtime, deployment or live claims.",
+  "repositories": [
+    "vibemind-v1",
+    "vibemind-os",
+    "openfang"
+  ],
+  "allowed_paths": [
+    "docs/governance/session-requests/task-observability-0012-current-chain-reconciliation-v1.json",
+    "docs/governance/cockpit-reconciliation-ledger-v1.json",
+    "tools/v1_governance/reconciliation.py",
+    "tests/v1_governance/test_cockpit_reconciliation_ledger.py",
+    "docs/superpowers/plans/2026-08-17-current-chain-reconciliation-v1.md",
+    "docs/operations/2026-08-17-current-chain-reconciliation-handoff.md"
+  ],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "standing-autonomy:v1",
+  "base_ref": "origin/master",
+  "branch": "codex/observability/task-observability-0012-current-chain-reconciliation-v1",
+  "risk_class": "code",
+  "dependencies": [
+    "task-git-0032-openfang-pin-75067d8-v1",
+    "task-git-0033-vibemind-os-pin-n8n-chain-v1"
+  ],
+  "merge_position": 8
+}

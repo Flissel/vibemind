@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0035-coding-engine-pin-352a858-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0035-coding-engine-pin-352a858-v1",
+  "objective": "Stage 1 of the gitmodules pin chain, following the task-git-0032 pattern: inside the vibemind-os repository, lift the coding-engine gitlink from 81ab938 to 352a858 as a dedicated pin commit per submodule policy. 352a858 is the DaveFelix-Coding-Engine#4 merge carrying task-coding-0006 - external/Automation_ui and external/minibook mapped in .gitmodules, and the gitlinks external/NemoClaw and external/free-llm-api-resources retired under user authority, so coding-engine goes from five child gitlinks to three. Verify the target commit is reachable on the coding-engine remote default branch before pinning rather than assuming it, verify the baseline gitlink reads 81ab938, and check whether any vibemind-os-internal file references the old pin textually. Deliberately out of scope, because it must land as one coherent commit in stage 2 rather than be split: the superproject gitlink, repo-manifest.yaml, the observed_gitlinks fixture and the coverage test.",
+  "repositories": ["vibemind-v1", "vibemind-os", "coding-engine"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0035-coding-engine-pin-352a858-v1",
+  "risk_class": "code",
+  "dependencies": ["task-coding-0006-external-gitmodules-mapping-v1"],
+  "merge_position": 7
+}

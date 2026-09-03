@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:task-handoff:v1",
+  "title": "TaskHandoffV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "handoff_id", "task_id", "created_at", "from_party", "to_party", "summary", "task_brief_ref"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "handoff_id": {"$ref": "#/$defs/handoffId"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "from_party": {"type": "string", "minLength": 1, "maxLength": 200},
+    "to_party": {"type": "string", "minLength": 1, "maxLength": 200},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "task_brief_ref": {"$ref": "#/$defs/taskId"},
+    "todo_refs": {"type": "array", "items": {"$ref": "#/$defs/todoId"}, "uniqueItems": true},
+    "evidence_refs": {"type": "array", "items": {"$ref": "#/$defs/evidenceId"}, "uniqueItems": true},
+    "approval_refs": {"type": "array", "items": {"$ref": "#/$defs/approvalId"}, "uniqueItems": true},
+    "event_refs": {"type": "array", "items": {"$ref": "#/$defs/eventId"}, "uniqueItems": true},
+    "open_questions": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 2000}}
+  },
+  "$defs": {
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "handoffId": {"type": "string", "pattern": "^handoff_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "todoId": {"type": "string", "pattern": "^todo_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "evidenceId": {"type": "string", "pattern": "^evidence_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "approvalId": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "eventId": {"type": "string", "pattern": "^event_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}
+  }
+}

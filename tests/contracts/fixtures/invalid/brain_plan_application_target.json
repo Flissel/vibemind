@@ -1,0 +1,37 @@
+{
+  "contract_version": "v1",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEH",
+  "intent": {
+    "summary": "Attempt to call an application directly.",
+    "context": ["This fixture proves direct application targets are rejected."],
+    "requested_by": "contract-test"
+  },
+  "participating_spaces": [
+    {
+      "space_id": "research",
+      "roles": [
+        {
+          "role": "researcher",
+          "required_agent_count": 1
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "node_id": "call-application",
+      "order": 1,
+      "summary": "Attempt a forbidden direct application call.",
+      "space_ids": ["research"],
+      "depends_on": [],
+      "success_criteria": ["The application receives a request."],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "An application response exists."
+        }
+      ],
+      "application_target": "external-application"
+    }
+  ]
+}

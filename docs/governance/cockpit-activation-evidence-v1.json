@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "external_observations_sidecar": "docs/governance/cockpit-external-observations-v1.json",
+  "authority": {
+    "membership_source": "docs/governance/session-portfolio-registry-v1.json",
+    "membership_authority": "portfolio",
+    "standing_activation_authority": "standing-autonomy:v1",
+    "standing_activation_authority_scope": "authority-available-not-activation-proof",
+    "current_lifecycle_authority": "main-orchestrator-external"
+  },
+  "cockpits": [
+    {
+      "cockpit_session_id": "cockpit-brain",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3e4-0b82-7ef1-b722-883d480d2fea"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01QRN26s9tpp4ZfY5G3BKqtT@2026-08-13T10:08:21Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-openfang",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fcdb3-d021-73a0-9d8b-7b93ee5be965"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_015Ljwv8QaWgBhn8hvVXk8j3@2026-08-13T15:24:08Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-shared",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3e3-ec49-77c2-a91c-1d43d9f086e2"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01QcNtCS4G5WjaisymA2CVtz@2026-08-13T10:08:10Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-git",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb354-f120-7363-8214-ee9e493fe7b4"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01RPNeXkEKZJxwvm1PgThPiM@2026-08-13T10:07:46Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-deployment",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3e4-2acc-7cc0-94bf-09e12d32a3bc"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01FH9V1HccAKFTsg31BnLp1c@2026-08-13T10:08:33Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-integration",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f1-b382-7b61-bddc-0ba2c12c93ad"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01RcmRkiDCyKN5tAdw5TLWCH@2026-08-13T15:24:30Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-observability",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f1-d690-7312-95ec-d02c71f13def"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01Vz4R7MWoozMhdnXDKD7o4b@2026-08-13T15:24:43Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-channels",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f1-f5c3-74d3-b3e4-e1a23b2bf033"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_0147zJxXhizNHjMRg6shHD8X@2026-08-13T15:24:54Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-ideas",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f5-7c0c-7961-b1d7-ac35a01d5214"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_011HPbWYGoFkWfJyfsMr9PZg@2026-08-13T18:33:27Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-bubbles",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f5-a75a-7601-a976-5e3fa406f845"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01KUPG3WK5XbkmZtgUvmkeyh@2026-08-13T18:33:39Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-coding",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f5-d21a-7aa0-892c-e5cc3ef53e46"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01LGsUreNkJQ9Z95HG3FU5SB@2026-08-14T13:51:49Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-desktop",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f5-f91a-70e0-ae9d-33526136c161"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01PfqU6J1ZYxiA3HYwmpBY6A@2026-08-14T13:51:58Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-research",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f6-280b-7a71-b797-f643df388b92"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01QNovqXMThUdDuUVjgbow7Y@2026-08-14T13:52:16Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-n8n",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb743-0fcc-7191-b8a2-1812ed51464f"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01HKiohkamKh5X9FhZrCrWou@2026-08-14T13:53:37Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-agentfarm",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fcf2c-9249-7040-abc7-a0bdf0e1cabc"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01MVDw1byxFgk7L6rY7C1EL2@2026-08-14T13:54:06Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-schedule",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb743-1772-7eb0-8541-e449c7519b3d"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_017bGa7hswDNfDfXZYd6gEYL@2026-08-14T13:52:43Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-rowboat",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f6-d434-7b52-b331-5bb02b155343"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01C5WQGLwvFaYdndhphoSZc6@2026-08-14T13:52:25Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-minibook",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f6-ff51-7050-83e5-ba191851ae00"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01TjehuDCbu3qSVCgxBB9h7T@2026-08-13T18:33:50Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-video",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f7-2a8d-7340-90c1-4bffd4795bea"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01UtXeMZgGTGbxqSMiUA7Lt1@2026-08-14T13:53:47Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-flowzen",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb3f7-5543-7ec0-b582-47a9ffd52b85"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_013nY4TrknvcbSaqZf4fCFWZ@2026-08-14T13:52:51Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-mirofish",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb477-35b2-7aa3-9fc6-bd97c35b9bc3"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01WPy2KSna28AmBoCnvh3xLT@2026-08-14T13:53:09Z"
+      }
+    },
+    {
+      "cockpit_session_id": "cockpit-marketing",
+      "membership_evidence": {
+        "status": "normative",
+        "source": "docs/governance/session-portfolio-registry-v1.json"
+      },
+      "standing_activation_authority": {
+        "status": "available",
+        "reference": "standing-autonomy:v1",
+        "proves_activation": false
+      },
+      "historical_observation": {
+        "status": "historical_external_only",
+        "evidence_scope": "external-not-git-verified",
+        "evidence_source": "external",
+        "observation": "final_reported",
+        "thread_id": "019fb743-0598-7132-aedd-9ff460a5942f"
+      },
+      "current_evidence": {
+        "activation": "git-evidenced-creation",
+        "interactivity": "not-git-evidenced",
+        "approval": "git-evidenced-approval-ledger",
+        "durable_evidence_reference": "ccr-session:session_01MtcHMpwR87h66oVV85cVrE@2026-08-14T13:53:19Z"
+      }
+    }
+  ]
+}

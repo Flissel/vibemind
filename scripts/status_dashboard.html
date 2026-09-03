@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibeMind — Live Status</title>
+<style>
+  :root {
+    --bg:#0b0f17; --card:#141a24; --line:#222b38;
+    --up:#2ecc71; --down:#e74c3c; --txt:#e6edf3; --dim:#7d8aa0;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--txt);
+    font:14px/1.4 -apple-system,Segoe UI,Roboto,sans-serif; padding:24px; }
+  header { display:flex; align-items:baseline; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+  h1 { font-size:18px; font-weight:600; }
+  .summary { font-size:13px; color:var(--dim); }
+  .summary b { color:var(--txt); }
+  .pill { font-size:11px; padding:2px 8px; border-radius:999px; background:var(--card);
+    border:1px solid var(--line); color:var(--dim); }
+  .pill.live { color:var(--up); }
+  .grid { display:grid; gap:10px;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); }
+  .svc { background:var(--card); border:1px solid var(--line);
+    border-radius:10px; padding:12px 14px; display:flex; align-items:center; gap:12px;
+    transition:border-color .2s; }
+  .svc.up { border-left:3px solid var(--up); }
+  .svc.down { border-left:3px solid var(--down); }
+  .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; background:var(--dim); }
+  .svc.up .dot { background:var(--up); box-shadow:0 0 8px var(--up); }
+  .svc.down .dot { background:var(--down); }
+  .meta { flex:1; min-width:0; }
+  .nm { font-weight:600; }
+  .tg { font-size:11px; color:var(--dim); white-space:nowrap; overflow:hidden;
+    text-overflow:ellipsis; }
+  .rt { font-size:12px; color:var(--dim); text-align:right; white-space:nowrap; }
+  .rt .d { font-weight:600; }
+  .svc.up .rt .d { color:var(--up); }
+  .svc.down .rt .d { color:var(--down); }
+  footer { margin-top:18px; font-size:12px; color:var(--dim); }
+  .err { color:var(--down); }
+</style>
+</head>
+<body>
+<header>
+  <h1>VibeMind — Live Status</h1>
+  <span class="summary" id="summary">lade…</span>
+  <span class="pill" id="pill">poll: 5s</span>
+</header>
+<div class="grid" id="grid"></div>
+<footer id="foot">probe-server: <span id="foothost"></span></footer>
+
+<script>
+const POLL_MS = 5000;
+const $ = id => document.getElementById(id);
+$("foothost").textContent = location.origin + "/api/status";
+
+function render(data) {
+  const grid = $("grid");
+  grid.innerHTML = "";
+  for (const s of data.services) {
+    const el = document.createElement("div");
+    el.className = "svc " + (s.up ? "up" : "down");
+    el.innerHTML =
+      '<span class="dot"></span>' +
+      '<div class="meta"><div class="nm">' + s.name + '</div>' +
+      '<div class="tg">' + s.target + '</div></div>' +
+      '<div class="rt"><div class="d">' + (s.detail||"") + '</div>' +
+      '<div>' + (s.ms!=null ? s.ms+" ms" : "") + '</div></div>';
+    grid.appendChild(el);
+  }
+  const t = new Date(data.ts*1000).toLocaleTimeString();
+  $("summary").innerHTML = "<b>" + data.up + "</b> / " + data.total +
+    " up &nbsp;·&nbsp; aktualisiert " + t;
+  $("pill").className = "pill live";
+  $("pill").textContent = "● live (" + (POLL_MS/1000) + "s)";
+}
+
+async function tick() {
+  try {
+    const r = await fetch("/api/status", {cache:"no-store"});
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    render(await r.json());
+    $("foot").classList.remove("err");
+  } catch (e) {
+    $("summary").innerHTML = '<span class="err">Probe-Server nicht erreichbar: '
+      + e.message + '</span>';
+    $("pill").className = "pill";
+    $("pill").textContent = "○ offline";
+    $("foot").classList.add("err");
+  }
+}
+tick();
+setInterval(tick, POLL_MS);
+</script>
+</body>
+</html>

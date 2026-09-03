@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:research-job:v1",
+  "title": "ResearchJobV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "job_id", "request_id", "plan_id", "task_id", "trace_id", "status", "status_history"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "job_id": {"$ref": "#/$defs/jobId"},
+    "request_id": {"$ref": "#/$defs/requestId"},
+    "plan_id": {"$ref": "#/$defs/planId"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "trace_id": {"$ref": "#/$defs/traceId"},
+    "status": {"$ref": "#/$defs/status"},
+    "status_history": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {"$ref": "#/$defs/statusRecord"}
+    }
+  },
+  "$defs": {
+    "jobId": {"type": "string", "pattern": "^job_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "requestId": {"type": "string", "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "planId": {"type": "string", "pattern": "^plan_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceId": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "status": {
+      "enum": ["clarification_required", "queued", "running", "waiting_for_approval", "paused", "succeeded", "failed", "cancelled", "unavailable"]
+    },
+    "transitionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "action"],
+      "properties": {
+        "actor": {"enum": ["chat", "brain", "research_space"]},
+        "action": {"enum": ["pause", "resume", "cancel", "complete", "fail", "mark_unavailable"]}
+      }
+    },
+    "statusRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "occurred_at"],
+      "properties": {
+        "status": {"$ref": "#/$defs/status"},
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+        },
+        "transition_context": {"$ref": "#/$defs/transitionContext"}
+      },
+      "allOf": [
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "pause"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "paused"}}}},
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "resume"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "queued"}}}},
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "cancel"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "cancelled"}}}},
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "complete"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "succeeded"}}}},
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "fail"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "failed"}}}},
+        {"if": {"properties": {"transition_context": {"properties": {"action": {"const": "mark_unavailable"}}, "required": ["action"]}}, "required": ["transition_context"]}, "then": {"properties": {"status": {"const": "unavailable"}}}}
+      ]
+    }
+  }
+}

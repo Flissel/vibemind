@@ -1,0 +1,14 @@
+schema_version: 1
+feature_branch_pattern: '^codex/[a-z0-9]+(?:-[a-z0-9]+)*/[a-z0-9]+(?:-[a-z0-9]+)*$'
+current_integration_branch: master
+target_integration_branch: main
+direct_commits_to_integration_branch: false
+force_push_to_integration_branch: false
+delete_branch_requires_user_approval: true
+delete_worktree_requires_user_approval: true
+required_preflight:
+  - worktrees
+  - dirty_state
+  - ancestry
+  - remote_parity
+  - submodules

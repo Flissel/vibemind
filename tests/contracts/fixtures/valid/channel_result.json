@@ -1,0 +1,20 @@
+{
+  "contract_version": "v1",
+  "correlation_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "channel_kind": "desktop-chat",
+  "actor_context": {
+    "actor_id": "user:local-42",
+    "locale": "de-DE"
+  },
+  "session_context": {
+    "session_id": "session-20260731-01",
+    "conversation_id": "desktop-chat-42"
+  },
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "participating_space_ids": ["research", "coding"],
+  "status": "succeeded",
+  "summary": "Die angeforderte Zusammenfassung ist bereit.",
+  "evidence_refs": [
+    "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEG"
+  ]
+}

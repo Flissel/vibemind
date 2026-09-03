@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0022-authority-contract-repair-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0022-authority-contract-repair-v1",
+  "objective": "Repair the two authority-contract violations that task-openfang-0009 and task-openfang-0011 introduced and neither closed, both of which the orchestrator commissioned. task-openfang-0021 measured them: shared/contracts/openfang-mcp-authority-v1.json declares spaces-minibook and n8n as unregistered while the live openfang config declares both, so tests/integration/test_openfang_mcp_authority_contract_v1.py::test_registered_servers_match_the_openfang_config fails whenever vibemind-os is populated. Reproduce that failure yourself before changing anything, and walk every one of the roughly 40 declared servers independently rather than trusting the count of two, because the test aborts at its first failure and therefore hides how many violations exist - 0021 found two by walking, and a third would have appeared had the rowboat block been added. Then bring the contract's registration status for each violating server into agreement with what openfang actually registers at the pinned commit, deriving the truth from the live config at the pin rather than from the template, since 0021 established that the template is the git-tracked source of truth while the effective file is a machine-specific render and the two legitimately differ. THE RISK CLASS DESERVES A SENTENCE OF ITS OWN: this is filed as code rather than breaking-contract because the declarations being changed are factually false and correcting them turns a red test green, which is repair rather than a change of contract meaning. That reasoning is a hypothesis you must test, not a licence you have been granted. Search for every consumer of the registration status - tests, generators, runtime discovery, other contracts - and establish that none of them depends on the false value. If any consumer's behaviour would change beyond a false assertion becoming true, FAIL CLOSED, change nothing, and report it as a breaking contract needing user authority. DELIBERATELY OUT OF SCOPE, to report rather than act on. First, do not touch the spaces-rowboat template-only declaration: 0021 established it is correct as written and that adding the block would break it. Second, the enforcing test is decorated requires_submodule and is therefore SKIPPED whenever vibemind-os is uninitialised, which is the default in these session environments and is the reason both violations rotted unnoticed for a full day; changing when that test runs alters what the program gates and is not routine work, so measure the consequence and describe the options without editing the decorator, the workflow files or the CI scope. Third, openfang/.gitignore lists openfang.vibemind.toml as must-not-be-committed while the file is already tracked, making the rule inert and, per 0021, the root cause of contributors hand-mirroring edits into a generated artifact; report whether repairing that is safe and what it would cost, but do not untrack the file, because removing a tracked artifact is a destructive action needing request-specific authority.",
+  "repositories": ["vibemind-v1", "openfang", "vibemind-os"],
+  "allowed_paths": ["shared/contracts/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0022-authority-contract-repair-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0021-rowboat-registration-file-split-v1"],
+  "merge_position": 12
+}

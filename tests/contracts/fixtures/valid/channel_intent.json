@@ -1,0 +1,20 @@
+{
+  "contract_version": "v1",
+  "correlation_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "channel_kind": "desktop-chat",
+  "actor_context": {
+    "actor_id": "user:local-42",
+    "locale": "de-DE"
+  },
+  "session_context": {
+    "session_id": "session-20260731-01",
+    "conversation_id": "desktop-chat-42"
+  },
+  "message": "Bitte fasse die Projektlage zusammen.",
+  "received_at": "2026-07-31T10:00:00Z",
+  "requested_space_id": "agentfarm",
+  "user_facing_expectations": {
+    "reply": "required",
+    "evidence": "summary"
+  }
+}

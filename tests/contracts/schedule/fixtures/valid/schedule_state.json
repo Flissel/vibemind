@@ -1,0 +1,20 @@
+{
+  "contract_version": "v1",
+  "schedule_id": "schedule_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "revision": 5,
+  "idempotency_key": "schedule-request-01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "status": "succeeded",
+  "status_history": [
+    {"status": "draft", "occurred_at": "2026-07-31T09:00:00Z", "revision": 1},
+    {"status": "awaiting_approval", "occurred_at": "2026-07-31T09:00:01Z", "revision": 2},
+    {"status": "scheduled", "occurred_at": "2026-07-31T09:00:02Z", "revision": 3},
+    {"status": "running", "occurred_at": "2026-08-01T07:00:00Z", "revision": 4},
+    {"status": "succeeded", "occurred_at": "2026-08-01T07:00:01Z", "revision": 5}
+  ],
+  "next_run_at": null,
+  "last_run_at": "2026-08-01T07:00:01Z",
+  "counters": {"run_count": 1, "max_runs": 1, "retry_count": 0, "max_retries": 2}
+}

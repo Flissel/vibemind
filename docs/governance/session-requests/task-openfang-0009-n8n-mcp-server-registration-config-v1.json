@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0009-n8n-mcp-server-registration-config-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0009-n8n-mcp-server-registration-config-v1",
+  "objective": "Precondition for E8 stage 2: the registry references an MCP server named n8n for the eight n8n.* events, but that server has no registration entry in the OpenFang configuration, so the canonical path marketing is supposed to migrate onto does not exist yet. Ground repo-first what the server actually needs - launch command, transport, and which environment variables must appear on the entry-level env allowlist, following the pattern established by the B1 fix in openfang#17 - then add the registration entry to openfang.vibemind.toml.template and the rendered openfang.vibemind.toml. Service commits in the Flissel/openfang repository on a codex branch; superproject writes limited to evidence documentation. Expressly no live registration, no runtime start, no secret values in the repository: only variable names on the allowlist.",
+  "repositories": ["vibemind-v1", "openfang"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-17T07:02:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0009-n8n-mcp-server-registration-config-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 6
+}

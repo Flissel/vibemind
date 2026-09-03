@@ -1,0 +1,8 @@
+{
+  "contract_version": "v1",
+  "handoff_id": "handoff_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "result_id": "result_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "evidence_refs": ["evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEG"],
+  "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "idea_summary": "A reviewable idea candidate based on the cited research result."
+}

@@ -1,0 +1,11 @@
+{
+  "contract_version": "v1",
+  "handoff_id": "handoff_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "created_at": "2026-07-31T09:15:00Z",
+  "from_party": "shared-contracts",
+  "to_party": "brain-planning",
+  "summary": "This handoff has an invalid approval reference.",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "approval_refs": ["task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"]
+}

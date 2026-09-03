@@ -1,0 +1,50 @@
+{
+  "contract_version": "v1",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEG",
+  "intent": {
+    "summary": "Prepare a cyclic plan.",
+    "context": ["This fixture proves offline cycle rejection."],
+    "requested_by": "contract-test"
+  },
+  "participating_spaces": [
+    {
+      "space_id": "research",
+      "roles": [
+        {
+          "role": "researcher",
+          "required_agent_count": 1
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "node_id": "first-step",
+      "order": 1,
+      "summary": "First cyclic step.",
+      "space_ids": ["research"],
+      "depends_on": ["second-step"],
+      "success_criteria": ["The step completes."],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "An artifact exists."
+        }
+      ]
+    },
+    {
+      "node_id": "second-step",
+      "order": 2,
+      "summary": "Second cyclic step.",
+      "space_ids": ["research"],
+      "depends_on": ["first-step"],
+      "success_criteria": ["The step completes."],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "An artifact exists."
+        }
+      ]
+    }
+  ]
+}

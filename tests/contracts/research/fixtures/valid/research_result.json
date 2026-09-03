@@ -1,0 +1,16 @@
+{
+  "contract_version": "v1",
+  "result_id": "result_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "job_id": "job_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "status": "succeeded",
+  "claims": [{"claim_id": "claim-1", "text": "The stated conclusion is supported.", "verification_status": "verified"}],
+  "source_evidence": [{"contract_version": "v1", "evidence_id": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "job_id": "job_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "source_url": "https://example.org/research", "retrieved_at": "2026-07-31T09:10:00Z", "content_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef", "locator": "section-1", "passage": "The source supports the stated conclusion.", "source_quality": "primary", "verification_status": "verified", "artifact_refs": ["artifact_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"], "evidence_refs": ["evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEG"]}],
+  "citations": [{"contract_version": "v1", "citation_id": "citation_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "claim_id": "claim-1", "source_evidence_id": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "locator": "section-1", "passage": "The source supports the stated conclusion."}],
+  "artifact_refs": ["artifact_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"],
+  "evidence_refs": ["evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEG"],
+  "cost": {"currency": "EUR", "estimated_cost_minor": 500, "actual_cost_minor": 245, "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"}
+}

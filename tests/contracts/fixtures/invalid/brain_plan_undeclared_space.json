@@ -1,0 +1,36 @@
+{
+  "contract_version": "v1",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEJ",
+  "intent": {
+    "summary": "Reference a space that does not participate.",
+    "context": ["This fixture proves space membership validation."],
+    "requested_by": "contract-test"
+  },
+  "participating_spaces": [
+    {
+      "space_id": "research",
+      "roles": [
+        {
+          "role": "researcher",
+          "required_agent_count": 1
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "node_id": "use-undeclared-space",
+      "order": 1,
+      "summary": "Reference a non-participating space.",
+      "space_ids": ["writing"],
+      "depends_on": [],
+      "success_criteria": ["The task completes."],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "An artifact exists."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# Temporary dump artefacts that should not be committed.
+*.dump
+*.tar
+*.tar.gz
+*.tar.zst
+pgdata_snapshot_*/
+.tmp/
+
+# initdb/01-restore.sql IS committed (it's the canonical snapshot).
+# Keep this gitignore here so the directory survives even if someone
+# rm's the snapshots locally.
+!initdb/

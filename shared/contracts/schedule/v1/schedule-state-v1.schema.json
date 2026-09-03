@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:schedule-state:v1",
+  "title": "ScheduleStateV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "schedule_id", "request_id", "task_brief_ref", "trace_id", "revision", "idempotency_key", "status", "status_history", "next_run_at", "last_run_at", "counters"],
+  "properties": {
+    "contract_version": {"const": "v1"}, "schedule_id": {"$ref": "#/$defs/scheduleRef"}, "request_id": {"$ref": "#/$defs/requestRef"}, "task_brief_ref": {"$ref": "#/$defs/taskRef"}, "trace_id": {"$ref": "#/$defs/traceRef"}, "revision": {"type": "integer", "minimum": 1, "maximum": 1000000}, "idempotency_key": {"$ref": "#/$defs/idempotencyKey"}, "status": {"$ref": "#/$defs/status"}, "status_history": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"$ref": "#/$defs/historyRecord"}}, "next_run_at": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}, "last_run_at": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}, "counters": {"$ref": "#/$defs/counters"}
+  },
+  "$defs": {
+    "scheduleRef": {"type": "string", "pattern": "^schedule_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "requestRef": {"type": "string", "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "taskRef": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "traceRef": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "timestamp": {"type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"}, "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"}, "status": {"enum": ["draft", "clarification_required", "awaiting_approval", "scheduled", "paused", "running", "succeeded", "failed", "cancelled", "unavailable"]}, "historyRecord": {"type": "object", "additionalProperties": false, "required": ["status", "occurred_at", "revision"], "properties": {"status": {"$ref": "#/$defs/status"}, "occurred_at": {"$ref": "#/$defs/timestamp"}, "revision": {"type": "integer", "minimum": 1, "maximum": 1000000}}}, "counters": {"type": "object", "additionalProperties": false, "required": ["run_count", "max_runs", "retry_count", "max_retries"], "properties": {"run_count": {"type": "integer", "minimum": 0, "maximum": 1000}, "max_runs": {"type": "integer", "minimum": 1, "maximum": 1000}, "retry_count": {"type": "integer", "minimum": 0, "maximum": 10}, "max_retries": {"type": "integer", "minimum": 0, "maximum": 10}}}
+  }
+}

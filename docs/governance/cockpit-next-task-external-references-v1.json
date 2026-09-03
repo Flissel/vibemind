@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "membership_source": "docs/governance/session-portfolio-registry-v1.json",
+  "evidence_class": "external-not-git-verified",
+  "nonclaims": [
+    "not-a-task-request-or-approval",
+    "does-not-prove-task-execution-or-gate-outcome",
+    "does-not-prove-admission-handoff-pr-merge-runtime-or-live-evidence"
+  ],
+  "references": [
+    {"cockpit_session_id": "cockpit-openfang", "reference_kind": "task", "reference_id": "task-openfang-0008-mcp-servers-manifest-migration-v1", "evidence_scope": "external-not-git-verified", "evidence_source": "external-user-owned-thread", "observed_at": "2026-08-05T06:32:40Z", "source_thread_id": "019fa01e-5cd6-7ac0-b320-7222affb6164"},
+    {"cockpit_session_id": "cockpit-openfang", "reference_kind": "task", "reference_id": "task-openfang-0009-child-openfang-gitlink-pin-v1", "evidence_scope": "external-not-git-verified", "evidence_source": "external-user-owned-thread", "observed_at": "2026-08-05T06:32:40Z", "source_thread_id": "019fa01e-5cd6-7ac0-b320-7222affb6164"},
+    {"cockpit_session_id": "cockpit-integration", "reference_kind": "task", "reference_id": "task-integration-0015-mcp-provenance-legacy-regression-v1", "evidence_scope": "external-not-git-verified", "evidence_source": "external-user-owned-thread", "observed_at": "2026-08-05T06:32:40Z", "source_thread_id": "019fa01e-5cd6-7ac0-b320-7222affb6164"},
+    {"cockpit_session_id": "cockpit-agentfarm", "reference_kind": "task", "reference_id": "task-agentfarm-0009-versioned-runtime-source-artifact-v1", "evidence_scope": "external-not-git-verified", "evidence_source": "external-user-owned-thread", "observed_at": "2026-08-05T06:32:40Z", "source_thread_id": "019fcf2c-9249-7040-abc7-a0bdf0e1cabc"},
+    {"cockpit_session_id": "cockpit-git", "reference_kind": "gate", "reference_id": "gate-integration-0016-vibemind-os-pr115-postpin-regate-v1", "evidence_scope": "external-not-git-verified", "evidence_source": "external-user-owned-thread", "observed_at": "2026-08-05T06:32:40Z", "source_thread_id": "019fa01e-5cd6-7ac0-b320-7222affb6164"}
+  ]
+}

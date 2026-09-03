@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0026-normative-document-scope-agreement-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0026-normative-document-scope-agreement-v1",
+  "objective": "Bring docs/contracts/openfang-mcp-authority-v1.md into agreement with shared/contracts/openfang-mcp-authority-v1.json about SPACE SCOPES, and widen the guard task-openfang-0023 built so it covers scopes and not only registration status. task-openfang-0023 aligned that markdown for registration status and added tests/contracts/test_openfang_mcp_authority_normative_document_v1.py, which derives its expectation from the JSON. task-openfang-0025 then aligned the research space's mcp_servers, mcp_tools and mcp_events in the JSON and reported that the markdown is stale about research scope in THREE distinct places rather than the one the orchestrator's brief had guessed, and that its own change widened that staleness. Measure the three places yourself and read the whole document for a fourth: the count of two that preceded 0023 was also wrong, and 0023 found a third statement nobody had predicted, so treat any number in this request as a lower bound rather than a total. The guard is the part that outlasts this repair. Extend the existing tests/contracts/ test so the two documents must agree about each space's mcp_servers, mcp_tools and mcp_events as well, deriving every expectation from the JSON rather than hardcoding a list, and make each new assertion RED FIRST against the current markdown with the failure output recorded in the handoff. A test that is green from birth here repeats exactly the failure being closed, and this is the second time this document has drifted without anything detecting it. Say plainly in the handoff, as task-openfang-0023 did, that tests/contracts/ is NOT collected by the required CI checks, which run only tests/architecture/test_v1_ci_contract.py and tests/v1_governance/test_manifest.py - so what you are building is a local guard rather than a gate, and the difference is the whole subject of this chain. Do not change any workflow file. Deliberately out of scope and to be reported rather than acted on: the JSON itself, which is now correct and whose integration suite is fully green at 18 passed with the submodule populated; OpenFang's own Rust test test_vibemind_brain_manifests_use_top_level_mcp_servers, which task-openfang-0025 found stale for brain-researcher at pin ef9d73f and could not execute for want of a Rust toolchain; and the brain layer's routing of research.summarize and research.to_idea, which does not yet use the mcp: execution-target form its MCP-bound neighbours use.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/contracts/", "tests/contracts/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0026-normative-document-scope-agreement-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0025-research-space-contract-registry-alignment-v1"],
+  "merge_position": 16
+}

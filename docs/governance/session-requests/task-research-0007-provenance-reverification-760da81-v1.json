@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0007-provenance-reverification-760da81-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0007-provenance-reverification-760da81-v1",
+  "objective": "Run the verification pass that tests/contracts/research/test_research_provenance_pins_v1.py::test_the_checked_pins_are_the_live_gitlinks is now demanding, and append it to the verifications list in shared/contracts/research/v1/research-service-tiers-v1.json. The gate compares the most recent pass's checked_pins against repo-manifest.yaml expected_gitlink_pin and went red when task-git-0039 completed the Captain Cook pin lift, advancing vibemind-os from da2a29a to 760da81. That redness is the mechanism working, not a regression: the test's own docstring says it reads the manifest live so that the next pin lift makes it say a verification pass is due instead of quietly passing. task-git-0039 deliberately did NOT bump the literal, because doing so would assert a pass nobody performed, and this task exists to perform it. This is the third pass in the same append-only structure; the previous two were task-research-0004 and task-research-0006, and 0006 is the model to follow. Measure the live pins yourself at the commit you branch from rather than taking any number from this request. THE STRUCTURE IS APPEND-ONLY AND THAT IS THE POINT. Add a NEW entry to verifications with verified_by_task, verified_on, checked_pins, checked_pin_origin, method, the outcome_vocabulary, and a real per-reference outcome for every reference the previous pass covered - twelve at the last count, but count them yourself. Earn each outcome the way the existing method line describes: blob-hash comparison of the cited path between the observed pin and the checked pin, then a direct read of the cited locator at the checked pin. Use holds, holds_with_locator_drift or diverged as the evidence actually warrants; a holds you did not verify is worse than a diverged you did. Do not edit either previous pass, do not rewrite any observed pin, and do not rewrite a reference's assertion to make it fit - under the provenance convention a diverged outcome is a finding, not a licence. Note one thing the interval makes likely and check it rather than assuming either way: the vibemind-os interval da2a29a..760da81 changed config/space_agent_registry.yml in the agentfarm region, and task-git-0039 found that four locators in a DIFFERENT contract had drifted by exactly that edit. If any of the research contract's twelve references cite a line range in that file, expect locator drift and record holds_with_locator_drift rather than silently re-pointing. Also confirm or refute, as task-research-0006 was asked to and did: whether docs/governance/provenance-pin-convention-v1.md and docs/spaces/research/provenance-pin-convention-v1.md still agree, since 0006 reported that the contract family binds to the spaces document while the governance one carries the orchestrator's wording. Deliberately out of scope: repo-manifest.yaml and the gitlinks, which task-git-0039 has already settled; shared/contracts/openfang-mcp-authority-v1.json, whose three now-false agentfarm assertions are an authorization decision waiting on the user; and any workflow file.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["shared/contracts/research/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "standing-autonomy:v1",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0007-provenance-reverification-760da81-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0039-captain-cook-manifest-stage2-v1"],
+  "merge_position": 20
+}

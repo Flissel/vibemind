@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0024-authority-contract-source-pins-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0024-authority-contract-source-pins-v1",
+  "objective": "Re-pin shared/contracts/openfang-mcp-authority-v1.json to the pins its own enforcing test actually reads, and give the drift a guard that cannot rot silently. The contract declares source_pins.vibemind-os 9ee1cc42 and source_pins vibemind-os/openfang 33be359c, and tests/integration/test_openfang_mcp_authority_contract_v1.py line 75 asserts the first prefix, while the manifest gitlinks and the tree that test actually walks are vibemind-os da2a29a with openfang ef9d73f. Measure all four values yourself at the commit you branch from instead of trusting these. The consequence is not theoretical and was hit during task-openfang-0022: the sources line references it had to replace were ALREADY stale against the live tree - the old spaces-minibook reference space_agent_registry.yml:209-210 now points at rowboat-chat and the old n8n reference at line 249 points at a minibook event, both presumably correct at 9ee1cc42. So a re-pin without re-verifying the line references would leave the contract internally consistent and externally wrong, which is worse than the current state because it would look checked. FIRST count how many sources line references the contract carries and how many still resolve to what they claim at the new pins. Report that count before repairing anything, and if it is large enough that a careful pass is not achievable in one session, FAIL CLOSED: repair nothing, report the count and the sample you verified, and let the orchestrator split it. A half-verified re-pin is the one outcome worse than no re-pin. THEN, if the count is manageable, advance source_pins and every line reference together in one coherent commit, and update the line-75 prefix assertion to match. SECOND, and independently valuable, add a test that ties source_pins to the manifest so this cannot drift unnoticed again: assert that source_pins.vibemind-os equals repo-manifest.yaml expected_gitlink_pin for vibemind-os, and that source_pins vibemind-os/openfang equals the openfang entry, and put it in tests/v1_governance/test_manifest.py because that file IS one of the two the required CI checks collect - which makes this guard actually CI-visible rather than local-only, unlike most of the suite. Make it red first against the current stale values and say so with the output. Note the anti-freeze consequence and treat it as the point rather than an obstacle: once that test exists, every future superproject pin lift will redden it until the contract is re-pinned in the same commit, exactly as task-git-0034's property does for the manifest fixtures. Deliberately out of scope: the normative markdown under docs/contracts/, which task-openfang-0023 owns and which must not be touched here; the research-space contract-versus-registry drift that task-openfang-0022 left red and reported; the requires_submodule decorator; and any workflow file, since changing which checks are required is not routine work.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["shared/contracts/", "tests/integration/", "tests/v1_governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0024-authority-contract-source-pins-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0022-authority-contract-repair-v1"],
+  "merge_position": 14
+}

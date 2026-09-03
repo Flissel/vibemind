@@ -1,0 +1,15 @@
+{
+  "contract_version": "v1",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "title": "Validate a shared contract fixture",
+  "objective": "Provide a deterministic example for offline validation.",
+  "requested_by": "shared-contracts",
+  "created_at": "2026-07-31T09:00:00Z",
+  "approval_refs": ["approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"],
+  "todos": [
+    {
+      "todo_id": "todo_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+      "summary": "Run the offline contract validator"
+    }
+  ]
+}

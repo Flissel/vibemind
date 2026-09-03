@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0004-speckit-jobspec-format-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0004-speckit-jobspec-format-v1",
+  "objective": "Implement the spec-kit artifact conventions (spec.md/plan.md/tasks.md) as a fifth SpecFormat in the coding-engine spec_adapter chain, per the merged evaluation docs/superpowers/specs/2026-08-14-speckit-openclaude-evaluation.md. Service commits in the Flissel/DaveFelix-Coding-Engine repository on a codex branch; execution path stays Brain -> OpenFang -> coding-engine; no new execution lane, no spec-kit installation, no runtime mutation. Superproject writes limited to evidence documentation.",
+  "repositories": ["vibemind-v1", "coding-engine"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-14T13:45:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0004-speckit-jobspec-format-v1",
+  "risk_class": "code",
+  "dependencies": ["task-coding-0003-speckit-openclaude-evaluation-v1"],
+  "merge_position": 5
+}

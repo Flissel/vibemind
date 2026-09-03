@@ -1,0 +1,9 @@
+{
+  "contract_version": "v1",
+  "event_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "event_type": "task.brief.referenced",
+  "occurred_at": "2026-07-31T09:05:00Z",
+  "actor": "shared-contracts",
+  "summary": "The task brief was referenced for a handoff."
+}

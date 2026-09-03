@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:flowzen-acceptance:v1",
+  "title": "FlowzenAcceptanceV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "acceptance_id", "recommendation_id", "checkin_id", "subject_ref", "task_brief_ref", "intent_ref", "trace_id", "accepted_at", "operation_class", "expected_recommendation_status", "approval_ref", "idempotency_key", "parameter_digest", "timeout_seconds", "cost_limit"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "acceptance_id": {"$ref": "#/$defs/acceptanceRef"},
+    "recommendation_id": {"$ref": "#/$defs/recommendationRef"},
+    "checkin_id": {"$ref": "#/$defs/checkinRef"},
+    "subject_ref": {"$ref": "#/$defs/subjectRef"},
+    "task_brief_ref": {"$ref": "#/$defs/taskRef"},
+    "intent_ref": {"$ref": "#/$defs/intentRef"},
+    "trace_id": {"$ref": "#/$defs/traceRef"},
+    "accepted_at": {"$ref": "#/$defs/timestamp"},
+    "operation_class": {"const": "mutating"},
+    "expected_recommendation_status": {"const": "proposed"},
+    "approval_ref": {"$ref": "#/$defs/approvalRef"},
+    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^accept:recommendation_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "parameter_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 300},
+    "cost_limit": {"$ref": "#/$defs/costLimit"}
+  },
+  "$defs": {
+    "acceptanceRef": {"type": "string", "pattern": "^acceptance_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "recommendationRef": {"type": "string", "pattern": "^recommendation_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "checkinRef": {"type": "string", "pattern": "^checkin_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "subjectRef": {"type": "string", "pattern": "^subject_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskRef": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "intentRef": {"type": "string", "pattern": "^intent_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceRef": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "approvalRef": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "quoteRef": {"type": "string", "pattern": "^quote_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"},
+    "costLimit": {"type": "object", "additionalProperties": false, "required": ["max_cost_minor", "currency", "quote_ref", "approval_ref"], "properties": {"max_cost_minor": {"type": "integer", "minimum": 0, "maximum": 10000000}, "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "quote_ref": {"$ref": "#/$defs/quoteRef"}, "approval_ref": {"$ref": "#/$defs/approvalRef"}}}
+  }
+}

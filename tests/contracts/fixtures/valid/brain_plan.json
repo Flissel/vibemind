@@ -1,0 +1,63 @@
+{
+  "contract_version": "v1",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent": {
+    "summary": "Prepare a verified cross-space research brief.",
+    "context": ["The source material is already available offline."],
+    "requested_by": "product-owner"
+  },
+  "participating_spaces": [
+    {
+      "space_id": "research",
+      "roles": [
+        {
+          "role": "researcher",
+          "required_agent_count": 1
+        }
+      ]
+    },
+    {
+      "space_id": "writing",
+      "roles": [
+        {
+          "role": "editor",
+          "required_agent_count": 1
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "node_id": "research-sources",
+      "order": 1,
+      "summary": "Extract source findings.",
+      "space_ids": ["research"],
+      "depends_on": [],
+      "success_criteria": [
+        "Findings are traceable to the supplied source material."
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "A source finding artifact is available."
+        }
+      ]
+    },
+    {
+      "node_id": "write-brief",
+      "order": 2,
+      "summary": "Create the brief from the findings.",
+      "space_ids": ["writing"],
+      "depends_on": ["research-sources"],
+      "success_criteria": [
+        "The brief answers the stated intent."
+      ],
+      "evidence_requirements": [
+        {
+          "evidence_type": "artifact",
+          "description": "A reviewable brief artifact is available."
+        }
+      ]
+    }
+  ]
+}

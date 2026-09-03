@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0035-aug01-07-decision-crossref-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0035-aug01-07-decision-crossref-v1",
+  "objective": "Cross-reference the fifteen Aug 1-7 operations documents that PR #230 just recovered onto master against the orchestrator's architecture-decision series (docs/governance/architecture-decisions-2026-08-13-v1.md, -2026-08-15-v1.md, -2026-08-16-v1.md, entries E1 through E15) and against docs/governance/session-request-queue-v1.md, and report every conflict, duplication and collision you find. This exists because the orchestrator built the E series starting 2026-08-13 while a binding user architecture decision from 2026-08-07 was sitting on an unmerged branch, and a grep shows the E series cites it nowhere. Three concrete leads to check first, all of which the orchestrator found but has not resolved. FIRST, docs/operations/2026-08-07-entscheidung-mcp-vollsemantik-und-fahrplan.md states as an architecture principle that multi-step operations with rollback run through OpenFang, with no split between atomic-over-MCP and composite-in-the-brain, and that the truth: validator explicitly stays in the brain. Determine for every E entry whether it is consistent with that principle, contradicts it, or is silent, and say which - a silent entry that assumes the split is a conflict, not a neutral. SECOND, that same document defines D2 as a documented finding about an unresolved placeholder yielding UNVERIFIED, while the queue carries a different D2 from task-research-0002 about bubble fan-out between shuttles and exploration_nodes. Two different D2s. Establish which label predates the other, whether either has been acted on under the wrong reading, and propose a disambiguation - do not renumber anything yourself. THIRD, the same document records M3a as verified at 1536 dimensions and describes the kg-migration as 1024 to 3072, while the queue still lists embedding dimensions 1536 versus 3072 as an open user decision. Determine whether that question was already settled on 2026-08-07, and if so for which surface, because the two numbers may belong to two different indexes rather than being alternatives. Also read docs/operations/2026-08-07-user-freigaben-m5-m6-reindex.md in full, 595 lines of user approvals the orchestrator has never read, and list every approval in it that the queue does not reflect. HARD BOUNDARY: this task finds and reports, it does not decide. Do not edit any architecture-decision entry, do not renumber any E or D label, do not change the queue's open-decision list, and do not resolve any conflict you find. Resolving a conflict between an orchestrator decision and a user decision is a product-architecture decision and belongs to the user; presenting it cleanly is what is being asked for. Write the finding set into the handoff, ordered by how much rework a wrong reading would cost, and state for each whether it is a genuine contradiction, a duplication of labels only, or a question the recovered evidence already answers.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0035-aug01-07-decision-crossref-v1",
+  "risk_class": "docs",
+  "dependencies": [],
+  "merge_position": 11
+}

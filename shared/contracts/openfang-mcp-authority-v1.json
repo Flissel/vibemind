@@ -1,0 +1,474 @@
+{
+  "contract_version": "v1",
+  "contract_id": "openfang-mcp-authority-v1",
+  "title": "OpenFang MCP Authority V1 — static, code-grounded",
+  "normative_document": "docs/contracts/openfang-mcp-authority-v1.md",
+  "source_pins": {
+    "vibemind-os": "82127e44944495e5cb47d22e597cee9c51bbee83",
+    "vibemind-os/openfang": "8a4904b3ff622d7ffda1e8cb01a509d2db430904"
+  },
+  "scope_statement": "Static authority only: canonical MCP server identities, per-agent scopes, tool allowlists and registration authority as evidenced in the pinned vibemind-os checkout. No live registration, no runtime activation, no OpenFang mutation. Live claims are owned by task-integration-0005b.",
+  "role_semantics": {
+    "decision": "E1",
+    "statement": "Registry agent names are canonical agent ROLES named by Brain. OpenFang alone binds a role to a concrete instance, provider and model. Generated manifests currently pin provider/model statically at generation time; re-specification belongs to task-brain-0018.",
+    "sources": [
+      "docs/governance/architecture-decisions-2026-08-13-v1.md:13-23",
+      "vibemind-os/scripts/sync_openfang_agents.py:41-84",
+      "docs/contracts/brain-openfang-handoff-v1.md:15-16"
+    ]
+  },
+  "servers": {
+    "brain": { "registration": "registered", "transport": "sse", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:31-36"] },
+    "issue-detector": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:39-45"] },
+    "network-monitor": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:51-57"] },
+    "endpoint-hardening": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:59-65"] },
+    "event-log": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:67-73"] },
+    "firewall": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:75-81"] },
+    "botnet-detector": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:83-89"] },
+    "site-verifier": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:91-97"] },
+    "driver-manager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:103-109"] },
+    "power-manager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:111-117"] },
+    "display-audio": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:119-125"] },
+    "process-manager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:127-133"] },
+    "registry": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:135-141"] },
+    "scheduled-tasks": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:143-149"] },
+    "update-manager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:151-157"] },
+    "env-manager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:159-165"] },
+    "backup-sync": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:171-177"] },
+    "pitch-deck": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:183-189"] },
+    "tavily": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:196-203"] },
+    "context7": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:216-222"] },
+    "playwright": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:225-231"] },
+    "filesystem": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:238-244"] },
+    "fetch": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:261-267"] },
+    "git": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:270-276"] },
+    "docker": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:279-285"] },
+    "time": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:288-294"] },
+    "qdrant": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:297-304"] },
+    "memory": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:311-317"] },
+    "redis": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:320-326"] },
+    "taskmanager": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:339-345"] },
+    "vibemind-db": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:352-359", "vibemind-os/voice/python/vibemind_db_mcp.py"] },
+    "laura": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:364-376"] },
+    "desktop-automation": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:387-397"] },
+    "spaces-ideas": {
+      "registration": "registered",
+      "transport": "stdio",
+      "tools": [
+        "bubble_list", "bubble_get", "bubble_create", "bubble_update",
+        "bubble_delete", "bubble_promote", "idea_list", "idea_get",
+        "idea_create", "idea_update", "idea_delete", "idea_connect",
+        "idea_disconnect"
+      ],
+      "sources": [
+        "vibemind-os/openfang/openfang.vibemind.toml:404-411",
+        "vibemind-os/spaces/ideas/mcp_server.py:30-183"
+      ]
+    },
+    "space-navigator": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:457-464"] },
+    "spaces-rowboat": { "registration": "template-only", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml.template:411-418", "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1714-1730"] },
+    "github": { "registration": "commented-out", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:246-254"] },
+    "postgres": { "registration": "commented-out", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:328-336"] },
+    "vibemind": { "registration": "unregistered", "transport": null, "tools": null, "sources": ["vibemind-os/config/space_agent_registry.yml:29"] },
+    "spaces-minibook": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:413-420", "vibemind-os/openfang/openfang.vibemind.toml.template:420-427", "vibemind-os/config/space_agent_registry.yml:236-237"] },
+    "n8n": { "registration": "registered", "transport": "stdio", "tools": null, "sources": ["vibemind-os/openfang/openfang.vibemind.toml:441-448", "vibemind-os/openfang/openfang.vibemind.toml.template:448-455", "vibemind-os/config/space_agent_registry.yml:276"] }
+  },
+  "spaces": {
+    "bubbles": {
+      "agent_role": "brain-bubbles",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "vibemind", "spaces-ideas"],
+      "mcp_tools": {
+        "spaces-ideas": ["bubble_create"],
+        "vibemind-db": ["db_ideas_get", "db_ideas_update", "db_projects_create"]
+      },
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-bubbles/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:21-59",
+        "vibemind-os/openfang/agents/brain-bubbles/agent.toml:7",
+        "vibemind-os/openfang/agents/brain-bubbles/agent.toml:40",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1486-1497"
+      ]
+    },
+    "ideas": {
+      "agent_role": "brain-ideas",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "spaces-ideas"],
+      "mcp_tools": { "spaces-ideas": ["idea_connect"] },
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-ideas/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:62-100",
+        "vibemind-os/openfang/agents/brain-ideas/agent.toml:7",
+        "vibemind-os/openfang/agents/brain-ideas/agent.toml:40",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1498-1506",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:629"
+      ]
+    },
+    "coding": {
+      "agent_role": "brain-coder",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "filesystem", "git", "github", "context7", "qdrant", "fetch", "brain", "issue-detector"],
+      "mcp_tools": {},
+      "manifest": { "generated": false, "path": "vibemind-os/openfang/agents/brain-coder/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:103-119",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1411-1460",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1658-1682",
+        "vibemind-os/scripts/sync_openfang_agents.py:160-164"
+      ]
+    },
+    "desktop": {
+      "agent_role": "brain-desktop",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "desktop-automation"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-desktop/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:122-159",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1507-1511"
+      ]
+    },
+    "research": {
+      "agent_role": "brain-researcher",
+      "enabled": true,
+      "mcp_servers": ["fetch", "spaces-ideas", "qdrant"],
+      "mcp_tools": {
+        "fetch": ["fetch"],
+        "spaces-ideas": ["idea_create", "idea_update"]
+      },
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-researcher/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:162-203",
+        "vibemind-os/openfang/agents/brain-researcher/agent.toml:7",
+        "vibemind-os/openfang/agents/brain-researcher/agent.toml:40"
+      ]
+    },
+    "rowboat": {
+      "agent_role": "rowboat-chat",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "fetch", "spaces-rowboat"],
+      "mcp_tools": { "spaces-rowboat": ["rowboat_status"] },
+      "manifest": { "generated": false, "path": "vibemind-os/openfang/agents/rowboat-chat/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:206-227",
+        "vibemind-os/openfang/agents/rowboat-chat/agent.toml",
+        "vibemind-os/scripts/sync_openfang_agents.py:160-164",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:1765"
+      ]
+    },
+    "minibook": {
+      "agent_role": "brain-knowledge",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "fetch", "spaces-minibook"],
+      "mcp_tools": { "spaces-minibook": ["minibook_status"] },
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-knowledge/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:230-247",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1517-1525",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:1956"
+      ]
+    },
+    "schedule": {
+      "agent_role": "brain-scheduler",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "scheduled-tasks"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-scheduler/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:250-266",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1526-1530"
+      ]
+    },
+    "n8n": {
+      "agent_role": "brain-n8n",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db", "n8n"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-n8n/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:269-286",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1531-1535"
+      ]
+    },
+    "agentfarm": {
+      "agent_role": "vibemind",
+      "enabled": false,
+      "mcp_servers": [],
+      "mcp_tools": {},
+      "manifest": null,
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:289-317"
+      ]
+    },
+    "video": {
+      "agent_role": "brain-video",
+      "enabled": true,
+      "mcp_servers": ["laura", "vibemind-db"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-video/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:320-337",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1536-1540"
+      ]
+    },
+    "flowzen": {
+      "agent_role": "brain-wellness",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-wellness/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:340-351",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1541-1545"
+      ]
+    },
+    "mirofish": {
+      "agent_role": "brain-forecaster",
+      "enabled": true,
+      "mcp_servers": ["vibemind-db"],
+      "mcp_tools": {},
+      "manifest": { "generated": true, "path": "vibemind-os/openfang/agents/brain-forecaster/agent.toml" },
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:354-369",
+        "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1546-1550"
+      ]
+    }
+  },
+  "fallback_agent": {
+    "agent": "brain-fallback",
+    "no_mcp": true,
+    "mcp_servers": [],
+    "sources": [
+      "vibemind-os/config/space_agent_registry.yml:13",
+      "vibemind-os/openfang/agents/brain-fallback/agent.toml:6"
+    ]
+  },
+  "additional_openfang_agents": {
+    "brain-planner": {
+      "binding": "openfang-native",
+      "mcp_servers": ["vibemind-db", "taskmanager", "memory", "qdrant", "filesystem", "time", "brain"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1551-1571"]
+    },
+    "brain-orchestrator": {
+      "binding": "openfang-native",
+      "mcp_servers": ["vibemind-db", "space-navigator"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1572-1576"]
+    },
+    "brain-monitor": {
+      "binding": "openfang-native",
+      "mcp_servers": ["vibemind-db", "docker", "process-manager", "event-log", "issue-detector", "network-monitor", "redis", "postgres", "brain"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1577-1591"]
+    },
+    "brain-security": {
+      "binding": "openfang-native",
+      "mcp_servers": ["botnet-detector", "endpoint-hardening", "firewall", "network-monitor", "event-log", "site-verifier", "issue-detector", "brain"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1592-1605"]
+    },
+    "brain-writer": {
+      "binding": "openfang-native",
+      "mcp_servers": ["vibemind-db", "filesystem", "memory", "context7", "tavily", "brain"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1606-1625"]
+    },
+    "brain-devops": {
+      "binding": "openfang-native",
+      "mcp_servers": ["vibemind-db", "docker", "redis", "postgres", "filesystem", "git", "process-manager", "driver-manager", "power-manager", "scheduled-tasks", "registry", "env-manager", "brain", "issue-detector"],
+      "sources": ["vibemind-os/openfang/crates/openfang-types/src/agent.rs:1626-1657"]
+    }
+  },
+  "mcp_events": [
+    {
+      "space": "bubbles",
+      "event": "bubble.create",
+      "agent_role": "brain-bubbles",
+      "server": "spaces-ideas",
+      "tool": "bubble_create",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:43-47",
+        "vibemind-os/spaces/ideas/mcp_server.py:45",
+        "vibemind-os/spaces/ideas/mcp_server.py:552"
+      ]
+    },
+    {
+      "space": "ideas",
+      "event": "idea.connect",
+      "agent_role": "brain-ideas",
+      "server": "spaces-ideas",
+      "tool": "idea_connect",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:77-81",
+        "vibemind-os/spaces/ideas/mcp_server.py:147",
+        "vibemind-os/spaces/ideas/mcp_server.py:738",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:629"
+      ]
+    },
+    {
+      "space": "research",
+      "event": "research.summarize",
+      "agent_role": "brain-researcher",
+      "server": "spaces-ideas",
+      "tool": "idea_update",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:192-196",
+        "vibemind-os/spaces/ideas/mcp_server.py:126",
+        "vibemind-os/spaces/ideas/mcp_server.py:721"
+      ]
+    },
+    {
+      "space": "research",
+      "event": "research.to_idea",
+      "agent_role": "brain-researcher",
+      "server": "spaces-ideas",
+      "tool": "idea_create",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:197-201",
+        "vibemind-os/spaces/ideas/mcp_server.py:110",
+        "vibemind-os/spaces/ideas/mcp_server.py:686"
+      ]
+    },
+    {
+      "space": "rowboat",
+      "event": "rowboat.status",
+      "agent_role": "rowboat-chat",
+      "server": "spaces-rowboat",
+      "tool": "rowboat_status",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:221-225",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:1765"
+      ]
+    },
+    {
+      "space": "minibook",
+      "event": "minibook.status",
+      "agent_role": "brain-knowledge",
+      "server": "spaces-minibook",
+      "tool": "minibook_status",
+      "required_provenance": ["approval_ref", "cost_ref"],
+      "sources": [
+        "vibemind-os/config/space_agent_registry.yml:242-246",
+        "vibemind-os/brain/the_brain/data/capabilities.yaml:1956"
+      ]
+    }
+  ],
+  "registration_authority": {
+    "registration_mechanism": "An MCP server is registered if and only if it appears as a [[mcp_servers]] entry (McpServerConfigEntry) in the merged OpenFang config (openfang.vibemind.toml merged with ~/.openfang/config.toml at startup); config hot-reload watches mcp_servers changes.",
+    "agent_scope_mechanism": "Per-agent scopes are the top-level mcp_servers allowlist in openfang/agents/<agent>/agent.toml, generated exclusively from the registry by scripts/sync_openfang_agents.py after its three fail-closed validators pass; capability tools are derived only from registry mcp_tools, never from mcp_servers.",
+    "empty_scope_semantics": "OpenFang interprets an empty AgentManifest mcp_servers list as ALL connected MCP servers. Enabled agents must therefore declare a non-empty allowlist or no_mcp = true.",
+    "mutation_requires": "runtime-authority",
+    "mutation_task": "task-integration-0005b",
+    "standing_autonomy_sufficient": false,
+    "protected_hand_curated_agents": ["brain-coder", "rowboat-chat", "brain-fallback"],
+    "registration_evidence": {
+      "static": [
+        "Config entry present at the pinned revision (openfang.vibemind.toml [[mcp_servers]])",
+        "Agent manifest scope pinned by OpenFang's own test test_vibemind_brain_manifests_use_top_level_mcp_servers",
+        "sync_openfang_agents.py --check reports no drift",
+        "This contract validated by tests/integration/test_openfang_mcp_authority_contract_v1.py"
+      ],
+      "live": {
+        "verified_here": false,
+        "endpoints": [
+          "GET /api/mcp/servers — configured and connected servers with their tool lists",
+          "GET /api/agents — per-agent mcp_servers plus mcp_servers_mode (all|allowlist)"
+        ],
+        "owner": "task-integration-0005b"
+      }
+    },
+    "sources": [
+      "vibemind-os/openfang/openfang.vibemind.toml:1-2",
+      "vibemind-os/openfang/crates/openfang-types/src/config.rs:1180",
+      "vibemind-os/openfang/crates/openfang-kernel/src/config_reload.rs:228",
+      "vibemind-os/openfang/crates/openfang-types/src/agent.rs:459-464",
+      "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1484-1709",
+      "vibemind-os/openfang/crates/openfang-api/src/routes.rs:1534-1535",
+      "vibemind-os/openfang/crates/openfang-api/src/routes.rs:5179",
+      "vibemind-os/scripts/sync_openfang_agents.py:87-110",
+      "vibemind-os/scripts/sync_openfang_agents.py:167-459",
+      "docs/governance/multi-session-program-charter-v1.md",
+      "AGENTS.md"
+    ]
+  },
+  "golden_path_ideas": {
+    "server": "spaces-ideas",
+    "events": ["ideas.idea.connect", "bubbles.bubble.create"],
+    "data_plane": "Supabase PostgREST via spaces/ideas/mcp_server.py (no LLM dependency; every tool call verified against the database)",
+    "statically_complete": true,
+    "remaining_for_0005b": [
+      "Live proof that spaces-ideas and vibemind-db are connected: GET /api/mcp/servers must list both as connected with their tools (spaces-ideas: 13 tools including idea_connect and bubble_create)",
+      "Live proof that brain-ideas and brain-bubbles run with mcp_servers_mode=allowlist and the exact contract scopes: GET /api/agents",
+      "Runtime enforcement evidence that bubble.create and idea.connect envelopes carry approval_ref and cost_ref provenance",
+      "Independent database readback of a created bubble/edge row correlated to the intent (Golden-Path evidence per program focus directive point 3)",
+      "Resolution of the environment-bound absolute Windows paths in the registration entries for the target host"
+    ],
+    "sources": [
+      "vibemind-os/spaces/ideas/mcp_server.py:1-30",
+      "docs/governance/session-request-queue-v1.md:104-111",
+      "docs/SPACES.md:39-63"
+    ]
+  },
+  "gaps": [
+    {
+      "server": "vibemind",
+      "kind": "unregistered-but-scoped",
+      "detail": "brain-bubbles scopes MCP server 'vibemind' (registry bubbles.mcp_servers) but no [[mcp_servers]] entry named 'vibemind' exists in openfang.vibemind.toml or its template."
+    },
+    {
+      "server": "spaces-rowboat",
+      "kind": "template-only",
+      "detail": "rowboat-chat scopes spaces-rowboat and OpenFang's own test requires the template entry, but the live openfang.vibemind.toml has no spaces-rowboat entry; only the template declares it."
+    },
+    {
+      "server": "github",
+      "kind": "commented-out-but-scoped",
+      "detail": "coding scope and the pinned brain-coder manifest include 'github'; its registration entry is commented out pending GITHUB_PERSONAL_ACCESS_TOKEN."
+    },
+    {
+      "server": "postgres",
+      "kind": "commented-out-but-scoped",
+      "detail": "brain-monitor and brain-devops expected scopes include 'postgres'; its registration entry is commented out pending POSTGRES_CONNECTION_STRING."
+    },
+    {
+      "kind": "dual-source-capabilities",
+      "detail": "capabilities.yaml routes bubble_create via execution_target 'supabase:bubble.create' (line 412) while the registry binds bubble.create to MCP spaces-ideas:bubble_create with provenance; only three active 'mcp:' execution targets exist (lines 629, 1765, 1956) and they embed agent instance names, predating E1. Unification is owned by task-brain-0018.",
+      "sources": ["vibemind-os/brain/the_brain/data/capabilities.yaml:412", "vibemind-os/brain/the_brain/data/capabilities.yaml:629", "vibemind-os/brain/the_brain/data/capabilities.yaml:1765", "vibemind-os/brain/the_brain/data/capabilities.yaml:1956"]
+    },
+    {
+      "kind": "static-provider-pinning",
+      "detail": "Generated manifests pin provider=openai model=gpt-4o-mini at generation time; under E1 the instance/provider/model binding belongs to OpenFang at execution time.",
+      "sources": ["vibemind-os/scripts/sync_openfang_agents.py:32-38", "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1428-1439"]
+    },
+    {
+      "kind": "non-mcp-wildcards",
+      "detail": "Generated manifests grant network=[\"*\"] and memory_read=[\"*\"]; the MCP dimension itself is wildcard-free (enforced by OpenFang's manifest test).",
+      "sources": ["vibemind-os/scripts/sync_openfang_agents.py:81-83", "vibemind-os/openfang/crates/openfang-types/src/agent.rs:1707-1709"]
+    },
+    {
+      "kind": "host-bound-registration",
+      "detail": "All stdio registration entries use absolute Windows paths (C:/Users/User/Desktop/Vibemind_V1/...); registration is environment-specific and must be re-derived per target host by 0005b.",
+      "sources": ["vibemind-os/openfang/openfang.vibemind.toml:45"]
+    },
+    {
+      "kind": "tool-inventories-not-captured",
+      "detail": "Only spaces-ideas has an in-checkout authoritative tool inventory captured here; other servers' tool lists are external or not inventoried in this contract (tools: null means no claim, not an empty allowlist)."
+    },
+    {
+      "kind": "dual-port-8000-binding",
+      "detail": "Two coding-engine apps claim port 8000 at engine pin be1994b (M1 of docs/operations/2026-08-14-coding-event-binding-matrix.md): infra/control_server/server.py (published by infra/docker-compose.yml:31, CONTROL_PORT=8000 line 70) implements all 8 registry-bound routes plus GET /api/health with a boolean 'healthy' field (lines 456-468), while src/api/main.py (published by the root docker-compose.yml:65, uvicorn command line 114) implements none of the 8 routes (all routers mount under /api/v1) and its /health returns {\"status\": \"healthy\"} without a 'healthy' boolean, so CodingEngineExecutor._assert_healthy (capability_targets.py:297-304) fails closed against it. Which compose file owns port 8000 is user-gated; this record makes no ownership claim.",
+      "sources": ["vibemind-os/coding-engine/infra/control_server/server.py:456-468", "vibemind-os/coding-engine/infra/control_server/server.py:491", "vibemind-os/coding-engine/infra/docker-compose.yml:31", "vibemind-os/coding-engine/infra/docker-compose.yml:70", "vibemind-os/coding-engine/src/api/main.py:163-185", "vibemind-os/coding-engine/src/api/routes/health.py:14-17", "vibemind-os/coding-engine/docker-compose.yml:65", "vibemind-os/coding-engine/docker-compose.yml:110", "vibemind-os/brain/the_brain/core/capability_targets.py:297-304"]
+    },
+    {
+      "kind": "dual-dispatch-coding",
+      "detail": "Live coding intents dispatch through capability coding_task with execution_target 'openfang:openclaude-coder' (capabilities.yaml:1551-1582), an agent that appears nowhere in the registry SoT (config/space_agent_registry.yml has zero 'openclaude' mentions) or in this contract's agent catalog, while the registry binds all 8 code.* events to 'coding-engine:<METHOD>:<route>' (registry lines 112-119) mirrored by capabilities.yaml:1500-1549. Measured validation (intent_validation/cat5_results.json) records 20 openclaude-coder dispatches and 0 coding-engine dispatches. Dispatch authority is user-gated and overlaps task-brain-0018 (E1/E2); this record makes no selection claim.",
+      "sources": ["vibemind-os/brain/the_brain/data/capabilities.yaml:1500-1549", "vibemind-os/brain/the_brain/data/capabilities.yaml:1551-1582", "vibemind-os/config/space_agent_registry.yml:112-119", "intent_validation/cat5_results.json"]
+    },
+    {
+      "kind": "protected-manifest-not-generated",
+      "detail": "sync_openfang_agents.py skips 'brain-coder' as protected/pre-existing (_skip_reason, lines 122-133), so its manifest is never generated from the registry: the current hand-curated agent.toml lists the same 9 mcp_servers as the registry coding entry, but that parity is manual and no generation path propagates future registry MCP-scope changes (spaces.coding.manifest.generated is false in this contract).",
+      "sources": ["vibemind-os/scripts/sync_openfang_agents.py:154-165", "vibemind-os/openfang/agents/brain-coder/agent.toml:8-18", "vibemind-os/config/space_agent_registry.yml:103-110"]
+    }
+  ]
+}

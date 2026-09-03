@@ -1,0 +1,9 @@
+{
+  "contract_version": "v1",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent_ref": "intent_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "operation": "create",
+  "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "idempotency_key": "schedule-chat:01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+}

@@ -1,0 +1,8 @@
+{
+  "contract_version": "v1",
+  "task_id": "task_v1_not-a-valid-ulid",
+  "title": "Invalid task brief",
+  "objective": "This fixture must fail.",
+  "requested_by": "shared-contracts",
+  "created_at": "2026-07-31T09:00:00Z"
+}

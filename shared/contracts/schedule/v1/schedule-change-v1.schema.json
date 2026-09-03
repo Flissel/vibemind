@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:schedule-change:v1",
+  "title": "ScheduleChangeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "change_id", "schedule_id", "request_id", "trace_id", "action", "expected_revision", "approval_ref", "idempotency_key"],
+  "properties": {
+    "contract_version": {"const": "v1"}, "change_id": {"type": "string", "pattern": "^change_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "schedule_id": {"type": "string", "pattern": "^schedule_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "request_id": {"type": "string", "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "trace_id": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "action": {"enum": ["create", "update", "pause", "resume", "cancel", "run_now"]}, "expected_revision": {"type": "integer", "minimum": 0, "maximum": 999999}, "approval_ref": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}, "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"}
+  }
+}

@@ -1,0 +1,18 @@
+# Grafana auto-provisioned dashboard provider.
+# Mounted at /etc/grafana/provisioning/dashboards/vibemind.yml.
+# Tells Grafana to scan /var/lib/grafana/dashboards/ for .json files
+# (the 3 VibeMind dashboards are mounted there as separate configs).
+
+apiVersion: 1
+
+providers:
+  - name: 'VibeMind'
+    orgId: 1
+    folder: 'VibeMind'
+    type: file
+    disableDeletion: true     # UI delete = drift from repo, block it
+    updateIntervalSeconds: 30
+    allowUiUpdates: false      # repo is the truth; UI edits won't persist
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

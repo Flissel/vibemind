@@ -1,0 +1,140 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"drawStyle": "bars", "lineWidth": 0, "fillOpacity": 80, "stacking": {"mode": "normal"}, "axisLabel": "errors/min"},
+          "unit": "short"
+        }
+      },
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "editorMode": "code",
+          "expr": "sum by (swarm_service) (rate({swarm_service=~\"$service\"} |~ \"$pattern\" [1m]))",
+          "legendFormat": "{{swarm_service}}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Error rate over time (per service, $pattern matches)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "gridPos": {"h": 16, "w": 16, "x": 0, "y": 6},
+      "id": 2,
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      },
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "editorMode": "code",
+          "expr": "{swarm_service=~\"$service\"} |~ \"$pattern\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Matching log lines ($pattern across $service)",
+      "type": "logs"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 6},
+      "id": 3,
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "custom": {"align": "auto", "displayMode": "color-background"},
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 1}, {"color": "red", "value": 10}]}
+        }
+      },
+      "options": {"showHeader": true, "footer": {"show": false}, "cellHeight": "sm"},
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "editorMode": "code",
+          "expr": "topk(20, sum by (swarm_service, container) (count_over_time({swarm_service=~\"$service\"} |~ \"$pattern\" [$__range])))",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Hits by container (range)",
+      "transformations": [{"id": "labelsToFields", "options": {}}],
+      "type": "table"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 14},
+      "id": 4,
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}
+        }
+      },
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "colorMode": "value", "graphMode": "none", "orientation": "horizontal"},
+      "targets": [
+        {
+          "datasource": {"type": "loki", "uid": "loki"},
+          "editorMode": "code",
+          "expr": "sum(count_over_time({swarm_service=~\"$service\"} |~ \"$pattern\" [$__range]))",
+          "instant": true,
+          "queryType": "instant",
+          "refId": "A"
+        }
+      ],
+      "title": "Total hits in range",
+      "type": "stat"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": ["vibemind", "incident", "debug"],
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "label": "Service (regex on swarm_service)",
+        "type": "textbox",
+        "current": {"value": "vibemind_.+", "text": "vibemind_.+"},
+        "query": "vibemind_.+",
+        "description": "Swarm-service regex — e.g. vibemind_brain-core, vibemind_brain.*, vibemind_rowboat.*, vibemind_.+"
+      },
+      {
+        "name": "pattern",
+        "label": "Match pattern",
+        "type": "textbox",
+        "current": {"value": "(?i)error|exception|traceback|fatal", "text": "(?i)error|exception|traceback|fatal"},
+        "query": "(?i)error|exception|traceback|fatal",
+        "description": "Loki line filter regex — e.g. (?i)error, SIGTERM, timeout"
+      }
+    ]
+  },
+  "time": {"from": "now-2h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "VibeMind — Incident Timeline",
+  "uid": "vibemind-incident-timeline",
+  "version": 1
+}

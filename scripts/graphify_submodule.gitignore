@@ -1,0 +1,76 @@
+# Standard-.graphifyignore für Vibemind-Submodul-Graphen.
+# Wird vor dem Build in das jeweilige Submodul-Verzeichnis kopiert.
+# Zweck: nur Eigen-Code des Submoduls graphen, Müll + vendored Fremdcode raus.
+
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+.env.*
+*.env
+*secret*
+*credentials*
+*.key
+*.pem
+
+# ── Build- & venv-Artefakte ──────────────────────────────────────────────────
+node_modules
+.venv
+.venv312
+venv
+__pycache__
+site-packages
+target
+dist
+build
+.next
+.turbo
+out
+*.pyc
+*.pyo
+*.so
+*.pyd
+*.h
+*.c
+*.lock
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# ── Vendored Fremdcode (NICHT-Flissel) in voice/external ─────────────────────
+external/zeroclaw
+external/minibook
+external/Autogen_AgentFarm
+external/openclaw
+electron-app/clawport-ui
+zeroclaw
+minibook
+clawport-ui
+
+# ── Duplikate (nested Submodule, anderswo schon erfasst) ─────────────────────
+spaces/coding/Coding_engine
+Coding_engine
+
+# ── Bilder / Binär / Modelle ─────────────────────────────────────────────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.pdf
+*.zip
+*.tar
+*.gz
+*.bin
+*.onnx
+*.safetensors
+*.pkl
+*.pt
+*.pth
+*.gguf
+
+# ── Lärm ─────────────────────────────────────────────────────────────────────
+graphify-out
+.git
+*.log
+*.bak
+.fungus_cache

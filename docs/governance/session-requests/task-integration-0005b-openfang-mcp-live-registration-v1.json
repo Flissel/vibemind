@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-integration-0005b-openfang-mcp-live-registration-v1",
+  "session_type": "task",
+  "space": "integration",
+  "parent_cockpit": "cockpit-integration",
+  "request_reference": "task-request:task-integration-0005b-openfang-mcp-live-registration-v1",
+  "objective": "Apply the merged openfang-mcp-authority-v1 contract to the real OpenFang configuration and perform the live MCP registration for the Ideas golden path with correlated status readback. vibemind-os configuration changes happen as service commits on a codex branch in the vibemind-os repository; superproject writes are limited to runbook and evidence documentation. If the OpenFang runtime is not reachable from the session, fail closed and deliver an exact, tested activation runbook plus the reachability finding instead of a live claim. No space data mutation, no deployments beyond the contract-scoped MCP registration, no secrets.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["docs/runbooks/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T19:42:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/integration/task-integration-0005b-openfang-mcp-live-registration-v1",
+  "risk_class": "deployment",
+  "dependencies": ["task-integration-0005a-openfang-mcp-authority-static-v1"],
+  "merge_position": 10
+}

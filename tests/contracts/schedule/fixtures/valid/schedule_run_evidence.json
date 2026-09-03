@@ -1,0 +1,21 @@
+{
+  "contract_version": "v1",
+  "run_id": "run_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "schedule_id": "schedule_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "revision": 5,
+  "scheduled_for": "2026-08-01T07:00:00Z",
+  "started_at": "2026-08-01T07:00:00Z",
+  "completed_at": "2026-08-01T07:00:01Z",
+  "outcome": "succeeded",
+  "attempt": 1,
+  "evidence_refs": ["evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"],
+  "artifact_refs": ["artifact_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"],
+  "cost": {
+    "actual_cost_minor": 100,
+    "currency": "EUR",
+    "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  }
+}

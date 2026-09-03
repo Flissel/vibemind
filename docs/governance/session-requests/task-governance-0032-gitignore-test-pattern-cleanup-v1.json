@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0032-gitignore-test-pattern-cleanup-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0032-gitignore-test-pattern-cleanup-v1",
+  "objective": "Remove or narrow the .gitignore rule 'test_*.py' (line 108) that currently forces git add -f for every new governance test file, per the orchestrator disposition answering the task-governance-0031 follow-up question (queue section 3.1d item 2). Determine repo-first which paths the rule was actually meant to cover, replace the global pattern with the narrowest expression preserving that intent, and prove the fix with a canary test file added WITHOUT -f whose collection keeps the governance suite green. No other ignore rules change; behavior of shipped code is untouched.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": [".gitignore", "docs/governance/", "tests/v1_governance/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0032-gitignore-test-pattern-cleanup-v1",
+  "risk_class": "code",
+  "dependencies": ["task-governance-0033-wave456-ledger-records-v1"],
+  "merge_position": 1
+}

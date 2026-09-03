@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0003-speckit-openclaude-evaluation-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0003-speckit-openclaude-evaluation-v1",
+  "objective": "Evaluate github/spec-kit (Spec-Driven Development toolkit: specify CLI, constitution/specify/plan/tasks/implement workflow, MIT) for integration with OpenClaude and the VibeMind Coding space, grounded in the real OpenClaude source. Deliver an evaluation spec with a fit/gap analysis, a concrete integration proposal, explicit non-goals and exactly one recommended first implementation task. Read-only research: no code changes, no dependency installation into repositories, no runtime mutation.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/superpowers/specs/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-14T11:08:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0003-speckit-openclaude-evaluation-v1",
+  "risk_class": "docs",
+  "dependencies": [],
+  "merge_position": 1
+}

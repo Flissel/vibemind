@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0031-activation-evidence-recording-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0031-activation-evidence-recording-v1",
+  "objective": "Extend the closed cockpit activation-evidence ledger and its validator by a controlled, narrowly shaped recording vocabulary without weakening the fail-closed principle: add the evidence class activation=git-evidenced-creation, valid only together with a strictly shaped durable_evidence_reference of the form ccr-session:<session-id>@<rfc3339>; add approval=git-evidenced-approval-ledger, valid only together with the creation class and a well-formed entry for the same cockpit in the closed approval ledger; keep interactivity restricted to not-git-evidenced because no durable reference form exists for it; keep every entry without a reference mandatorily not-git-evidenced; extend the deterministic portfolio-check output by the recorded approval evidence and reference; record the eleven wave-1..3 cockpit creation records from the session-request queue section 2.1 as the first ledger entries (creation evidence only, expressly no activation/interactivity/live claims); update the session-lifecycle runbook accordingly. TDD: red tests first, then implementation, then deliberately lifting the repository-state contract tests to the new truth.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": [
+    "tools/v1_governance/",
+    "tests/v1_governance/",
+    "docs/governance/",
+    "docs/runbooks/"
+  ],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-14T13:45:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0031-activation-evidence-recording-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 1
+}

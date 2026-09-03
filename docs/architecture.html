@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VibeMind V1 Architecture</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #0e1b2e;
+      --line: #29405f;
+      --text: #e7eef9;
+      --muted: #9eb0c9;
+      --blue: #4299e1;
+      --orange: #ed8936;
+      --purple: #9f7aea;
+      --green: #48bb78;
+      --red: #f56565;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #142a46 0, var(--bg) 46rem);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 72px; }
+    header {
+      padding: 44px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(66,153,225,.2), rgba(159,122,234,.18));
+      box-shadow: 0 24px 70px rgba(0,0,0,.28);
+    }
+    h1 { margin: 0 0 10px; font-size: clamp(2.2rem, 6vw, 4.5rem); line-height: 1; }
+    h2 { margin: 0 0 18px; font-size: 1.55rem; }
+    h3 { margin: 0 0 8px; }
+    p { margin: 0 0 12px; }
+    .eyebrow { color: #8dd5ff; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+    .lead { max-width: 850px; color: #c6d5e9; font-size: 1.15rem; }
+    .notice {
+      margin-top: 22px;
+      padding: 14px 18px;
+      border-left: 4px solid var(--orange);
+      background: rgba(237,137,54,.1);
+      color: #ffd8ad;
+    }
+    section { margin-top: 42px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(14,27,46,.92);
+    }
+    .card p, .muted { color: var(--muted); }
+    .diagram {
+      overflow-x: auto;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #091525;
+    }
+    svg { display: block; min-width: 940px; width: 100%; height: auto; }
+    .pipeline { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+    .step {
+      position: relative;
+      min-height: 130px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--panel);
+      border-top: 4px solid var(--blue);
+    }
+    .step:nth-child(2), .step:nth-child(3) { border-color: var(--purple); }
+    .step:nth-child(4), .step:nth-child(5) { border-color: var(--orange); }
+    .step:nth-child(6) { border-color: var(--green); }
+    .step b { display: block; margin-bottom: 7px; }
+    .step span { color: var(--muted); font-size: .9rem; }
+    .layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .spaces { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .space { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(14,27,46,.92); }
+    .space b { display: block; color: #b8e4ff; }
+    .space span { color: var(--muted); font-size: .86rem; }
+    .space.blocked { border-color: var(--red); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+    table { width: 100%; min-width: 760px; border-collapse: collapse; background: rgba(14,27,46,.92); }
+    th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: #b8e4ff; }
+    a { color: #8dd5ff; }
+    ul { margin: 10px 0 0; padding-left: 20px; color: var(--muted); }
+    code { color: #b8e4ff; }
+    footer { margin-top: 48px; color: var(--muted); font-size: .9rem; }
+    @media (max-width: 900px) {
+      .grid, .layers { grid-template-columns: 1fr; }
+      .spaces { grid-template-columns: repeat(2, 1fr); }
+      .pipeline { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 540px) { .pipeline, .spaces { grid-template-columns: 1fr; } header { padding: 28px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">VibeMind V1</div>
+    <h1>System architecture</h1>
+    <p class="lead">A modular agentic workspace with a separate cognitive control plane,
+      governed execution boundary, domain Spaces, and evidence-producing data services.</p>
+    <div class="notice"><strong>Architecture contract:</strong> Brain decides and plans.
+      OpenFang resolves, approves, and executes. Missing authority fails closed.</div>
+    <p style="margin-top:18px"><a href="ARCHITECTURE.md">Detailed architecture</a> ·
+      <a href="SPACES.md">All 13 Spaces</a> ·
+      <a href="DOCUMENTATION_AUDIT.md">Documentation audit</a></p>
+  </header>
+
+  <section>
+    <h2>Business context</h2>
+    <div class="grid">
+      <article class="card"><h3>Objective</h3><p>Turn natural-language intent into traceable,
+        bounded work across AI-assisted applications.</p></article>
+      <article class="card"><h3>Users</h3><p>Builders and operators who need one interface for
+        coding, knowledge, automation, communication, and planning.</p></article>
+      <article class="card"><h3>Quality bar</h3><p>Explicit authority, least-privilege tools,
+        correlated outcomes, reproducible setup, and visible failure.</p></article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Technical architecture</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 1120 560" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">VibeMind layered architecture</title>
+        <desc id="diagram-desc">Ingress flows through Brain and OpenFang to agents, tools,
+          applications, and data services.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L9,3 z" fill="#7892b5"></path>
+          </marker>
+          <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-opacity=".28"></feDropShadow></filter>
+        </defs>
+        <g font-family="system-ui" fill="#e7eef9" filter="url(#shadow)">
+          <rect x="25" y="45" width="180" height="90" rx="16" fill="#183b5c" stroke="#4299e1"></rect>
+          <text x="115" y="80" text-anchor="middle" font-size="18" font-weight="700">Ingress</text>
+          <text x="115" y="107" text-anchor="middle" font-size="13" fill="#b9cee5">Voice · UI · Channels · API</text>
+
+          <rect x="255" y="45" width="190" height="90" rx="16" fill="#31265a" stroke="#9f7aea"></rect>
+          <text x="350" y="80" text-anchor="middle" font-size="18" font-weight="700">Brain</text>
+          <text x="350" y="107" text-anchor="middle" font-size="13" fill="#d5c9f7">Control plane</text>
+
+          <rect x="495" y="45" width="190" height="90" rx="16" fill="#5a3519" stroke="#ed8936"></rect>
+          <text x="590" y="80" text-anchor="middle" font-size="18" font-weight="700">OpenFang</text>
+          <text x="590" y="107" text-anchor="middle" font-size="13" fill="#ffd4aa">Execution boundary</text>
+
+          <rect x="735" y="45" width="160" height="90" rx="16" fill="#183f35" stroke="#48bb78"></rect>
+          <text x="815" y="80" text-anchor="middle" font-size="18" font-weight="700">Agents</text>
+          <text x="815" y="107" text-anchor="middle" font-size="13" fill="#bcebd0">Canonical identities</text>
+
+          <rect x="945" y="45" width="150" height="90" rx="16" fill="#183f35" stroke="#48bb78"></rect>
+          <text x="1020" y="80" text-anchor="middle" font-size="18" font-weight="700">MCP tools</text>
+          <text x="1020" y="107" text-anchor="middle" font-size="13" fill="#bcebd0">Allowed operations</text>
+
+          <path d="M205 90 H250" stroke="#7892b5" stroke-width="3" marker-end="url(#arrow)"></path>
+          <path d="M445 90 H490" stroke="#7892b5" stroke-width="3" marker-end="url(#arrow)"></path>
+          <path d="M685 90 H730" stroke="#7892b5" stroke-width="3" marker-end="url(#arrow)"></path>
+          <path d="M895 90 H940" stroke="#7892b5" stroke-width="3" marker-end="url(#arrow)"></path>
+
+          <rect x="165" y="225" width="790" height="115" rx="22" fill="#10243b" stroke="#29405f"></rect>
+          <text x="560" y="258" text-anchor="middle" font-size="19" font-weight="700">Domain Spaces</text>
+          <g font-size="14" text-anchor="middle">
+            <rect x="195" y="278" width="130" height="42" rx="10" fill="#183b5c"></rect><text x="260" y="304">Coding</text>
+            <rect x="345" y="278" width="130" height="42" rx="10" fill="#183b5c"></rect><text x="410" y="304">Ideas</text>
+            <rect x="495" y="278" width="130" height="42" rx="10" fill="#183b5c"></rect><text x="560" y="304">Desktop</text>
+            <rect x="645" y="278" width="130" height="42" rx="10" fill="#183b5c"></rect><text x="710" y="304">Bubbles</text>
+            <rect x="795" y="278" width="130" height="42" rx="10" fill="#183b5c"></rect><text x="860" y="304">Optional Spaces</text>
+          </g>
+          <path d="M1020 135 V190 H560 V220" stroke="#7892b5" stroke-width="3" fill="none" marker-end="url(#arrow)"></path>
+
+          <rect x="165" y="420" width="790" height="95" rx="22" fill="#142238" stroke="#29405f"></rect>
+          <text x="560" y="452" text-anchor="middle" font-size="19" font-weight="700">Data and observability</text>
+          <text x="560" y="486" text-anchor="middle" font-size="15" fill="#b9cee5">Supabase / PostgreSQL · Qdrant · Neo4j · Redis · Loki / Grafana</text>
+          <path d="M560 340 V415" stroke="#7892b5" stroke-width="3" marker-end="url(#arrow)"></path>
+          <path d="M230 420 C80 390,80 175,330 140" stroke="#9f7aea" stroke-width="2" fill="none" stroke-dasharray="8 7" marker-end="url(#arrow)"></path>
+          <text x="75" y="300" font-size="13" fill="#d5c9f7" transform="rotate(-90 75 300)">state and outcome evidence</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>Canonical Space map</h2>
+    <p class="muted">Derived from <code>space_agent_registry.yml</code>: 12 enabled Spaces and one explicitly blocked contract.</p>
+    <div class="spaces" style="margin-top:16px">
+      <div class="space"><b>Bubbles</b><span>brain-bubbles · 14 events</span></div>
+      <div class="space"><b>Ideas</b><span>brain-ideas · 25 events</span></div>
+      <div class="space"><b>Coding</b><span>brain-coder · 8 events</span></div>
+      <div class="space"><b>Desktop</b><span>brain-desktop · 28 events</span></div>
+      <div class="space"><b>Research</b><span>brain-researcher · 6 events</span></div>
+      <div class="space"><b>Rowboat</b><span>rowboat-chat · 8 events</span></div>
+      <div class="space"><b>Minibook</b><span>brain-knowledge · 4 events</span></div>
+      <div class="space"><b>Schedule</b><span>brain-scheduler · 7 events</span></div>
+      <div class="space"><b>n8n</b><span>brain-n8n · 8 events</span></div>
+      <div class="space blocked"><b>AgentFarm</b><span>vibemind · disabled/blocked · 8 contracts</span></div>
+      <div class="space"><b>Video</b><span>brain-video · 9 events</span></div>
+      <div class="space"><b>Flowzen</b><span>brain-wellness · 3 events</span></div>
+      <div class="space"><b>MiroFish</b><span>brain-forecaster · 7 events</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Request pipeline</h2>
+    <div class="pipeline">
+      <div class="step"><b>1. Normalize</b><span>Ingress supplies intent, context, and correlation data.</span></div>
+      <div class="step"><b>2. Decide</b><span>Brain classifies, plans, and selects a capability.</span></div>
+      <div class="step"><b>3. Govern</b><span>Contracts and policy reject invalid or unauthorized work.</span></div>
+      <div class="step"><b>4. Resolve</b><span>OpenFang resolves the canonical agent and approval scope.</span></div>
+      <div class="step"><b>5. Execute</b><span>The agent calls only allowlisted MCP tools or applications.</span></div>
+      <div class="step"><b>6. Prove</b><span>Structured results and terminal evidence return to the caller.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Deployment planes</h2>
+    <div class="layers">
+      <article class="card"><h3>Docker Swarm</h3><ul><li>Brain and shared infrastructure</li><li>Supabase, Qdrant, and observability</li><li>Profile-selected domain services</li></ul></article>
+      <article class="card"><h3>Native host</h3><ul><li>OpenFang execution runtime</li><li>Bridges and local models</li><li>Desktop and browser integrations</li></ul></article>
+      <article class="card"><h3>Interactive client</h3><ul><li>Electron 3D workspace</li><li>Voice backend and local IPC</li><li>Realtime application updates</li></ul></article>
+    </div>
+    <div class="table-wrap" style="margin-top:18px">
+      <table>
+        <thead><tr><th>Plane/profile</th><th>Representative components</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Core Swarm</td><td>Brain, Qdrant, embeddings, Supabase</td><td>Always included by the root launcher</td></tr>
+          <tr><td>Selectable profiles</td><td>Coding, Rowboat, MiroFish, n8n, media, logging</td><td>Configured deployment groups; not live proof</td></tr>
+          <tr><td>Native host</td><td>OpenFang, bridge, Ollama, Automation UI</td><td>Separate process and health boundaries</td></tr>
+          <tr><td>Separate Compose</td><td>Minibook and component integrations</td><td>Not uniformly controlled by Swarm profiles</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Trust and data boundaries</h2>
+    <div class="grid">
+      <article class="card"><h3>Authority</h3><p>Ingress requests work; Brain decides; OpenFang authorizes and executes; a Space proves terminal state.</p></article>
+      <article class="card"><h3>Data</h3><p>Supabase, coding stores, Rowboat Mongo/Qdrant, MiroFish Neo4j, n8n data and media artifacts retain distinct owners.</p></article>
+      <article class="card"><h3>External effects</h3><p>Desktop actions, messages, workflow runs and publication need explicit authority and external receipts.</p></article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Evidence boundary</h2>
+    <div class="grid">
+      <article class="card"><h3>Static</h3><p>Code or a contract exists.</p></article>
+      <article class="card"><h3>Configured</h3><p>A registry or deployment references it.</p></article>
+      <article class="card"><h3>Verified live</h3><p>A current end-to-end run produced correlated terminal evidence.</p></article>
+    </div>
+    <p class="muted" style="margin-top:16px">This page documents static architecture. It does not assert live service state.</p>
+  </section>
+
+  <footer>VibeMind V1 public architecture overview · Updated 2026-08-09 · Static/configured evidence only · Source: repository contracts, registry, launchers, and Swarm definitions.</footer>
+</main>
+</body>
+</html>

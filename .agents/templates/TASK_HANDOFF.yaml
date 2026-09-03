@@ -1,0 +1,14 @@
+schema_version: 2
+session_id: task-coding-1042
+branch: codex/coding/task-coding-1042-codegen-start
+parent_cockpit: cockpit-coding
+request_reference: task-request:task-coding-1042-v1
+# Match request exactly: standing-autonomy:v1 or codex-user-message:<thread-UUID>@<RFC3339 timestamp>.
+approval_reference: standing-autonomy:v1
+commits: []
+tests: []
+evidence: []
+dependencies: []
+merge_position: 1
+deployment_status: not_required
+remaining_blockers: []

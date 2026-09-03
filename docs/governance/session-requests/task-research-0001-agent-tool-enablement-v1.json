@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0001-agent-tool-enablement-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0001-agent-tool-enablement-v1",
+  "objective": "Task zero for the research space, implementing decisions E9 and E10: the generated brain-researcher manifest grants only memory_store and memory_recall, so all six research.* events bind to tools the agent does not have and the space cannot execute at all. Define the mcp_tools allowlist for the research block in the registry using the vocabulary of the merged openfang-mcp-authority contract, so that lookup events reach fetch and idea writes reach the spaces-ideas authority instead of the broad vibemind-db server, and size the agent model for the intended workload. Verify repo-first through the generator that the regenerated manifest actually carries the intended tools; a manifest that still lacks them is a failed task. Service commits in vibemind-os on a codex branch; superproject writes limited to evidence documentation. No live registration, no runtime action, no deep-research wiring - that is a separate task.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-16T15:45:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0001-agent-tool-enablement-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 3
+}

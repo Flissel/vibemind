@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0028-vibemind-os-child-gitlink-lifts-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0028-vibemind-os-child-gitlink-lifts-v1",
+  "objective": "Stage 1 of the next pin chain: inside the vibemind-os repository, lift the openfang gitlink from 33be359 to 5d38662 (B1 env-whitelist fix merged as openfang#17 on main) and the coding-engine gitlink from be1994b to 81ab938 (spec-kit SpecFormat merged as DaveFelix-Coding-Engine#3 on master), as two separate pin commits per submodule policy, each verifying the target commit exists on the respective remote default branch before pinning. Service commits on a codex branch in vibemind-os; superproject writes limited to evidence documentation. The superproject gitlink and repo-manifest lift to the resulting vibemind-os commit is expressly NOT in scope and follows as its own task after this one merges.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0028-vibemind-os-child-gitlink-lifts-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 7
+}

@@ -1,0 +1,24 @@
+{
+  "contract_version": "v1",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent": "Assess the cited research evidence.",
+  "question": "What conclusion is supported by the supplied sources?",
+  "clarification": {"required": false, "questions": []},
+  "source_policy": {
+    "allowed_source_types": ["primary", "secondary"],
+    "allow_paywalled_sources": false
+  },
+  "collection_limits": {
+    "max_sources": 10,
+    "max_depth": 2,
+    "max_duration_seconds": 300
+  },
+  "budget": {
+    "currency": "EUR",
+    "max_cost_minor": 500,
+    "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "contract_version": "v1",
+  "correlation_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "channel_kind": "openclaw",
+  "actor_context": {"actor_id": "user:local-42"},
+  "session_context": {"session_id": "session-20260731-01"},
+  "message": "Ingress aliases must not cross the Shared boundary.",
+  "received_at": "2026-07-31T10:00:00Z",
+  "requested_space_alias": "autogen",
+  "user_facing_expectations": {"reply": "required", "evidence": "summary"}
+}

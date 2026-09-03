@@ -1,0 +1,63 @@
+services:
+  loki:
+    image: grafana/loki:3.4.1@sha256:1d0c5ddc7644b88956aa0bd775ad796d9635180258a225d6ab3552751d5e2a66
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+    - 3102:3100
+    volumes:
+    - loki_data:/loki
+    - ./configs/loki_config_v1.yml:/etc/loki/loki-config.yml:ro
+    restart: unless-stopped
+  grafana-vibemind:
+    image: grafana/grafana:11.5.0@sha256:0a2874cf39c6487093c682215f7c7903ed8646d78ae5f911af945d2dfcc0a447
+    ports:
+    - 3030:3000
+    environment:
+    - GF_SECURITY_ADMIN_USER=admin
+    - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
+    - GF_USERS_ALLOW_SIGN_UP=false
+    - GF_AUTH_ANONYMOUS_ENABLED=false
+    - GF_INSTALL_PLUGINS=
+    volumes:
+    - grafana_vibemind_data:/var/lib/grafana
+    - ./configs/grafana_datasources_v2.yml:/etc/grafana/provisioning/datasources/loki.yml:ro
+    - ./configs/grafana_dashboards_v1.yml:/etc/grafana/provisioning/dashboards/vibemind.yml:ro
+    - ./configs/grafana_dash_brain_v2.json:/var/lib/grafana/dashboards/brain-overview.json:ro
+    - ./configs/grafana_dash_services_v2.json:/var/lib/grafana/dashboards/vibemind-services.json:ro
+    - ./configs/grafana_dash_incident_v2.json:/var/lib/grafana/dashboards/incident-timeline.json:ro
+    depends_on:
+    - loki
+    restart: unless-stopped
+  coding-gitea:
+    image: gitea/gitea:1.23@sha256:8b5a98abe52dacbead16eb4179c9abb7c217d523df3a75901343906ae7853357
+    ports:
+    - 3002:3000
+    - '2222:22'
+    environment:
+    - USER_UID=1000
+    - USER_GID=1000
+    - GITEA__database__DB_TYPE=postgres
+    - GITEA__database__HOST=gitea-postgres:5432
+    - GITEA__database__NAME=gitea
+    - GITEA__database__USER=gitea
+    - GITEA__database__PASSWD=${GITEA_POSTGRES_PASSWORD}
+    - GITEA__server__ROOT_URL=http://192.168.178.65:3002/
+    - GITEA__server__HTTP_PORT=3000
+    volumes:
+    - coding_gitea:/data
+    restart: unless-stopped
+  gitea-postgres:
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    environment:
+    - POSTGRES_USER=gitea
+    - POSTGRES_PASSWORD=${GITEA_POSTGRES_PASSWORD}
+    - POSTGRES_DB=gitea
+    volumes:
+    - gitea_postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  loki_data: {}
+  grafana_vibemind_data: {}
+  coding_gitea: {}
+  gitea_postgres: {}
+

@@ -1,0 +1,94 @@
+# Loki — single-binary single-host config for VibeMind.
+#
+# Tuning rationale:
+#   * auth_enabled=false       — single-host dev, vibemind-shared overlay
+#                                only; not exposed outside the swarm.
+#   * tsdb shipper             — modernest schema; no v11/boltdb-index
+#                                corruption risks BoltDB had under high
+#                                churn (rolling deploys = high churn).
+#   * filesystem storage       — chunks + index on the loki_data volume.
+#                                For single-host this is faster than
+#                                wiring S3-compatible + the volume
+#                                survives `docker stack rm` (the whole
+#                                point of this exercise).
+#   * compactor retention      — 30 days; periodic compaction merges
+#                                small chunks (cheaper queries + smaller
+#                                disk).
+#   * limits_config            — generous for dev; the 20-service stack
+#                                churns ~10-50 MB/day, easily 30-day
+#                                retained on a single host SSD.
+#
+# Endpoints (intern via vibemind-shared overlay):
+#   - http://loki:3100/loki/api/v1/push     (Promtail writes here)
+#   - http://loki:3100/loki/api/v1/query    (Grafana reads here)
+#   - http://loki:3100/ready                (healthcheck)
+#   - http://loki:3100/metrics              (Prometheus, future Phase W)
+
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+  log_level: info
+
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  tsdb_shipper:
+    active_index_directory: /loki/tsdb-index
+    cache_location: /loki/tsdb-cache
+  filesystem:
+    directory: /loki/chunks
+
+limits_config:
+  # Generous dev defaults — adjust down for prod budget.
+  retention_period: 720h          # 30 days
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h    # 7 days
+  max_streams_per_user: 10000         # 20 svc × ~100 unique label combos = OK
+  ingestion_rate_mb: 16                # 16 MB/s — way above our ~0.1 MB/s
+  ingestion_burst_size_mb: 32
+  max_global_streams_per_user: 10000
+  max_query_series: 5000
+  max_entries_limit_per_query: 5000
+
+compactor:
+  working_directory: /loki/compactor
+  delete_request_store: filesystem
+  retention_enabled: true
+  retention_delete_delay: 2h
+  retention_delete_worker_count: 100
+  compaction_interval: 10m
+
+ruler:
+  # Phase 11.W (later): Loki alerting rules go here.
+  storage:
+    type: local
+    local:
+      directory: /loki/rules
+  rule_path: /loki/rules-tmp
+  enable_api: true
+
+analytics:
+  # No phone-home to Grafana Labs; we're single-host self-hosted.
+  reporting_enabled: false

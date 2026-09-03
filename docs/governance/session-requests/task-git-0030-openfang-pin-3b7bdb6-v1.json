@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0030-openfang-pin-3b7bdb6-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0030-openfang-pin-3b7bdb6-v1",
+  "objective": "Stage 1 of the research pin chain: inside the vibemind-os repository, lift the openfang gitlink from 5d38662 to 3b7bdb6 (openfang#18 merge on main, carrying the regenerated brain-researcher manifest that gives the research agent its tool allowlist and model dimensioning), as a dedicated pin commit per submodule policy. Verify the target commit is reachable on the openfang remote default branch main before pinning, and check whether any vibemind-os-internal file references the old pin textually. Service commits in vibemind-os on a codex branch; superproject writes limited to evidence documentation. The superproject gitlink and repo-manifest lift is expressly out of scope and follows as its own task.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0030-openfang-pin-3b7bdb6-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0010-brain-researcher-manifest-regeneration-v1"],
+  "merge_position": 7
+}

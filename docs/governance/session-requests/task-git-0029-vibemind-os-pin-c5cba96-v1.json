@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0029-vibemind-os-pin-c5cba96-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0029-vibemind-os-pin-c5cba96-v1",
+  "objective": "Stage 2 of the pin chain: lift the vibemind-os gitlink in the superproject from a92ccd3 to c5cba96 (vibemind-os#139 merge on master, which carries the brain-0019 service merge fbc8761 plus the child gitlink lifts openfang 5d38662 and coding-engine 81ab938) and update repo-manifest.yaml expected_gitlink_pin plus the evidence.parent_pin chain accordingly, as a dedicated pin commit per submodule policy. Verify the target commit is reachable on the vibemind-os remote master before pinning; run the governance suite and manifest validate as evidence. Follows the task-git-0027 pattern.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["vibemind-os", "repo-manifest.yaml", "docs/operations/", "tests/v1_governance/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0029-vibemind-os-pin-c5cba96-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0028-vibemind-os-child-gitlink-lifts-v1"],
+  "merge_position": 7
+}

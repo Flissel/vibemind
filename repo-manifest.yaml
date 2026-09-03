@@ -1,0 +1,413 @@
+schema_version: 1
+superproject:
+  id: vibemind-v1
+  path: .
+  current_integration_branch: master
+  target_integration_branch: main
+  branch_rename_status: approval-required
+repositories:
+  - id: vibemind-os
+    parent: vibemind-v1
+    path: vibemind-os
+    kind: submodule
+    expected_gitlink_pin: 82127e44944495e5cb47d22e597cee9c51bbee83
+    remote: https://github.com/Flissel/vibemind-os.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: uninitialized
+    gitlink_state: present
+    evidence: {source: local-git, parent_pin: 7f5c1c9fe34080cd5025be555be7b82bbeeb5724, validation_state: local}
+
+  - id: tribe
+    parent: vibemind-os
+    path: brain/the_brain/tribe
+    kind: submodule
+    expected_gitlink_pin: 72399081ed3f1040c4d996cefb2864a4c46f5b8e
+    remote: https://github.com/Flissel/tribev2.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: coding-engine
+    parent: vibemind-os
+    path: coding-engine
+    kind: submodule
+    expected_gitlink_pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80
+    remote: https://github.com/Flissel/DaveFelix-Coding-Engine.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: la-fungus-search
+    parent: vibemind-os
+    path: la-fungus-search
+    kind: submodule
+    expected_gitlink_pin: 22011ea9c437c13f771337516c7f432ceb8be236
+    remote: https://github.com/Flissel/la_fungus_search.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: openclaude
+    parent: vibemind-os
+    path: openclaude
+    kind: submodule
+    expected_gitlink_pin: 20d570b33ed627d5ccb8ae75ac380006bcd78616
+    remote: https://github.com/Flissel/openclaude.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: openclaw
+    parent: vibemind-os
+    path: openclaw
+    kind: submodule
+    expected_gitlink_pin: 65e35a6771b4a8be81867d2384df50d5666c608d
+    remote: https://github.com/Flissel/openclaw.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: openfang
+    parent: vibemind-os
+    path: openfang
+    kind: submodule
+    expected_gitlink_pin: 8a4904b3ff622d7ffda1e8cb01a509d2db430904
+    remote: https://github.com/Flissel/openfang.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: shared
+    parent: vibemind-os
+    path: shared
+    kind: submodule
+    expected_gitlink_pin: fe9c31d257c551568794c44098bf75e92f327e7f
+    remote: https://github.com/Flissel/vibemind-shared.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: captain-cook
+    parent: vibemind-os
+    path: spaces/captain_cook
+    kind: submodule
+    expected_gitlink_pin: 644a5c3b827ea8345c29a5256425117f8e117cc4
+    remote: https://github.com/Flissel/Captain_cook.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: automation-ui
+    parent: vibemind-os
+    path: spaces/desktop/Automation_ui
+    kind: submodule
+    expected_gitlink_pin: d8ffe30b3a97fd5f5360e68f5bfb74267b87b69d
+    remote: https://github.com/Flissel/Automation_ui.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: swe-desgine
+    parent: vibemind-os
+    path: spaces/shuttles/swe_desgine
+    kind: submodule
+    expected_gitlink_pin: 73331177678f715c2077c146ccde565e033fcf7a
+    remote: https://github.com/Flissel/swe_desgine.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: vibevideo
+    parent: vibemind-os
+    path: spaces/video/vibevideo
+    kind: submodule
+    expected_gitlink_pin: bf0315f33435ece5f13e379f4138e28a3fa59ecb
+    remote: https://github.com/Flissel/vibevideo.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: vibevideo-deepfake
+    parent: vibemind-os
+    path: spaces/video/vibevideo_deepfake
+    kind: submodule
+    expected_gitlink_pin: 3c67511d9eaa9e7c921f0815d63324c6eeab1ece
+    remote: https://github.com/Flissel/vibevideo-deepfake.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: laura
+    parent: vibemind-os
+    path: spaces/video/laura
+    kind: submodule
+    expected_gitlink_pin: 909a43d499ffe00f4fd3d779127da45debf64f0c
+    remote: https://github.com/Vibemind-LAB/Lauras_star.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+
+  - id: voice
+    parent: vibemind-os
+    path: voice
+    kind: submodule
+    expected_gitlink_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015
+    remote: https://github.com/Flissel/VibeMind-VoiceDialog.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+
+  - id: flowzen-declaration
+    parent: vibemind-os
+    path: spaces/flowzen/flowzen
+    kind: submodule
+    expected_gitlink_pin: absent
+    remote: https://github.com/Flissel/flowzen.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: declared-legacy
+    initialization_state: absent
+    gitlink_state: declared-without-gitlink
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+  - id: outer-moire-tracker-declaration
+    parent: vibemind-os
+    path: spaces/desktop/Automation_ui/moire_tracker
+    kind: submodule
+    expected_gitlink_pin: absent
+    remote: https://github.com/Flissel/Vibemind_Moire_Tracker.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: declared-legacy
+    initialization_state: absent
+    gitlink_state: declared-without-gitlink
+    evidence: {source: pinned-remote-tree, parent_pin: 82127e44944495e5cb47d22e597cee9c51bbee83, validation_state: pinned-not-live}
+
+  - id: hermes-agent
+    parent: captain-cook
+    path: hermes-agent
+    kind: submodule
+    expected_gitlink_pin: fcbdeca1ebedf1d1ee7f0199f4df7bf3f39619a0
+    remote: https://github.com/Flissel/hermes-agent.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 644a5c3b827ea8345c29a5256425117f8e117cc4, validation_state: pinned-not-live}
+  - id: arch-team
+    parent: swe-desgine
+    path: external/arch_team
+    kind: submodule
+    expected_gitlink_pin: 70d9856fd1059fb4bae8cffbdde1586cd0b1be1f
+    remote: https://github.com/Flissel/-req-orchestrator.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 73331177678f715c2077c146ccde565e033fcf7a, validation_state: pinned-not-live}
+  - id: automation-ui-moire-tracker
+    parent: automation-ui
+    path: moire_tracker
+    kind: submodule
+    expected_gitlink_pin: 436fbff95b2b04db1b7c5d66cbd9b9a2eddc9948
+    remote: https://github.com/Flissel/Vibemind_Moire_Tracker.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: d8ffe30b3a97fd5f5360e68f5bfb74267b87b69d, validation_state: pinned-not-live}
+  - id: clawport-ui
+    parent: voice
+    path: electron-app/clawport-ui
+    kind: submodule
+    expected_gitlink_pin: ac5740f61a50aef9ff671f55dbe52cc0654fc6cc
+    remote: https://github.com/JohnRiceML/clawport-ui.git
+    remote_role: external-upstream
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015, validation_state: pinned-not-live}
+  - id: autogen-agentfarm
+    parent: voice
+    path: external/Autogen_AgentFarm
+    kind: submodule
+    expected_gitlink_pin: 73b00888d31486df3e3fad3dfc5cd953bbd26bd4
+    remote: https://github.com/Flissel/Autogen_AgentFarm.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015, validation_state: pinned-not-live}
+  - id: voice-openclaw
+    parent: voice
+    path: external/openclaw
+    kind: submodule
+    expected_gitlink_pin: 3cf06f7939578541120712947a7d6b30561b4477
+    remote: https://github.com/Flissel/openclaw.git
+    remote_role: canonical-origin
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015, validation_state: pinned-not-live}
+  - id: zeroclaw
+    parent: voice
+    path: external/zeroclaw
+    kind: submodule
+    expected_gitlink_pin: e4fc97f5f272b1c530b9c22f03db4cface16b933
+    remote: https://github.com/zeroclaw-labs/zeroclaw.git
+    remote_role: external-upstream
+    owner: platform
+    required: true
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015, validation_state: pinned-not-live}
+  - id: voice-minibook-declaration
+    parent: voice
+    path: external/minibook
+    kind: submodule
+    expected_gitlink_pin: absent
+    remote: https://github.com/c4pt0r/minibook.git
+    remote_role: external-upstream
+    owner: platform
+    required: false
+    migration_state: declared-legacy
+    initialization_state: absent
+    gitlink_state: declared-without-gitlink
+    evidence: {source: pinned-remote-tree, parent_pin: a8c8d9f172a768850ad4cf999c6ebbb68bc6f015, validation_state: pinned-not-live}
+
+  # Children of coding-engine@352a858. Three now, not the five declared at
+  # 81ab938: task-coding-0006 mapped `external/Automation_ui` and
+  # `external/minibook` in coding-engine's own .gitmodules and retired the
+  # `external/NemoClaw` and `external/free-llm-api-resources` gitlinks under user
+  # authority, so those two paths carry no gitlink at this pin and their entries
+  # are gone rather than restated. All three survivors are both declared here and
+  # mapped upstream, so the mapping half of finding B2 is closed as well as the
+  # manifest-coverage half. Automation_ui and minibook keep the pins they had at
+  # 81ab938 -- only their mapping is new -- and la_fungus_search keeps f731c19a,
+  # which is still dangling on its remote and deliberately not re-pinned, so a
+  # recursive init still aborts there. `required: false` is retained: no gate keys
+  # on this field, and the retirement-vs-mapping precedent does not make these
+  # paths required.
+  - id: coding-engine-automation-ui
+    parent: coding-engine
+    path: external/Automation_ui
+    kind: submodule
+    expected_gitlink_pin: 3a413ae2886e2b83379e0eea9e4729cc1d3a4573
+    remote: https://github.com/Flissel/Automation_ui.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80, validation_state: pinned-not-live}
+  - id: coding-engine-minibook
+    parent: coding-engine
+    path: external/minibook
+    kind: submodule
+    expected_gitlink_pin: b19c61e27bb3ac2ca8a4f06addb541819bfbe9a0
+    remote: https://github.com/Flissel/minibook.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80, validation_state: pinned-not-live}
+  - id: coding-engine-la-fungus-search
+    parent: coding-engine
+    path: la_fungus_search
+    kind: submodule
+    expected_gitlink_pin: f731c19afa08ddc84874669fb96faef9bd6d1a69
+    remote: https://github.com/Flissel/la_fungus_search.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 352a858eab252ddc4f4a2f25d9dd3549e798fc80, validation_state: pinned-not-live}
+
+  # Fourth level, reached through the gitlink above: coding-engine's
+  # external/Automation_ui@3a413ae2 carries its own moire_tracker gitlink. This is
+  # a different pin of the same upstream that automation-ui-moire-tracker declares
+  # under vibemind-os/spaces/desktop/Automation_ui (436fbff9), not a duplicate.
+  - id: coding-engine-automation-ui-moire-tracker
+    parent: coding-engine-automation-ui
+    path: moire_tracker
+    kind: submodule
+    expected_gitlink_pin: 7a11bbb421b9607667330cf8e9adebb1e0057018
+    remote: https://github.com/Flissel/Vibemind_Moire_Tracker.git
+    remote_role: canonical-origin
+    owner: platform
+    required: false
+    migration_state: nested-legacy
+    initialization_state: unobserved
+    gitlink_state: present
+    evidence: {source: pinned-remote-tree, parent_pin: 3a413ae2886e2b83379e0eea9e4729cc1d3a4573, validation_state: pinned-not-live}
+submodule_policy:
+  recursive_inventory_required: true
+  pin_change_requires_separate_commit: true
+  nested_submodules_target_state: remove-gradually
+  validator_network_access: forbidden

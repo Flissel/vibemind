@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:agentfarm-runtime-source-provenance:v1",
+  "title": "AgentFarmRuntimeSourceProvenanceV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "provenance_id",
+    "request_id",
+    "space_id",
+    "repository",
+    "revision",
+    "entrypoint",
+    "build_manifest",
+    "record_digest",
+    "captured_at"
+  ],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "provenance_id": {"$ref": "#/$defs/sourceRef"},
+    "request_id": {"$ref": "#/$defs/requestRef"},
+    "space_id": {"const": "agentfarm"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_id", "canonical_identity", "identity_digest"],
+      "properties": {
+        "repository_id": {"$ref": "#/$defs/repositoryRef"},
+        "canonical_identity": {"$ref": "#/$defs/repositoryIdentity"},
+        "identity_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "commit_sha", "tree_sha", "source_tree_digest"],
+      "properties": {
+        "kind": {"const": "commit"},
+        "commit_sha": {"$ref": "#/$defs/gitSha1"},
+        "tree_sha": {"$ref": "#/$defs/gitSha1"},
+        "source_tree_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "entrypoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "build_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "record_digest": {"$ref": "#/$defs/digest"},
+    "captured_at": {"$ref": "#/$defs/timestamp"}
+  },
+  "$defs": {
+    "sourceRef": {
+      "type": "string",
+      "pattern": "^source_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"
+    },
+    "requestRef": {
+      "type": "string",
+      "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"
+    },
+    "repositoryRef": {
+      "type": "string",
+      "pattern": "^repository_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"
+    },
+    "repositoryIdentity": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 300,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9.-]*/[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "gitSha1": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    }
+  }
+}

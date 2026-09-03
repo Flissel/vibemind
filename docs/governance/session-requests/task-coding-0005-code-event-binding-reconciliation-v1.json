@@ -1,0 +1,25 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0005-code-event-binding-reconciliation-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0005-code-event-binding-reconciliation-v1",
+  "objective": "Stage 1 of the code-event binding reconciliation recommended by cockpit-coding: produce a versioned, repo-first verified binding matrix for the coding space (registry code.* events, capabilities entries, CodingEngineExecutor, the two engine HTTP surfaces competing for port 8000, the code-job-* contract family with zero downstream implementation, and the live openfang:openclaude-coder dispatch path absent from the registry SoT), record the coding-space gaps additively in the openfang-mcp-authority contract with contract tests advanced deliberately, and prepare a decision template for the user-gated product questions (dispatch authority, port-8000 ownership, contract-vs-engine vocabulary). Expressly no behavior change: no edits to registry, capabilities, executor, engine code or any schema semantics; dual-dispatch resolution stays user-gated and overlaps task-brain-0018.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": [
+    "docs/operations/",
+    "docs/spaces/coding/",
+    "shared/contracts/",
+    "tests/integration/",
+    "tests/contracts/"
+  ],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0005-code-event-binding-reconciliation-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 2
+}

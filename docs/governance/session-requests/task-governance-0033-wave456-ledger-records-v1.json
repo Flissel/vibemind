@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0033-wave456-ledger-records-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0033-wave456-ledger-records-v1",
+  "objective": "Record the eleven wave-4..6 cockpit creation records from session-request-queue section 2.1 in the activation-evidence ledger using the recording vocabulary merged in #174 (activation=git-evidenced-creation with durable ccr-session:<session-id>@<rfc3339> reference, approval=git-evidenced-approval-ledger against the closed approval ledger). Creation evidence only - expressly no activation, interactivity or live claims. Advance the repository-state contract tests deliberately from eleven to twenty-two recorded entries, and update the queue section 2.1 paragraph so it names both cohorts. TDD: red test first against the extended ledger truth, then data, then contract-test lift.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/governance/", "tests/v1_governance/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0033-wave456-ledger-records-v1",
+  "risk_class": "code",
+  "dependencies": ["task-governance-0031-activation-evidence-recording-v1"],
+  "merge_position": 1
+}

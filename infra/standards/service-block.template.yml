@@ -1,0 +1,81 @@
+# =============================================================================
+# Vibemind swarm SERVICE BLOCK template  —  paste into infra/swarm/vibemind-stack.yml
+# =============================================================================
+# Every convention from infra/standards/STANDARDS.md applied in one block.
+# Modeled on the verified-working mirofish/brain blocks in the live stack
+# (NOT theory — these are the shapes that actually pass Gate B/D).
+#
+# Replace <PLACEHOLDERS>. Delete the branches you don't need.
+# This file is a reference fragment; it is not a deployable compose file.
+# =============================================================================
+
+  <service-name>:
+    image: vibemind-<service-name>:latest        # first-party local build
+    # build:                                     # uncomment if built by the stack
+    #   context: ../..                           # vibemind-os/ if it needs vibemind-shared
+    #   dockerfile: <path>/Dockerfile
+
+    ports:
+      - "<host-port>:<container-port>"
+
+    # --- Env (STANDARDS.md §5): env_file FIRST for shared keys, then ONLY
+    #     stack-topology overrides. Never ${VAR}-expand a key that .env supplies
+    #     (empty-deploy-shell expansion overrides it -> the recurring bug).
+    env_file:
+      - ../../.env
+    environment:
+      - <DEPENDENCY>_URL=http://<other-service>:<port>   # overlay DNS, literal
+      - PORT=<container-port>                             # pin, don't inherit
+      # - SOME_ROLE_FLAG=...                              # topology only
+
+    # --- host-process reachability (host Ollama, etc.) — only if needed
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
+    networks:
+      - vibemind-shared                           # the one shared overlay
+
+    depends_on:
+      - <other-service>                           # ordering hint (Swarm: best-effort)
+
+    # --- Healthcheck (STANDARDS.md §2): MANDATORY for long-lived services.
+    #   * 127.0.0.1, never localhost (busybox/alpine -> IPv6 trap)
+    #   * timeout >= 5s (3s caused false failures)
+    #   * start_period must cover real cold start (brain 60s / Flask-Node 30-40s
+    #     / nginx 10s). 0s health-kills a still-booting container.
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:<container-port>/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+
+      # --- Labels (STANDARDS.md §4): service metadata, currently zero in stack
+      labels:
+        vibemind.service: "<service-name>"
+        vibemind.tier: "<tier-1|tier-2|infra|space>"
+        vibemind.component: "<api|worker|datastore|frontend|proxy>"
+        vibemind.space: "<space-or-empty>"
+
+      # --- Resources (STANDARDS.md §3): BOTH limits AND reservations.
+      #     Limits-only lets the scheduler silently over-commit a node.
+      resources:
+        limits:
+          cpus: "<n>"
+          memory: <n>G
+        reservations:
+          cpus: "<n>"
+          memory: <n>M
+
+      restart_policy:
+        condition: on-failure                     # stack-wide convention
+
+    # --- CMD policy (STANDARDS.md §8): if the IMAGE has no default CMD (or a
+    #     bare [node]/[python3] that REPL-exits), the block MUST supply it,
+    #     JSON-array form, multi-token. This is the rowboat-jobs-worker /
+    #     mirofish failure class — silent exit, no logs.
+    # command: ["python", "start_server.py", "<port>"]
+    # command: ["npm", "run", "<script>"]

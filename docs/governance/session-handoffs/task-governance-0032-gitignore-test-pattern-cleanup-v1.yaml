@@ -1,0 +1,29 @@
+schema_version: 2
+session_id: task-governance-0032-gitignore-test-pattern-cleanup-v1
+branch: codex/governance/task-governance-0032-gitignore-test-pattern-cleanup-v1
+parent_cockpit: cockpit-observability
+request_reference: task-request:task-governance-0032-gitignore-test-pattern-cleanup-v1
+approval_reference: claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z
+commits:
+  - sha: be556a2b4637638dfd25bf9ca1cf2e54808533b3
+    subject: "fix(gitignore): root-anchor test_*.py session-scratch rule"
+tests:
+  - command: python -m pytest tests/v1_governance -q
+    status: passed
+    summary: "243 passed (red state before the fix: git add of the canary exited 1 as ignored; 3 failed, 1 passed in the canary file)"
+evidence:
+  - kind: gitignore-rule
+    path: .gitignore
+  - kind: canary-tests
+    path: tests/v1_governance/test_gitignore_test_pattern.py
+  - kind: queue
+    path: docs/governance/session-request-queue-v1.md
+  - kind: handoff-summary
+    path: docs/governance/handoffs/2026-08-14-task-governance-0032-handoff.md
+dependencies:
+  - session_id: task-governance-0033-wave456-ledger-records-v1
+    merged: true
+merge_position: 1
+deployment_status: not_required
+remaining_blockers:
+  - "session validate / pr check erst nach Merge des Admissions-PRs mit docs/governance/session-requests/task-governance-0032-gitignore-test-pattern-cleanup-v1.json ausführbar (Request-JSON fehlt auf origin/master; Orchestrator-Lauf)"

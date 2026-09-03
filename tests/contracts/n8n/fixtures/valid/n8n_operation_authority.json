@@ -1,0 +1,20 @@
+{
+  "contract_version": "v1",
+  "authority_ref": "authority_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "operation": "trigger",
+  "run_id": "run_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "definition_id": "definition_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "workflow_id": "workflow_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "workflow_version": 3,
+  "definition_revision": 5,
+  "definition_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "project_ref": "project_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "mode": "manual",
+  "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "issued_at": "2026-07-31T09:00:00Z",
+  "expires_at": "2026-07-31T09:15:00Z",
+  "idempotency_key": "n8n-request-01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+}

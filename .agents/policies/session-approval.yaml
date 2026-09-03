@@ -1,0 +1,29 @@
+schema_version: 3
+approval_authority: standing-user-mandate
+standing_authority_reference: standing-autonomy:v1
+autonomous_activation_allowed: true
+autonomous_risk_classes:
+  - docs
+  - code
+planning_approval_implies_implementation: false
+session_types:
+  space-cockpit:
+    writes_allowed: false
+    purpose: discovery-specification-backlog
+  task:
+    writes_allowed: true
+    isolated_worktree_required: true
+high_risk_classes:
+  - deployment
+  - destructive
+  - breaking-contract
+  - database-migration
+  - secrets
+  - proxmox
+  - repo-move
+task_provenance:
+  parent_cockpit_required: true
+  durable_request_reference_required: true
+  declared_dependencies_required: true
+  merge_position_required: true
+high_risk_requires_request_specific_authority: true

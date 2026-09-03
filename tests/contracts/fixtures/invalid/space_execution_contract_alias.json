@@ -1,0 +1,10 @@
+{
+  "contract_version": "v1",
+  "contract_id": "space_execution_contract_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEJ",
+  "space_id": "autogen",
+  "executor_id": "executor:brain-orchestrator",
+  "approval_policy_ref": "approval-policy:standard",
+  "cost_policy_ref": "cost-policy:bounded",
+  "healthcheck_ref": "healthcheck:agentfarm-structural",
+  "golden_path_ref": "golden-path:agentfarm-bootstrap"
+}

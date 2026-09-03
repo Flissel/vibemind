@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:task-brief:v1",
+  "title": "TaskBriefV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "title", "objective", "requested_by", "created_at"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "title": {"type": "string", "minLength": 1, "maxLength": 200},
+    "objective": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "requested_by": {"type": "string", "minLength": 1, "maxLength": 200},
+    "created_at": {"type": "string", "format": "date-time"},
+    "approval_refs": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/approvalId"},
+      "uniqueItems": true
+    },
+    "todos": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/todo"}
+    }
+  },
+  "$defs": {
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "approvalId": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "todo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["todo_id", "summary"],
+      "properties": {
+        "todo_id": {"type": "string", "pattern": "^todo_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+        "summary": {"type": "string", "minLength": 1, "maxLength": 2000}
+      }
+    }
+  }
+}

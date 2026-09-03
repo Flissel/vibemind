@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-brain-0019-multi-verb-decomposition-v1",
+  "session_type": "task",
+  "space": "brain",
+  "parent_cockpit": "cockpit-brain",
+  "request_reference": "task-request:task-brain-0019-multi-verb-decomposition-v1",
+  "objective": "Implement architecture decision E3 (always decompose): an intent with two or more independent verbs produces a multi-stage plan over the hard/SoM path instead of a one-hop plan, handed to OpenFang node by node. Define the independent-verb boundary precisely with test cases, align the intent_validation test expectations, and implement the routing change as service commits in the vibemind-os repository on a codex branch. No live runtime claims; superproject writes limited to intent_validation test expectations and evidence documentation.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["intent_validation/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-14T13:45:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/brain/task-brain-0019-multi-verb-decomposition-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 3
+}

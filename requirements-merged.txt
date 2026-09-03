@@ -1,0 +1,60 @@
+# =============================================================================
+# Vibemind_V1 — Consolidated requirements for the shared .venv (Python 3.11)
+# =============================================================================
+# This file replaces the four separate requirements.txt files in:
+#   - vibemind-os/bridge/
+#   - vibemind-os/la-fungus-search/
+#   - vibemind-os/brain/the_brain/
+#   - vibemind-os/spaces/desktop/Automation_ui/backend/
+#
+# voice/.venv312 stays separate (Python 3.12 constraint for mediapipe/eyeterm).
+#
+# Install:
+#   .venv\Scripts\python.exe -m pip install -r requirements-merged.txt
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Already satisfied by the moved Automation_ui venv (not re-listed):
+#   fastapi, uvicorn, pydantic, pydantic-settings, httpx, pyyaml, numpy, scipy,
+#   pandas, scikit-learn, matplotlib, networkx, torch, opencv-python, aiohttp,
+#   sqlalchemy, alembic, psycopg2-binary, asyncpg, redis, loguru, orjson,
+#   requests, python-dotenv, aiofiles, mcp, paddleocr, paddlepaddle, easyocr,
+#   psutil, pyautogui, websockets, watchdog, starlette, ...
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# la-fungus-search (semantic search / MCMP-RAG)
+# -----------------------------------------------------------------------------
+sentence-transformers>=3.0.0
+faiss-cpu>=1.7.0
+streamlit>=1.28.0
+plotly>=5.0.0
+ollama>=0.1.0
+rank-bm25>=0.2.2
+# python-simhash abandoned (py2 only); use 'simhash' which is maintained
+simhash>=2.1.0
+gitpython>=3.1.40
+qdrant-client>=1.7.0
+llama-index>=0.9.0
+transformers>=4.35.0
+scikit-learn-extra>=0.3.0
+sentencepiece>=0.1.99
+
+# -----------------------------------------------------------------------------
+# brain/the_brain (cognitive AI + 43 neuroscience modules)
+# -----------------------------------------------------------------------------
+flask>=2.0.0
+flask-cors>=3.0.0
+boto3>=1.26.0
+openai>=1.0.0
+anthropic>=0.3.0
+pyautogen>=0.2.0
+notebook>=6.4.0
+ddgs>=6.0.0
+umap-learn==0.5.11
+pynndescent==0.6.0
+
+# -----------------------------------------------------------------------------
+# Shared internal package (local editable install, listed by all submodules)
+# -----------------------------------------------------------------------------
+# vibemind-shared>=0.1.0   # TODO: install separately as editable if/when needed

@@ -1,0 +1,20 @@
+{
+  "contract_version": "v1",
+  "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_brief_ref": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "intent_ref": "intent_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "requested_at": "2026-07-31T09:00:00Z",
+  "timezone": "Europe/Berlin",
+  "request_kind": "reminder",
+  "clarification": {"required": false, "questions": []},
+  "idempotency_key": "schedule-request-01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "limits": {
+    "max_runs": 1,
+    "max_retries": 2,
+    "max_cost_minor": 500,
+    "currency": "EUR",
+    "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+    "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"
+  }
+}

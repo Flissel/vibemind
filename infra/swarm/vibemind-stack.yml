@@ -1,0 +1,2512 @@
+# =============================================================================
+# VibeMind unified Docker-Swarm stack — Phase B2 SKELETON
+# =============================================================================
+# Deploy:
+#   docker stack deploy -c infra/swarm/vibemind-stack.yml vibemind
+#
+# SCOPE OF THIS SKELETON (deliberately not "everything at once"):
+#   * qdrant      — ONE shared vector DB. Resolves the 3-way port collision
+#                   (automation_ui :6333, la-fungus :6339, brain host :6730 all
+#                   wanted their own). In-stack it is the single overlay
+#                   service `qdrant:6333`.
+#   * brain-core  — the image already built in Phase A
+#                   (vibemind-brain-core:latest). In the overlay it reaches
+#                   Qdrant via DNS `qdrant:6333` instead of
+#                   host.docker.internal:6730 — no host round-trip.
+#
+# The 5 "ready" build-services (minibook, n8n, rowboat, video, +) are NOT
+# inlined yet: they build from local contexts (some are git submodules / a
+# 4-service rowboat compose) and `docker stack deploy` does NOT build images —
+# it only pulls/uses pre-built ones. Adding them needs a pre-build step
+# (`docker compose build` → tag → push/local). They are documented at the
+# bottom as the explicit Phase-B-next extension points, NOT silently dropped.
+#
+# Modelled structurally on the proven swarm precedent:
+#   vibemind-os/coding-engine/infra/docker/docker-stack.yml
+# (version 3.8, external secrets, overlay networks, deploy/resources/restart).
+# =============================================================================
+
+version: "3.8"
+
+services:
+  # === Shared vector DB (singleton — replaces 3 colliding qdrant instances)
+  # Gap List #3 (STANDARDS.md §4): every service carries vibemind.* service
+  # metadata. Purely additive — deploy.labels are stack/service metadata,
+  # zero runtime behaviour change. Schema: service / tier / component / space.
+  qdrant:
+    # Gap List #5: pinned to the digest that was running + verified through
+    # Phases A–D (NOT a version bump — exact reproduction of the verified
+    # state). Tag kept readable; @sha256 nails the bits so a future
+    # `:latest` upstream push can't silently change behaviour.
+    image: qdrant/qdrant:latest@sha256:b3063c673f3973877c038eeecc392bad5011f072ee7892b56c9a8e204a3bdea9
+    ports:
+      # Host-published so the still-host-bound services (Bridge venv,
+      # la-fungus venv) and the legacy Brain venv path keep working at the
+      # SAME port the repo .env already uses (QDRANT_URL=...:6730).
+      - "6730:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - vibemind-shared
+    deploy:
+      labels:
+        vibemind.service: "qdrant"
+        vibemind.tier: "infra"
+        vibemind.component: "datastore"
+        vibemind.space: ""
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  # === Brain Dashboard (Phase A image; Tier-1/mono by default — Phase C)
+  brain-core:
+    image: vibemind-brain-core:latest
+    # The Dockerfile has NO default CMD by design (image CMD is just
+    # [python3] → REPL → instant clean exit). The command MUST be set here,
+    # same as the working docker-compose.brain-core.yml:63. start_server.py
+    # passes the app object to uvicorn (no import-string pyenv fork — Phase A).
+    command: python start_server.py 5000
+    ports:
+      - "5000:5000"
+    environment:
+      - BRAIN_PORT=5000
+      - PYTHONUNBUFFERED=1
+      # Phase B (2026-06-08): difficulty=insane → dynamisches AutoGen-Capability-
+      # Team (openfang:som-team) statt SoM-Fallback. Durable hier setzen, NIE per
+      # `docker service update --env-add` (räumt den Stack ab — Lesson 2026-06-08).
+      - INSANE_AUTOGEN=1
+      # Brain-Contention (2026-06-08): die CPU-Last kam aus 6+ Hintergrund-Loops
+      # (ContinuousThinking-radial-tick, Consolidation-n-gram-mining, MCMP-Gardener-
+      # random-walks, ClusterEngine-DBSCAN, …), die GIL-gebunden den async HTTP-
+      # Server (Single-Process) verhungern liessen — auch Drosseln allein reichte
+      # nicht (mehrere Loops gleichzeitig). ARCHITEKTUR-FIX: brain-core faehrt die
+      # Loops jetzt NICHT mehr (BRAIN_BACKGROUND_LOOPS=0) → HTTP-Prozess loop-frei
+      # → responsiv. Der separate brain-loops-Service (unten) faehrt sie in eigenem
+      # Prozess/GIL. THINK/CONSOLIDATION-Intervalle hier irrelevant (Loops aus),
+      # bleiben als Doku.
+      - BRAIN_BACKGROUND_LOOPS=0
+      # 2026-06-09 struktureller Contention-Fix: 2 uvicorn-Worker. Der Single-
+      # Process-async-Server staut bei JEDER synchronen schweren Handler-Op
+      # (Qwen-embed, torch-route, serielle Qdrant-Sweeps) alle Requests — mehrere
+      # Worker halten dann nur EINEN pro blockierendem Request. Single-Writer
+      # bleibt erfuellt (BRAIN_BACKGROUND_LOOPS=0 = null State-Loops im HTTP-Prozess).
+      - BRAIN_HTTP_WORKERS=2
+      # BRAIN_ROLE=inference: zusätzlich die is_learner()-gated Writer-Loops
+      # (ConsolidationEngine, SnapshotEngine, DiscourseAggregator, MirofishKGSync,
+      # SelfAwarenessWatcher, DiscourseMemoryConsolidator) AUS — die laufen NICHT
+      # über BRAIN_BACKGROUND_LOOPS, sondern über is_learner(). mono liess sie in
+      # brain-core weiter floten (multi-collection points/query-Flut, CPU 100%).
+      # brain-loops ist der learner (Writer-Owner) → genau EIN Owner. brain-core
+      # = reiner Router/Inference, NULL Hintergrund-Loops.
+      - BRAIN_ROLE=inference
+      - BRAIN_THINK_INTERVAL_MS=30000
+      # Dynamische Tool-Scope (plans/dynamic-agent-tools-prompt.md): pro openfang-Hop
+      # waehlt der ToolScopeSelector semantisch die relevanten Tools + Prompt-Focus
+      # (lenkt gpt-5.5 weg vom 71-Tool-Loop). Default-off im Code; hier scharf fuer
+      # den Live-Test. Graceful — Fehler = heutiges Verhalten.
+      - DYNAMIC_TOOL_SCOPE=1
+      # CUDA-Embedder (plans/brain-cuda-migration.md): der Launcher (Invoke-GpuSetup)
+      # setzt $VIBEMIND_GPU_DEVICES=all WENN eine NVIDIA-GPU da ist + die nvidia-Runtime
+      # aktiv ist; sonst leer. NVIDIA_VISIBLE_DEVICES=all gibt brain-core dann die GPU
+      # (mit default-runtime:nvidia). Leer = kein GPU-Zugriff = CPU-Fallback (Embedder
+      # device=cuda-if-available, qdrant_kg.py). Portabel: GPU-lose Hosts → leer → CPU.
+      - NVIDIA_VISIBLE_DEVICES=${VIBEMIND_GPU_DEVICES:-}
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # Overlay DNS — no host.docker.internal round-trip inside the stack.
+      - QDRANT_URL=http://qdrant:6333
+      - BRAIN_URL=http://brain-core:5000
+      # OpenFang stays a HOST native binary on :4200 (HTTP API; :50051 is
+      # the gRPC bridge port only — see master .env OPENFANG_PORT, fixed
+      # 2026-05-19). Reach it via the host gateway, like standalone compose.
+      - OPENFANG_URL=http://host.docker.internal:4200
+      # 2026-05-29: OpenFang's /message/stream SSE endpoint doesn't relay
+      # the claude_code driver's stdout chunks to Brain (the wrapper writes
+      # text but no `chunk` SSE events surface — only `phase` + heartbeat).
+      # Force Brain onto the blocking /message endpoint where the wrapper's
+      # response comes through correctly. Required for openclaw-visible /
+      # browser-automation via Telegram bot. Verified end-to-end 2026-05-29.
+      - OPENFANG_STREAM=0
+      # Phase 11.U.H — Supabase (Kong :54321) is a HOST service. The repo
+      # .env has SUPABASE_URL=http://localhost:54321 which from inside
+      # this overlay container = the container itself (curl -> 000), so
+      # every supabase: capability returned "Bubble … not found". Same
+      # host-gateway rewrite the standalone brain compose already applied;
+      # the swarm stack hadn't carried it over.
+      - SUPABASE_URL=http://192.168.178.65:54321
+      # 2026-06-02: Brain Dashboard read-path (/api/bubbles/list, /api/ideas/state)
+      # falls back to direct Supabase REST when Ideas-HTTP :5102 is offline
+      # (which is most of the time — that service is not in the stack). The
+      # anon key lets the fallback hit PostgREST through Kong without JWT.
+      # File-secret convention: SUPABASE_ANON_KEY_FILE points at the mount,
+      # Python reads it via config.get_secret() OR the IdeasClient resolver.
+      - SUPABASE_ANON_KEY_FILE=/run/secrets/supabase_anon_key
+      # 2026-06-01: Ollama is a HOST process on :11434. subagent_dispatcher
+      # (the planner's LLM subagent) defaults to 127.0.0.1:11434, which
+      # inside this container is the container itself -> "ollama_subagent
+      # error: All connection attempts failed" -> planner returns no hops ->
+      # every dispatched task degraded to chitchat. Same host-gateway rewrite
+      # as OPENFANG_URL/SUPABASE_URL above; Ollama was just missed.
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      # 2026-06-01: Planner LLM. Default was groq::llama-3.3-70b but the
+      # free Groq tier throws 429 on the ~3900-token planner prompt (full
+      # capability list + schema), then the OpenRouter fallback is 402
+      # (credit exhausted), so it degraded to the weak local llama3.1 which
+      # hallucinates the in-context example ("Python ideas / idea_add") for
+      # ANY intent. gpt-4o-mini goes DIRECT to api.openai.com (openai_subagent
+      # path, NOT OpenRouter), big-context, no 429. Reliable desktop_skill /
+      # browser_automation / coding_task classification. Verified 2026-06-01.
+      - PLANNER_MODEL=gpt-4o-mini
+      # Routing-matrix auto-train (2026-05-19). The hook in
+      # core/routing_matrix_autotrain.py appends trustworthy shortcut
+      # decisions to the queue; the brain-autotrain-drain sidecar drains
+      # it against brain-api. ROUTING_AUTOTRAIN_URL = overlay DNS (both
+      # in this stack). ROUTING_AUTOTRAIN_QUEUE pins the queue into the
+      # shared brain_data named-volume so the sidecar sees the same file
+      # (hook honours this override — routing_matrix_autotrain.py:60).
+      - ROUTING_AUTOTRAIN=1
+      - ROUTING_AUTOTRAIN_URL=http://brain-api:5001
+      - ROUTING_AUTOTRAIN_QUEUE=/app/data/routing_autotrain_queue.jsonl
+      # Ground truth SCHARF (2026-07-14). core/world_observer.py is flag-gated
+      # and defaults OFF, so until now EVERY truth:-validator returned
+      # verified=None ("GROUND_TRUTH_ENABLED off") -> contract_pass=None ->
+      # reward 0.0. The learning system was reward-blind: it could never
+      # produce a positive signal, no matter how many capabilities carried a
+      # truth: validator (27 of 66 today). All of them are on_fail: report —
+      # they OBSERVE and score, they do not block execution.
+      - GROUND_TRUTH_ENABLED=1
+      # Episodic diary queue: brain-core (N uvicorn workers, never persists)
+      # APPENDS one line per executed plan; brain-loops (the single writer)
+      # DRAINS it into the dual_graph it persists. Deliberately NOT pinned via
+      # env: core/multihop_kotlin_adapter.py resolves the default to
+      # <the_brain>/data/multihop_diary_queue.jsonl = /app/data/... which is
+      # the shared brain_data volume, mounted identically in BOTH services —
+      # so there is nothing to get out of sync. If it is ever pinned via
+      # MULTIHOP_DIARY_QUEUE, it MUST be set identically on brain-core AND
+      # brain-loops, or the drain silently never sees the episodes.
+      # (GET /api/diary/stats exposes queue.path so a mismatch is visible.)
+      # Phase C identity — empty/default == today's single-mono behaviour.
+      # Set BRAIN_ID / SPACE_ID / BRAIN_ROLE here for Phase D learner/inference.
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    secrets:
+      - openrouter_api_key
+      - anthropic_api_key
+      # Phase 11.U.H — OpenRouter credit is exhausted (402 on every
+      # openai/* + anthropic/* call). The Brain LLM path needs Groq
+      # (groq:: direct) as primary and OpenAI-direct (gpt-4o-mini via
+      # api.openai.com, NOT OpenRouter) as fallback. config.get_secret()
+      # resolves these from /run/secrets/<name> automatically — no
+      # environment: entry or code change needed (multi_llm_router.py:192
+      # + subagent_dispatcher.py:220 already use _cfg.groq_key()/openai_key()).
+      - groq_api_key
+      - openai_api_key
+      # Phase 11.U.J — needed by IdeasClient Supabase-fallback path so the
+      # Brain Dashboard read-endpoints work without Ideas-HTTP :5102.
+      - supabase_anon_key
+    # Phase B3: config.get_secret() reads /run/secrets/<name> automatically;
+    # the *_FILE convention also works for libraries that expect it.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Checkpoint persistence (EventRoutingHead/SpaceRoutingHead .pt, ctm,
+      # snapshots). Phase C namespaces sub-paths by BRAIN_ID when set.
+      - brain_data:/app/data
+    configs:
+      # Phase 11.U.H — repo capabilities.yaml wins over the volume copy.
+      # File-level mount onto a path inside the volume dir is allowed
+      # (same as nginx_media_conf_v2 onto /etc/nginx/...). 0444 is fine —
+      # the registry only reads it.
+      - source: brain_capabilities_v9
+        target: /app/data/capabilities.yaml
+        mode: 0444
+    networks:
+      - vibemind-shared
+    depends_on:
+      - qdrant
+      - embedding-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 8
+      # 2026-06-09: 60s war zu kurz -> exit 137 unhealthy-kill-loop. Mit
+      # BRAIN_HTTP_WORKERS=2 laedt JEDER Worker den Embedder (~109s) + vollen
+      # ML-Init; 360s deckt den 2-Worker-Cold-Start mit Puffer.
+      start_period: 360s
+    deploy:
+      labels:
+        vibemind.service: "brain-core"
+        vibemind.tier: "tier-1"
+        vibemind.component: "api"
+        vibemind.space: ""
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          # 2026-06-09: 2 uvicorn-Worker (BRAIN_HTTP_WORKERS=2, struktureller
+          # Contention-Fix) laden je ~1.5GB ML-Modelle → Limit 4G->6G.
+          cpus: "4"
+          memory: 6G
+        reservations:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  # === ProductionPlanner REST API (:5001) — routing-matrix learner =========
+  # Ported from docker-compose.brain-core.yml (2026-05-19) into the swarm
+  # stack so it survives a Vibemind.debug.ps1 restart. Same image (already
+  # contains production/api_server.py + Flask); only command/port differ.
+  # Keys via the EXISTING secret pattern (config.get_secret reads
+  # /run/secrets/<name>), NOT the ${VAR} env hack the dev compose used.
+  brain-api:
+    image: vibemind-brain-core:latest
+    command: python production/api_server.py
+    ports:
+      - "5001:5001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QDRANT_URL=http://qdrant:6333
+      - BRAIN_URL=http://brain-core:5000
+      - OPENFANG_URL=http://host.docker.internal:4200
+      - SUPABASE_URL=http://192.168.178.65:54321
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    secrets:
+      - openrouter_api_key
+      - anthropic_api_key
+      - groq_api_key
+      - openai_api_key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - brain_data:/app/data        # SAME named-volume as brain-core
+    networks:
+      - vibemind-shared
+    depends_on:
+      - qdrant
+      - embedding-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 90s   # ProductionPlanner (HierarchicalPlanner+SBERT) slow
+    deploy:
+      labels:
+        vibemind.service: "brain-api"
+        vibemind.tier: "tier-1"
+        vibemind.component: "api"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "3"
+          memory: 3G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  # === Auto-train drain sidecar — production replacement for the host =======
+  # Scheduled Task (2026-05-19). routing logic is in the image
+  # (production/autotrain_drain.py). One-shot main() wrapped in a sleep
+  # loop. Shares brain_data so it reads the SAME queue brain-core's hook
+  # writes; talks to brain-api over overlay DNS. Swarm-managed restart,
+  # no host-login dependency.
+  brain-autotrain-drain:
+    image: vibemind-brain-core:latest
+    command: ["sh","-c","while true; do python -m production.autotrain_drain --max 20 || true; sleep 1800; done"]
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ROUTING_AUTOTRAIN_API=http://brain-api:5001
+      - ROUTING_AUTOTRAIN_QUEUE=/app/data/routing_autotrain_queue.jsonl
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    volumes:
+      - brain_data:/app/data        # SAME queue as brain-core/brain-api
+    networks:
+      - vibemind-shared
+    depends_on:
+      - brain-api
+      - embedding-service
+    deploy:
+      labels:
+        vibemind.service: "brain-autotrain-drain"
+        vibemind.tier: "tier-2"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  # brain-loops: faehrt die CPU-gebundenen Hintergrund-Loops in EIGENEM Prozess
+  # (Contention-Architektur-Fix 2026-06-08). Gleiches Image, command=worker, KEIN
+  # HTTP. brain-core hat BRAIN_BACKGROUND_LOOPS=0 (Loops aus) → genau EIN Loop-Owner
+  # = dieser Service (Single-Writer-Constraint erfuellt). Muster wie brain-autotrain-
+  # drain. Spiegelt brain-core env/secrets/extra_hosts (die Loops nutzen LLM-keys via
+  # subagent_dispatcher + OpenFang/Ollama/Supabase via host-gateway).
+  brain-loops:
+    image: vibemind-brain-core:latest
+    command: ["python","brain_loops_worker.py"]
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BRAIN_BACKGROUND_LOOPS=1     # Loops HIER an
+      - BRAIN_ROLE=learner           # is_learner-gated Writer ebenfalls hier
+      - QDRANT_URL=http://qdrant:6333
+      - BRAIN_URL=http://brain-core:5000
+      - OPENFANG_URL=http://host.docker.internal:4200
+      - OPENFANG_STREAM=0
+      - SUPABASE_URL=http://192.168.178.65:54321
+      - SUPABASE_ANON_KEY_FILE=/run/secrets/supabase_anon_key
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - PLANNER_MODEL=gpt-4o-mini
+      - BRAIN_THINK_INTERVAL_MS=30000
+      - BRAIN_CONSOLIDATION_INTERVAL_S=300
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    secrets:
+      - openrouter_api_key
+      - anthropic_api_key
+      - groq_api_key
+      - openai_api_key
+      - supabase_anon_key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - brain_data:/app/data         # shared State/Checkpoints wie brain-core
+    configs:
+      - source: brain_capabilities_v9
+        target: /app/data/capabilities.yaml
+    networks:
+      - vibemind-shared
+    depends_on:
+      - qdrant
+      - embedding-service
+    deploy:
+      labels:
+        vibemind.service: "brain-loops"
+        vibemind.tier: "tier-2"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.2"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  # === Phase D topology: 1 learner + N inference replicas ===================
+  # brain-core above stays the mono/default option. The two services below
+  # are the Phase D split — deploy these INSTEAD of brain-core for scale-out.
+  # Both mount the SAME brain_data volume: the learner save()s checkpoints,
+  # inference replicas maybe_reload() them (D3, mtime-gated). Only the
+  # learner mutates centroids (D1 guards); inference forwards reward/train
+  # to the learner via BRAIN_LEARNER_URL (D2).
+  #
+  #   docker stack deploy -c infra/swarm/vibemind-stack.yml vibemind
+  # then to run the D topology instead of mono:
+  #   docker service scale vibemind_brain-core=0 \
+  #     vibemind_brain-learner=1 vibemind_brain-inference=2
+
+  brain-learner:
+    profiles: [core-phase-d]
+    image: vibemind-brain-core:latest
+    command: python start_server.py 5000
+    environment:
+      - BRAIN_PORT=5000
+      - PYTHONUNBUFFERED=1
+      - BRAIN_ROLE=learner          # writes centroids + Qdrant + checkpoints
+      - QDRANT_URL=http://qdrant:6333
+      - BRAIN_URL=http://brain-learner:5000
+      - OPENFANG_URL=http://host.docker.internal:4200
+      - SUPABASE_URL=http://192.168.178.65:54321
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    secrets:
+      - openrouter_api_key
+      - anthropic_api_key
+      # Phase 11.U.H — OpenRouter credit is exhausted (402 on every
+      # openai/* + anthropic/* call). The Brain LLM path needs Groq
+      # (groq:: direct) as primary and OpenAI-direct (gpt-4o-mini via
+      # api.openai.com, NOT OpenRouter) as fallback. config.get_secret()
+      # resolves these from /run/secrets/<name> automatically — no
+      # environment: entry or code change needed (multi_llm_router.py:192
+      # + subagent_dispatcher.py:220 already use _cfg.groq_key()/openai_key()).
+      - groq_api_key
+      - openai_api_key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - brain_data:/app/data        # SHARED — learner writes, inference reads
+    configs:
+      - source: brain_capabilities_v9
+        target: /app/data/capabilities.yaml
+        mode: 0444
+    networks:
+      - vibemind-shared
+    depends_on:
+      - qdrant
+      - embedding-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
+    deploy:
+      labels:
+        vibemind.service: "brain-learner"
+        vibemind.tier: "tier-1"
+        vibemind.component: "api"
+        vibemind.space: ""
+      replicas: 0                   # opt-in: scale to 1 to activate D topology
+      placement:
+        constraints: [node.role == manager]   # single writer, pinned
+      resources:
+        limits:
+          cpus: "4"
+          memory: 4G
+        reservations:
+          cpus: "1"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  brain-inference:
+    profiles: [core-phase-d]
+    image: vibemind-brain-core:latest
+    command: python start_server.py 5000
+    environment:
+      - BRAIN_PORT=5000
+      - PYTHONUNBUFFERED=1
+      - BRAIN_ROLE=inference        # read-only: no centroid/Qdrant writes (D1)
+      # reward/train forwarded here (D2); D3 reload tick polls brain_data
+      - BRAIN_LEARNER_URL=http://brain-learner:5000
+      - BRAIN_CKPT_RELOAD_SECS=30
+      - QDRANT_URL=http://qdrant:6333
+      - BRAIN_URL=http://brain-inference:5000
+      - OPENFANG_URL=http://host.docker.internal:4200
+      - SUPABASE_URL=http://192.168.178.65:54321
+      - EMBEDDING_SERVICE_URL=${EMBEDDING_SERVICE_URL:-http://embedding-service:8080}
+      - DECISION_GRAPH_NEO4J_URI=${DECISION_GRAPH_NEO4J_URI:-bolt://192.168.178.65:7688}
+      - MIROFISH_NEO4J_URI=${MIROFISH_NEO4J_URI:-bolt://192.168.178.65:7688}
+    secrets:
+      - openrouter_api_key
+      - anthropic_api_key
+      # Phase 11.U.H — OpenRouter credit is exhausted (402 on every
+      # openai/* + anthropic/* call). The Brain LLM path needs Groq
+      # (groq:: direct) as primary and OpenAI-direct (gpt-4o-mini via
+      # api.openai.com, NOT OpenRouter) as fallback. config.get_secret()
+      # resolves these from /run/secrets/<name> automatically — no
+      # environment: entry or code change needed (multi_llm_router.py:192
+      # + subagent_dispatcher.py:220 already use _cfg.groq_key()/openai_key()).
+      - groq_api_key
+      - openai_api_key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - brain_data:/app/data        # SHARED read — sees learner's save()s
+    configs:
+      - source: brain_capabilities_v9
+        target: /app/data/capabilities.yaml
+        mode: 0444
+    networks:
+      - vibemind-shared
+    depends_on:
+      - qdrant
+      - brain-learner
+      - embedding-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 60s
+    deploy:
+      labels:
+        vibemind.service: "brain-inference"
+        vibemind.tier: "tier-1"
+        vibemind.component: "api"
+        vibemind.space: ""
+      replicas: 0                   # opt-in: scale to N to activate
+      resources:
+        limits:
+          cpus: "3"
+          memory: 3G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  embedding-service:
+    image: vibemind-embedding-service:latest
+    environment:
+      - OPENFANG_URL=http://host.docker.internal:4200
+      - OPENFANG_API_KEY_FILE=/run/secrets/openfang_api_key
+    secrets:
+      - openfang_api_key
+    configs:
+      - source: embedding_service_llm_config_v1
+        target: /config/llm_config.yml
+        mode: 0444
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "embedding-service"
+        vibemind.tier: "infra"
+        vibemind.component: "embedding"
+        vibemind.space: ""
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  # === B-next: low-risk service-space additions ============================
+  # video + n8n — the two trivially-stackable services (recon: video is a
+  # pure nginx:alpine image, n8n a single self-contained build). mirofish
+  # (host-Ollama coupling), rowboat (5 services + qdrant dedup) and minibook
+  # (empty build context — blocked) stay documented as later steps.
+
+  # video — static media server. Pure pull-ready image, no build, no deps.
+  media:
+    profiles: [space-media]
+    image: nginx:alpine@sha256:4a73073bd557c65b759505da037898b61f1be6cbcc3c2c3aeac22d2a470c1752
+    ports:
+      - "9877:80"
+    volumes:
+      - rowboat-videos:/usr/share/nginx/html:ro
+    # Swarm `configs:` instead of a bind-mount. A bind-mount path in a
+    # stack file is resolved relative to the COMPOSE FILE (infra/swarm/),
+    # not the deploy CWD — so `./vibemind-os/...` became
+    # infra/swarm/vibemind-os/... and Docker auto-created a DIR over the
+    # file (verified deploy failure). configs ship the file content with
+    # the stack and work single- AND multi-node.
+    configs:
+      - source: nginx_media_conf_v2
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - vibemind-shared
+    healthcheck:
+      # ROOT CAUSE (verified): busybox-wget resolves `localhost` to IPv6
+      # [::1] first, but nginx-media.conf only `listen 80;` (IPv4) — so
+      # `http://localhost/health` = Connection refused → permanent
+      # unhealthy → kill loop. http://127.0.0.1 (explicit IPv4) works.
+      # This was the real bug all along (not CRLF / mount / start_period).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      labels:
+        vibemind.service: "media"
+        vibemind.tier: "infra"
+        vibemind.component: "proxy"
+        vibemind.space: "video"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  # n8n — workflow engine. Pre-built image (docker compose build → tagged
+  # vibemind-n8n:latest). Self-contained, no DB. env defaults mirror
+  # voice/docker-compose.n8n.yml; secret-overridable keys via .env.
+  n8n:
+    profiles: [space-n8n]
+    image: vibemind-n8n:latest
+    # E6 (architecture-decisions-2026-08-15-v1): host-published on loopback
+    # only. The marketing webhook worker runs host-bound (outside the docker
+    # network) and needs a host-published port — loopback keeps that path
+    # working while removing the LAN-wide surface. Stack-internal consumers
+    # continue to use n8n:5678 over vibemind-shared, unchanged.
+    #
+    # CAVEAT — Swarm does not honour the bind address. This stack is applied
+    # with `docker stack deploy` (scripts/vibemind-start.ps1:231,
+    # Vibemind.debug.ps1:373), and the Swarm service port model
+    # (EndpointSpec.Ports) has no bind-address field, so the host IP is
+    # dropped at conversion and the port is published on all interfaces.
+    # The form is accepted, not rejected: rowboat-mongo below carries the
+    # same `127.0.0.1:` prefix and deploys healthy. So this line records
+    # intent and is correct for any compose-mode apply, but on Swarm the
+    # effective control is a host firewall rule — see
+    # docs/runbooks/n8n-loopback-binding.md.
+    ports:
+      - "127.0.0.1:15678:5678"
+    environment:
+      - N8N_API_DISABLED=false
+      - N8N_PUBLIC_API_DISABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
+      - N8N_API_KEY=${N8N_API_KEY:-vibemind-dev-api-key}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-vibemind-dev-key-change-in-prod}
+      - GENERIC_TIMEZONE=Europe/Berlin
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - N8N_TEMPLATES_ENABLED=true
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5678/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      # start_period was MISSING — Swarm probed from t=0, but n8n takes a few
+      # seconds to bind :5678. Early probes failed → unhealthy → SIGTERM. n8n
+      # exits 0 on SIGTERM (clean shutdown) → "Complete", and restart_policy
+      # `on-failure` ignores exit-0 → service stays 0/1 forever (observed: one
+      # Complete task, no retry for 7h). A boot grace period fixes the root
+      # cause (other services already carry one: mongo 20s, rowboat 40s).
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "n8n"
+        vibemind.tier: "space"
+        vibemind.component: "api"
+        vibemind.space: "n8n"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  # === rowboat (Phase B-next heavy: 5-service refactor) ====================
+  # The 5 essential services only (optional profile workers: rag-worker,
+  # copilot, chat_widget, docs, setup_qdrant — left out; on-demand).
+  #
+  # qdrant DEDUP: rowboat services already use QDRANT_URL=http://qdrant:6333
+  # (DNS name) — in the overlay that resolves to the SHARED stack `qdrant`
+  # service automatically. rowboat's own qdrant service def is NOT carried
+  # over (collections don't collide: brain uses brain-* / rowboat-artifacts,
+  # rowboat uses "embeddings"). No env rewrite needed.
+  #
+  # mongo: standalone used a ./data/mongo BIND mount with 314MB live data.
+  # Here it's a NAMED volume rowboat_mongo — the live data is migrated into
+  # it at cutover (Phase 4), NOT lost. Backup verified restorable first.
+  # redis: ephemeral (no volume), session/queue cache.
+
+  rowboat-mongo:
+    profiles: [space-rowboat]
+    # Gap List #5: digest-pinned to the verified-running mongo (the same
+    # image the 314MB live data was migrated into + restore-verified).
+    image: mongo:latest@sha256:d6566e93e6a913cdb622ebe34e0ae7937d50efa60e92363fb4a84404dc890415
+    networks:
+      - vibemind-shared
+    # Host-published on loopback only so the host-bound voice/python backend
+    # can reach Mongo at localhost:27017 (RowboatMongoPublisher). Stack-
+    # internal services continue to use rowboat-mongo:27017 unchanged.
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - rowboat_mongo:/data/db
+    # Datastore: no HTTP. Verified in-container: `mongosh` is present at
+    # /usr/bin/mongosh; ping returns ok=1 (STANDARDS.md §2 — document
+    # reality, datastores use a client ping not an HTTP probe).
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.runCommand({ping:1}).ok\" | grep -q 1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    deploy:
+      labels:
+        vibemind.service: "rowboat-mongo"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "rowboat"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # single DB, data-pinned
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  rowboat-redis:
+    profiles: [space-rowboat]
+    # Gap List #5: digest-pinned to the verified-running redis.
+    image: redis:latest@sha256:0c341492924cad6f5483f9133e43bd6c51ecdecbcadfac5b51657393b6a7936c
+    environment:
+      # 2026-07-14b: unstick after docker-restart exit-0 (on-failure ignores clean exits)
+      - VIBEMIND_RESTART_NONCE=2026-07-14b
+    networks:
+      - vibemind-shared
+    # Datastore: no HTTP. Verified in-container: `redis-cli ping` -> PONG
+    # (no password configured on this instance). STANDARDS.md §2.
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      labels:
+        vibemind.service: "rowboat-redis"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "rowboat"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  rowboat:
+    profiles: [space-rowboat]
+    image: vibemind-rowboat-rowboat:latest
+    ports:
+      - "3100:3000"
+    # env_file delivers OPENAI_API_KEY / PROVIDER_* / AGENTS_API_KEY etc.
+    # from .env. The earlier bug: `environment: OPENAI_API_KEY=${OPENAI_API_KEY}`
+    # expands from the DEPLOY SHELL (empty) and OVERRIDES the env_file value
+    # → key arrived empty → agents crashed "No LLM Provider API key". Only
+    # set the few vars that need a stack-specific value (overlay DNS).
+    env_file:
+      - ../../.env
+    environment:
+      # .env has PORT=8007 (Automation_ui's var) — env_file leaks it into
+      # rowboat so `next start` bound :8007 instead of :3000, breaking the
+      # 3100->3000 publish. Pin PORT=3000 for this container (env_file fix
+      # for agents had this side-effect; standalone compose used no env_file).
+      - PORT=3000
+      - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+      - REDIS_URL=redis://rowboat-redis:6379
+      - QDRANT_URL=http://qdrant:6333
+    volumes:
+      - rowboat_uploads:/app/uploads
+    networks:
+      - vibemind-shared
+    depends_on:
+      - rowboat-mongo
+      - rowboat-redis
+      - qdrant
+    # Verified in-container: NO /health route (all 404); only `/` -> 200
+    # (Next.js app root). This is a node:18-alpine image: it has `node`
+    # but NEITHER python3 NOR wget/curl — so the probe MUST use node's
+    # own http client. (An earlier python3-based probe here was WRONG —
+    # the rowboat container lacks python3 [unlike rowboat-agents], the
+    # healthcheck failed every cycle and Swarm churned the task to death.
+    # STANDARDS.md §2: verify the toolset PER container, never assume a
+    # sibling service shares it. Re-verified: `node` present, py3 absent.)
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\" || exit 1"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 40s
+    deploy:
+      labels:
+        vibemind.service: "rowboat"
+        vibemind.tier: "space"
+        vibemind.component: "frontend"
+        vibemind.space: "rowboat"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  rowboat-agents:
+    profiles: [space-rowboat]
+    image: vibemind-rowboat-rowboat_agents:latest
+    ports:
+      - "3101:3001"
+    # Same fix as rowboat: env_file first (delivers OPENAI_API_KEY /
+    # PROVIDER_API_KEY / AGENTS_API_KEY from .env), only stack-specific
+    # overrides in environment. agents needs PROVIDER_API_KEY or
+    # OPENAI_API_KEY (client.py:8-16) — both come from .env now.
+    env_file:
+      - ../../.env
+    environment:
+      - REDIS_URL=redis://rowboat-redis:6379
+      - MONGODB_URI=mongodb://rowboat-mongo:27017/rowboat
+      - QDRANT_URL=http://qdrant:6333
+      # agents reads API_KEY (not AGENTS_API_KEY) for inter-service auth
+      - API_KEY=${AGENTS_API_KEY:-vibemind-local-key}
+    networks:
+      - vibemind-shared
+    depends_on:
+      - rowboat-mongo
+      - rowboat-redis
+      - qdrant
+    # Verified in-container: GET /health -> 200 (Quart/Hypercorn on
+    # 0.0.0.0:3001, confirmed via /proc/net/tcp + logs). Container has
+    # python3 but NO wget/curl -> probe uses python3 urllib. The earlier
+    # wget-timeout was a MISSING http client, NOT a dead service
+    # (STANDARDS.md §2 — verify the real surface, don't assume).
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:3001/health',timeout=8).status==200 else 1)\" || exit 1"]
+      interval: 30s
+      timeout: 12s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "rowboat-agents"
+        vibemind.tier: "space"
+        vibemind.component: "api"
+        vibemind.space: "rowboat"
+      # replicas:0 — opt-in/disabled. The rowboat_agents Python/Quart service
+      # (:3001) was removed from the upstream rowboatlabs/rowboat repo in
+      # mid-2025 and is not present in this checkout (apps/rowboat_agents has
+      # no source). Modern Rowboat runs UI+API+jobs+rag all from the single
+      # apps/rowboat image; agents is an optional external service. We consume
+      # Rowboat via UI/CDP + the :3100 chat API, which does NOT need this.
+      # Set back to 1 once a matching agents source is restored.
+      replicas: 0
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  rowboat-jobs-worker:
+    profiles: [space-rowboat]
+    image: vibemind-rowboat-jobs-worker:latest
+    # The MAIN bug for the 0/1: the image CMD is just [node] (entrypoint
+    # docker-entrypoint.sh) — without an explicit command the container ran
+    # `node` with no script → REPL → instant exit 0, no logs, the patched
+    # jobs-worker.ts never even ran. The standalone compose had
+    # `command: ["npm","run","jobs-worker"]`; this block was missing it.
+    # (Also: env_file-first so OPENAI_API_KEY isn't overridden by an empty
+    # ${VAR} shell expansion — same fix as rowboat/agents. And the
+    # jobs.worker.ts run() patch keeps it from resolving after startPolling.)
+    command: ["npm", "run", "jobs-worker"]
+    env_file:
+      - ../../.env
+    environment:
+      - PORT=3000
+      - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+      - REDIS_URL=redis://rowboat-redis:6379
+      - QDRANT_URL=http://qdrant:6333
+    networks:
+      - vibemind-shared
+    depends_on:
+      - rowboat-mongo
+      - rowboat-redis
+    # Queue worker — NO HTTP surface (verified: only the tsx node process,
+    # no listening port). Honest liveness probe: assert the actual
+    # jobs-worker.ts process is alive, NOT just any `node` (the original
+    # 0/1 bug was a bare `node` REPL passing for "running"). pgrep -f
+    # matches the real script path; this catches the worker dying while
+    # the container lingers (STANDARDS.md §2 — verify the real thing).
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'jobs-worker.ts' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "rowboat-jobs-worker"
+        vibemind.tier: "space"
+        vibemind.component: "worker"
+        vibemind.space: "rowboat"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  # rowboat-rag-worker — embeddet pending data-source-Docs nach Qdrant.
+  # FEHLTE bis 2026-06-03: war ein "on-demand"-Profil-Worker (s. Z.524) und lief
+  # in KEINEM Container → data-source-Docs blieben seit 19.05. ewig `pending`,
+  # rowboat-knowledge-Chat fand nichts. Jetzt als persistenter core-Service.
+  # command: erst setupQdrant (legt Collection `embeddings` size 1536 an, falls
+  # fehlt — sonst scheitert das Embedding mit "Collection doesn't exist"; das
+  # Script ist idempotent/'|| true' falls schon da), dann rag-worker (while-Loop,
+  # pollt pending sources, embeddet via OpenAI text-embedding-3-small).
+  # Gleiches Image/Env wie jobs-worker (rag-worker.ts liegt im selben Image).
+  rowboat-rag-worker:
+    profiles: [space-rowboat]
+    image: vibemind-rowboat-jobs-worker:latest
+    command: ["sh", "-c", "cd /app && (npm run setupQdrant || true) && npm run rag-worker"]
+    env_file:
+      - ../../.env
+    environment:
+      - PORT=3000
+      - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+      - REDIS_URL=redis://rowboat-redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - EMBEDDING_MODEL=text-embedding-3-small
+      - EMBEDDING_VECTOR_SIZE=1536
+      # 2026-07-14b: unstick after docker-restart exit-0 (on-failure ignores clean exits)
+      - VIBEMIND_RESTART_NONCE=2026-07-14b
+    networks:
+      - vibemind-shared
+    depends_on:
+      - rowboat-mongo
+      - rowboat-redis
+      - qdrant
+    # Queue worker, kein HTTP-Port. Liveness = der echte rag-worker.ts-Prozess
+    # lebt (nicht irgendein node) — analog jobs-worker. start_period grosszuegig
+    # (setupQdrant + erster Poll).
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f 'rag-worker.ts' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+    deploy:
+      labels:
+        vibemind.service: "rowboat-rag-worker"
+        vibemind.tier: "space"
+        vibemind.component: "worker"
+        vibemind.space: "rowboat"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  # === mirofish (Phase B-next: 2-service, shared Neo4j) ===================
+  # neo4j-mirofish holds a SHARED store: mirofish KG (Entity/Episode) AND
+  # Brain's decision history (Plan/Hop/Dispatch — Brain decision_graph.py
+  # writes here via bolt :7688). Backup verified restorable before cutover;
+  # data migrated into the named volume at Phase 4 (3103 nodes preserved).
+  # Brain is fail-soft if Neo4j is briefly down (in-memory mirror).
+  #
+  # env_file FIRST (rowboat lesson): otherwise ${MIROFISH_LLM_API_KEY:-
+  # ${OPENAI_API_KEY}} expands from the empty deploy shell and overrides
+  # the .env value. host-Ollama (:11434) stays via extra_hosts (host
+  # process — mirofish embeddings; degrades gracefully if down).
+  neo4j-mirofish:
+    profiles: [space-mirofish]
+    image: neo4j:5.18-community@sha256:8f01f7bb053e5564eb84a3f1824e4ca2202d29dd415d196cf8e27c8f7e6b611e
+    ports:
+      - "7475:7474"   # Browser
+      - "7688:7687"   # Bolt (Brain decision_graph + mirofish_kg_sync use this)
+    environment:
+      - NEO4J_AUTH=${MIROFISH_NEO4J_USER:-neo4j}/${MIROFISH_NEO4J_PASSWORD:-mirofish}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      # Default heap (~512M of the container) blew up restoring the 29MB
+      # cypher dump (3114 CREATEs in just 3 transactions = one huge TX).
+      # Explicit 2G heap + 1G pagecache; container limit raised to 4G to
+      # fit heap+pagecache+JVM overhead.
+      - NEO4J_server_memory_heap_initial__size=2G
+      - NEO4J_server_memory_heap_max__size=2G
+      - NEO4J_server_memory_pagecache_size=1G
+      - VIBEMIND_RESTART_NONCE=2026-07-14a
+    volumes:
+      - neo4j_mirofish_data:/data
+      - neo4j_mirofish_plugins:/plugins
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:7474 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+    deploy:
+      labels:
+        vibemind.service: "neo4j-mirofish"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "mirofish"
+        vibemind.restart-nonce: "2026-07-14a"
+      replicas: 0  # disabled: violates no-local-inference (Ollama-only), see VIBEMIND-DEPLOY-RECON.md §0.1 -- nothing else depends on it
+      placement:
+        constraints: [node.role == manager]   # single shared DB, pinned
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+      restart_policy:
+        condition: on-failure
+
+  mirofish:
+    profiles: [space-mirofish]
+    image: vibemind-mirofish-mirofish:latest
+    ports:
+      - "5101:5001"   # Flask API
+      - "3001:3000"   # Vue frontend
+    env_file:
+      - ../../.env
+    environment:
+      # mirofish backend Config.validate() requires LLM_API_KEY/NEO4J_*; these
+      # are mirofish-specific keys NOT in repo-root .env. Without them the
+      # backend exits 1 at boot -> `concurrently --kill-others` tears down the
+      # frontend -> container dies (same env-leak class as the rowboat block).
+      # mirofish runs fully on local Ollama: LLM_API_KEY is just a non-empty
+      # placeholder ('ollama'), real endpoints point at host Ollama via the
+      # host-gateway. Model pinned to one that exists on the host (llama3.1)
+      # — image default qwen2.5:32b is not pulled.
+      - NEO4J_URI=bolt://neo4j-mirofish:7687
+      - NEO4J_USER=${MIROFISH_NEO4J_USER:-neo4j}
+      - NEO4J_PASSWORD=${MIROFISH_NEO4J_PASSWORD:-mirofish}
+      - LLM_API_KEY=ollama
+      - LLM_BASE_URL=http://host.docker.internal:11434/v1
+      - LLM_MODEL_NAME=${MIROFISH_LLM_MODEL:-llama3.1:latest}
+      - EMBEDDING_MODEL=${MIROFISH_EMBEDDING_MODEL:-nomic-embed-text:latest}
+      - EMBEDDING_BASE_URL=http://host.docker.internal:11434
+      - OPENAI_API_KEY=ollama
+      - OPENAI_API_BASE_URL=http://host.docker.internal:11434/v1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - vibemind-shared
+    depends_on:
+      - neo4j-mirofish
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:5001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 40s
+    deploy:
+      labels:
+        vibemind.service: "mirofish"
+        vibemind.tier: "space"
+        vibemind.component: "api"
+        vibemind.space: "mirofish"
+      replicas: 0  # disabled: Ollama-only, violates no-local-inference (VIBEMIND-DEPLOY-RECON.md §0.1)
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  # === coding-engine Phase 1 (server-grade, 5 independent services) ========
+  # The autonomous code-gen subsystem ("swe/projekt"). Migrated in phases
+  # (Plan: phased, each a rollback point). Phase 1 = the 5 services with NO
+  # CODE host-binds: 3 datastores + vscode + egress-proxy. Phase 2 (separate
+  # session) brings api/worker/openclaude/frontend (those need
+  # source baked into images + the egress internal-net). `sandbox` is
+  # PERMANENTLY native-only — privileged:true + /dev/kvm cannot be expressed
+  # via `docker stack deploy` (those compose keys are silently dropped);
+  # documented like OpenFang. api degrades gracefully without sandbox
+  # (src/api/routes/dashboard.py try/except → "sandbox unreachable").
+  #
+  # Server-grade: host bind-mounts converted to swarm-native (named volumes
+  # for state, configs: for the egress-proxy config files). Upstream images
+  # tag-pinned (16-alpine/7-alpine/1.23 already pinned; code-server/tinyproxy
+  # float :latest upstream — pinned to a dated tag where one exists, else
+  # the :latest is accepted as a documented Phase-2 hardening item since
+  # they were never running so no verified digest exists yet).
+  # Volumes are EMPTY today (verified 0 files) → no data migration.
+
+  coding-postgres:
+    profiles: [space-coding]
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    environment:
+      - POSTGRES_USER=postgres
+      # compose hardcodes POSTGRES_PASSWORD=postgres; keep that value so the
+      # api/worker DATABASE_URL (Phase 2) stays valid. Swarm secret
+      # postgres_password exists but the app DSN is literal — not changing
+      # the app contract in an infra phase.
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=coding_engine
+    volumes:
+      - coding_postgres:/var/lib/postgresql/data
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      labels:
+        vibemind.service: "coding-postgres"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "coding"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # single DB, data-pinned
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  coding-redis:
+    profiles: [space-coding]
+    image: redis:7-alpine@sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2
+    command: ["redis-server", "--appendonly", "yes"]
+    environment:
+      # 2026-07-14b: unstick after docker-restart exit-0 (on-failure ignores clean exits)
+      - VIBEMIND_RESTART_NONCE=2026-07-14b
+    volumes:
+      - coding_redis:/data
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      labels:
+        vibemind.service: "coding-redis"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "coding"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  # 2026-05-21: dedicated Postgres for Gitea (was sharing coding-postgres).
+  # The Gitea install needs its OWN `gitea` database; POSTGRES_DB=gitea makes
+  # postgres create it on first boot, so Gitea can run with INSTALL_LOCK=true
+  # without a manual CREATE DATABASE in the shared coding-engine DB.
+  gitea-postgres:
+    profiles: [space-coding]
+    image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - gitea_postgres:/var/lib/postgresql/data
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gitea || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      labels:
+        vibemind.service: "gitea-postgres"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "coding"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # single DB, data-pinned
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+
+  coding-gitea:
+    profiles: [space-coding]
+    image: gitea/gitea:1.23@sha256:8b5a98abe52dacbead16eb4179c9abb7c217d523df3a75901343906ae7853357
+    ports:
+      # host :3000 AND :3001 are taken by OTHER swarm stacks' INGRESS ports
+      # (unity-ai_grafana :3000, +:3001) — NOT visible via `docker ps`, only
+      # `docker service ls`. Verified free: :3002. gitea stays on container
+      # :3000 internally; only the published host port moves.
+      - "3002:3000"
+      - "2222:22"     # git SSH (ingress :2222 verified free)
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      # 2026-05-21: own Postgres (gitea-postgres) — was coding-postgres:5432.
+      - GITEA__database__HOST=gitea-postgres:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+      - GITEA__server__ROOT_URL=http://localhost:3002/
+      - GITEA__server__HTTP_PORT=3000
+      - VIBEMIND_RESTART_NONCE=2026-07-14a
+    volumes:
+      - coding_gitea:/data
+    networks:
+      - vibemind-shared
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
+      start_period: 40s
+    deploy:
+      labels:
+        vibemind.service: "coding-gitea"
+        vibemind.tier: "space"
+        vibemind.component: "datastore"
+        vibemind.space: "coding"
+        vibemind.restart-nonce: "2026-07-14a"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # gitea_data pinned
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  # coding-vscode: ACTIVE (replicas:1). The Phase-1 "entrypoint/exec exit 0"
+  # diagnosis was WRONG — it was an artifact of git-bash MSYS path-mangling
+  # in the *diagnostic* docker commands (it rewrote /usr/bin/code-server →
+  # C:/Program Files/Git/usr/bin/...), NOT a real container fault. Verified
+  # with MSYS_NO_PATHCONV=1: this exact block (command: + curl healthcheck)
+  # runs stable — container stays Up, code-server "HTTP server listening",
+  # the literal healthcheck `curl -s -o /dev/null http://127.0.0.1:8443/`
+  # returns exit 0 (302→login = alive). The two real Phase-1 issues WERE
+  # fixed: EACCES (dropped the root-owned extensions volume) and the
+  # healthcheck tool (node absent in the image → curl, the §2 lesson).
+  # Lesson: never trust a docker diagnostic run from git-bash without
+  # MSYS_NO_PATHCONV=1 — a mangled path produces a false "exit 0".
+  coding-vscode:
+    profiles: [space-coding]
+    image: codercom/code-server:latest@sha256:b88ed46a6ace76a0294a17a24f39aa88032ed0a3692c3d8ab5433b47ab57ccbf
+    ports:
+      - "8444:8443"
+    command: ["--auth", "password", "--bind-addr", "0.0.0.0:8443"]
+    environment:
+      - PASSWORD=dev123
+    volumes:
+      # ./Data/generated host-bind → named volume (server-grade; it is the
+      # generated-project workspace, EMPTY today — 0 files. Phase 2 api/
+      # openclaude write here; for now an empty shared volume is correct).
+      - coding_generated:/home/coder/project
+      # NO extensions volume. Docker creates named volumes root:root; the
+      # code-server image runs as uid 1000 (coder) and cannot mkdir
+      # coder-logs/ inside a fresh root-owned volume → EACCES uncaught
+      # exception (verified via container logs — this looked like a CMD
+      # bug, was a volume-ownership crash; mounting the parent dir didn't
+      # help, the volume root is still root-owned). The extensions dir was
+      # EMPTY (0 files — nothing to persist) and code-server manages its
+      # own state dir fine WITHOUT a volume. Dropping it is the correct
+      # server-grade fix here (no data loss; extensions re-download on
+      # demand). A chown-init sidecar is the alternative if persistence is
+      # ever needed — deferred, not needed for Phase 1.
+    networks:
+      - vibemind-shared
+    healthcheck:
+      # code-server has no /health; root returns 302→login = server alive.
+      # VERIFIED in the running container: `node` is NOT on PATH (code-server
+      # bundles its own internally) — `curl` AND `wget` ARE present. The
+      # earlier node-based probe failed exit 127 ("node: not found") → the
+      # exact §2 lesson (verify the check tool inside THE container, never
+      # assume; same class as the rowboat regression). curl -o /dev/null
+      # WITHOUT -f so the 302 redirect counts as "alive" (not a failure);
+      # --max-time guards a hung server.
+      test: ["CMD-SHELL", "curl -s -o /dev/null --max-time 8 http://127.0.0.1:8443/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "coding-vscode"
+        vibemind.tier: "space"
+        vibemind.component: "frontend"
+        vibemind.space: "coding"
+      replicas: 1   # ACTIVE — verified stable (see header comment)
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+
+  coding-egress-proxy:
+    profiles: [space-coding]
+    image: vimagick/tinyproxy:latest@sha256:72b441b95ee1e641af948f68f09492f9f795ead72b73954414e339168c98ad8c
+    # tinyproxy egress firewall: api/openclaude (Phase 2) reach the
+    # internet ONLY through this. Phase 1 just stands it up + its config so
+    # Phase 2 can attach. The 2 host config-binds → swarm configs: objects
+    # (server-grade — file content travels with the stack, not a host path).
+    configs:
+      - source: coding_tinyproxy_conf
+        target: /etc/tinyproxy/tinyproxy.conf
+      - source: coding_tinyproxy_filter
+        target: /etc/tinyproxy/filter
+    networks:
+      # BOTH: vibemind-shared = the bridge OUT (reaches the internet);
+      # coding-egress = the internal net api/openclaude sit on so
+      # they can reach this proxy but have no direct default route (Phase
+      # 2a/b — the egress-firewall topology).
+      - vibemind-shared
+      - coding-egress
+    healthcheck:
+      # tinyproxy listens 0.0.0.0:8888; busybox in the image has nc.
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8888 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      labels:
+        vibemind.service: "coding-egress-proxy"
+        vibemind.tier: "space"
+        vibemind.component: "proxy"
+        vibemind.space: "coding"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+        reservations:
+          cpus: "0.1"
+          memory: 32M
+      restart_policy:
+        condition: on-failure
+
+  # === coding-engine Phase 2a/b (4 code-baked services) ====================
+  # Recon verdict: api/worker/openclaude Dockerfiles ALREADY
+  # COPY the app code into the image — the compose host-binds (./src etc.)
+  # were pure dev-convenience (live reload), NOT load-bearing. So: reuse the
+  # existing verified-working images (the SAME ones the live old-compose
+  # containers run — api/openclaude all answer /health=200 right
+  # now), drop the code binds, keep only configs:/secrets:/named-vols.
+  # `--resolve-image never` (launcher) uses the local tag, no registry.
+  # frontend is Phase 2c (Vite dev-server — own static-vs-dev decision).
+  # sandbox stays permanently native (privileged/kvm — Phase 1 note).
+  #
+  # Images pinned to the VERIFIED-RUNNING ones (not "newest" — the live
+  # containers prove these work; vibemind-coding-* variants are untested):
+  #   api        davefelix-coding-engine-api:latest        (live :8000=200)
+  #   openclaude davefelix-coding-engine-openclaude-service (live :8091=200)
+  #   worker     vibemind-coding-worker:latest  (never ran; only image avail)
+  #
+  # egress firewall: api/openclaude reach the internet ONLY via
+  # coding-egress-proxy. Replicated server-grade with an `internal: true`
+  # overlay (coding-egress) — those 2 join it for outbound; they ALSO join
+  # vibemind-shared for overlay-DNS to brain/qdrant/the datastores. The
+  # egress-proxy bridges both. HONEST limitation: swarm overlay does not
+  # hard-enforce that a service can't open arbitrary sockets — the tinyproxy
+  # filter is the actual control; internal:true removes the default route so
+  # non-proxied egress fails closed. Documented, not overstated.
+
+  coding-api:
+    profiles: [space-coding]
+    image: davefelix-coding-engine-api:latest
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+    # env_file FIRST (the recurring rowboat lesson) — delivers OPENAI/
+    # ANTHROPIC/OPENROUTER/GITHUB/DISCORD from the super-repo root .env
+    # (Phase 11.W consolidation 2026-05-20: coding-engine/.env was stale
+    # — empty ANTHROPIC_API_KEY blocked the router's claude backend).
+    # Only overlay-DNS + topology overrides here, literal (never ${VAR}
+    # of an .env key).
+    env_file:
+      - ../../.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@coding-postgres:5432/coding_engine
+      - REDIS_URL=redis://coding-redis:6379/0
+      - GIT_SERVER_URL=http://coding-gitea:3000
+      - LLM_BACKEND=openrouter
+      # Phase 11.W (2026-05-20): openclaude is the code-gen backend — an
+      # OpenAI /v1/chat/completions API. ClaudeCodeTool health-checks this
+      # URL and routes code generation through it.
+      - OPENCLAUDE_URL=http://coding-openclaude:8091
+      - HTTP_PROXY=http://coding-egress-proxy:8888
+      - HTTPS_PROXY=http://coding-egress-proxy:8888
+      - NO_PROXY=localhost,127.0.0.1,coding-postgres,coding-redis,coding-gitea,coding-openclaude,coding-egress-proxy,brain-core,qdrant,host.docker.internal
+      - OPENCLAW_URL=http://host.docker.internal:18789
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # docker.sock: api spawns containers (DinD). Code-independent — a
+      # PLACEMENT concern, not a code-bake one. Pinned to the manager node
+      # (single-node swarm today; multi-node needs a docker-capable node
+      # label). HONEST trade-off: this grants host-Docker access = a real
+      # blast radius; kept because api's container-spawn is functionally
+      # required and refactoring to the Docker SDK is out of scope here.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - coding_generated:/app/output
+      - coding_artifact:/data/artifacts
+    networks:
+      - vibemind-shared
+      - coding-egress
+    healthcheck:
+      # VERIFIED on the live container: api serves /health (NOT /api/health
+      # — that's 404). curl present in the image. §2: probe verified before
+      # deploy, not assumed.
+      test: ["CMD-SHELL", "curl -fsS --max-time 8 http://127.0.0.1:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    deploy:
+      labels:
+        vibemind.service: "coding-api"
+        vibemind.tier: "space"
+        vibemind.component: "api"
+        vibemind.space: "coding"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # docker.sock = manager-pinned
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  coding-worker:
+    profiles: [space-coding]
+    image: vibemind-coding-worker:latest
+    command: ["python", "-m", "workers.agent_worker"]
+    env_file:
+      - ../../.env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@coding-postgres:5432/coding_engine
+      - REDIS_URL=redis://coding-redis:6379/0
+      - GIT_SERVER_URL=http://coding-gitea:3000
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      # Phase 11.W — worker uses the openclaude HTTP API (OpenAI-compatible)
+      # as its code-gen backend.
+      - LLM_BACKEND=openrouter
+      - OPENCLAUDE_URL=http://coding-openclaude:8091
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # same DinD trade-off as api
+      - coding_artifact:/data/artifacts
+    networks:
+      - vibemind-shared
+    healthcheck:
+      # worker has NO http surface (queue worker). Liveness = the actual
+      # agent_worker process alive, not a bare python REPL (the rowboat-
+      # jobs-worker class). pgrep matches the real module path.
+      test: ["CMD-SHELL", "pgrep -f 'workers.agent_worker' >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "coding-worker"
+        vibemind.tier: "space"
+        vibemind.component: "worker"
+        vibemind.space: "coding"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]   # docker.sock = manager-pinned
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      restart_policy:
+        condition: on-failure
+
+  coding-openclaude:
+    profiles: [space-coding]
+    image: davefelix-coding-engine-openclaude-service:latest
+    ports:
+      # Phase 11.W (2026-05-20): host 8091 → container 8007 (the actual
+      # listen-port of serve.ts when PORT env is unset and the Bun script
+      # defaults to its hard-coded value of 8007 — Dockerfile EXPOSE says
+      # 8091 but the binary disagrees; force PORT=8091 below + map 8091:8091.
+      - "8091:8091"
+    env_file:
+      - ../../.env
+    environment:
+      - PORT=8091          # Phase 11.W: align with stack port mapping + Dockerfile EXPOSE
+      - CLAUDE_CODE_USE_OPENAI=1
+      - OPENAI_BASE_URL=https://openrouter.ai/api/v1
+      # Phase 11.W (2026-05-20): the openclaude CLI requires a model with
+      # `tools` support (it spawns subagents). Among OpenRouter free
+      # tool-capable models, the most reliably responding (not stuck at
+      # 429 rate-limit upstream) on 2026-05-20 were z-ai/glm-4.5-air:free
+      # and minimax/minimax-m2.5:free. qwen3-coder + gpt-oss + gemma +
+      # deepseek were all temporarily rate-limited. Swap when free-tier
+      # capacity shifts.
+      - OPENAI_MODEL=z-ai/glm-4.5-air:free
+      # The openclaude CLI reads OPENAI_API_KEY as the auth header when
+      # CLAUDE_CODE_USE_OPENAI=1, but our OPENAI_BASE_URL points at
+      # OpenRouter — so the header value must be the OpenRouter key, not
+      # the literal OpenAI one. Override env_file's OPENAI_API_KEY with
+      # the OpenRouter value (expanded from the same root .env at deploy).
+      - OPENAI_API_KEY=${OPENROUTER_API_KEY}
+      - DISABLE_TELEMETRY=1
+      - CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+      - HTTP_PROXY=http://coding-egress-proxy:8888
+      - HTTPS_PROXY=http://coding-egress-proxy:8888
+      - NO_PROXY=localhost,127.0.0.1,coding-api,coding-redis,coding-postgres,coding-gitea,coding-egress-proxy,brain-core,qdrant
+    volumes:
+      - coding_generated:/workspace
+    networks:
+      - vibemind-shared
+      - coding-egress
+    healthcheck:
+      # Phase 11.W (2026-05-20): healthcheck switched back to :8091.
+      # Earlier comment said serve.ts listens on 8007 — that was because
+      # PORT env wasn't set and the script hard-codes 8007 as fallback
+      # default. We now force PORT=8091 in environment: above, so the
+      # service + Dockerfile EXPOSE + stack port mapping + this probe
+      # all line up on one port.
+      test: ["CMD-SHELL", "curl -fsS --max-time 8 http://127.0.0.1:8091/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "coding-openclaude"
+        vibemind.tier: "space"
+        vibemind.component: "api"
+        vibemind.space: "coding"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  # === coding-engine Phase 2c: frontend (static build, server-grade) =======
+  # The old compose ran `npx vite` (DEV server — needs source live, the
+  # /api/v1 proxy was a Vite-dev-only feature). Rebuilt SERVER-GRADE:
+  # multi-stage Dockerfile.static (vite build → nginx static), nginx ALSO
+  # proxies /api/v1 → coding-api:8000 incl. WebSocket upgrade for the live
+  # generation stream (/api/v1/engine/generation/ws). Image pre-built +
+  # tagged vibemind-coding-frontend:static (launcher pre-build / manual);
+  # `--resolve-image never`. Verified locally: vite build OK, nginx -t ok,
+  # SPA root + deep-route fallback 200, container stays Up without
+  # coding-api (lazy resolver — survives start-order races).
+  coding-frontend:
+    profiles: [space-coding]
+    image: vibemind-coding-frontend:static
+    ports:
+      # Host :5173 → Container :80 (nginx-frontend.conf:16 `listen 80`).
+      # Vor 2026-05-20 falsch als "5173:5173" gemappt → Container hörte auf
+      # :80, ingress route auf :5173 → healthcheck wget timeout → SIGTERM →
+      # nginx graceful exit (Code 0). Live verifiziert.
+      - "5173:80"
+    configs:
+      # nginx vhost as a Swarm config (NOT host-bind — server-grade, the
+      # nginx_media_conf_v2 precedent). Onto conf.d/default.conf.
+      - source: coding_frontend_nginx
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - vibemind-shared
+    healthcheck:
+      # VERIFIED in the built image: wget present (busybox), curl absent.
+      # nginx serves the SPA at :80 (siehe ports-Note oben).
+      # 127.0.0.1 (not localhost — busybox→IPv6 trap, §2).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/ || exit 1"]
+      interval: 30s
+      timeout: 8s
+      retries: 5
+      start_period: 15s
+    deploy:
+      labels:
+        vibemind.service: "coding-frontend"
+        vibemind.tier: "space"
+        vibemind.component: "frontend"
+        vibemind.space: "coding"
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 32M
+      restart_policy:
+        condition: on-failure
+
+  # === Logging Stack (Phase 11.V — VibeMind-specific) ======================
+  # Loki + Promtail + Grafana for centralised, queryable logs that OUTLIVE
+  # `docker stack rm` (Brain/Rowboat/Mirofish logs disappear today the
+  # moment Swarm reaps the task — see 22:15 supabase shutdown analysis).
+  #
+  # Separate from `unity-ai_grafana` (which holds host :3000) — VibeMind-
+  # Grafana publishes :3030. Promtail uses docker_sd_configs to auto-
+  # discover all containers on the daemon; LogQL filters happen at query
+  # time (user choice in planning Q&A: max flexibility, all containers
+  # scraped, `{vibemind_service=~"..."}` carves out VibeMind).
+  #
+  # Persistence: loki_data volume → logs survive stack rm + redeploy.
+
+  loki:
+    profiles: [space-logging]
+    # Single-binary Loki; tsdb shipper (latest stable schema v13).
+    image: grafana/loki:3.4.1@sha256:1d0c5ddc7644b88956aa0bd775ad796d9635180258a225d6ab3552751d5e2a66
+    command: -config.file=/etc/loki/loki-config.yml
+    # 2026-05-20: published on host :3102 so the host-native error-monitor
+    # OpenFang agent can query Loki via curl from PowerShell without an
+    # exec-into-container detour. Rowboat owns :3100, rowboat-agents :3101
+    # → we use :3102. Internal overlay DNS `loki:3100` ist unaffected
+    # (Grafana datasource + Promtail client keep using that path).
+    ports:
+      - "3102:3100"
+    volumes:
+      - loki_data:/loki
+    configs:
+      - source: loki_config_v1
+        target: /etc/loki/loki-config.yml
+        mode: 0444
+    networks:
+      - vibemind-shared
+    healthcheck:
+      # loki image has wget (busybox-style). /ready is the standard endpoint.
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3100/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "loki"
+        vibemind.tier: "infra"
+        vibemind.component: "datastore"
+        vibemind.space: ""
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+
+  promtail:
+    profiles: [space-logging]
+    # Promtail uses docker_sd_configs → needs the docker socket. Pattern
+    # mirrors coding-docker-socket-proxy (also manager-pinned, also r-o
+    # socket mount). For a single-host swarm this is fine; multi-node would
+    # use a privileged DaemonSet pattern (Phase W).
+    image: grafana/promtail:3.4.1@sha256:8b2aa61745bc4a9343cc47bd391fb935a80e7da0793c7566d5985c75858ba3f8
+    command: -config.file=/etc/promtail/promtail-config.yml
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - promtail_positions:/tmp
+    configs:
+      - source: promtail_config_v2
+        target: /etc/promtail/promtail-config.yml
+        mode: 0444
+    networks:
+      - vibemind-shared
+    depends_on:
+      - loki
+    # Stateless collector — no healthcheck (same pattern as
+    # rowboat-jobs-worker which uses pgrep but is queue-driven, not HTTP).
+    # Promtail emits its own /metrics on :9080 if we ever want to probe.
+    deploy:
+      labels:
+        vibemind.service: "promtail"
+        vibemind.tier: "infra"
+        vibemind.component: "collector"
+        vibemind.space: ""
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+
+  grafana-vibemind:
+    profiles: [space-logging]
+    # Distinct from any unity-ai_grafana on this swarm. We publish :3030
+    # on the host (unity-ai_grafana owns :3000 — verified in the Gitea
+    # port-collision note at vibemind-stack.yml:928).
+    image: grafana/grafana:11.5.0@sha256:0a2874cf39c6487093c682215f7c7903ed8646d78ae5f911af945d2dfcc0a447
+    ports:
+      - "3030:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=vibemind-dev   # rotate via secret in prod
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_INSTALL_PLUGINS=
+      # Phase W: enable trace/metrics correlation once we add Tempo/Prom.
+    volumes:
+      - grafana_vibemind_data:/var/lib/grafana
+    configs:
+      - source: grafana_datasources_v2
+        target: /etc/grafana/provisioning/datasources/loki.yml
+        mode: 0444
+      - source: grafana_dashboards_v1
+        target: /etc/grafana/provisioning/dashboards/vibemind.yml
+        mode: 0444
+      - source: grafana_dash_brain_v2
+        target: /var/lib/grafana/dashboards/brain-overview.json
+        mode: 0444
+      - source: grafana_dash_services_v2
+        target: /var/lib/grafana/dashboards/vibemind-services.json
+        mode: 0444
+      - source: grafana_dash_incident_v2
+        target: /var/lib/grafana/dashboards/incident-timeline.json
+        mode: 0444
+    networks:
+      - vibemind-shared
+    depends_on:
+      - loki
+    healthcheck:
+      # grafana/grafana image ships wget (alpine-based) — verified via
+      # the same probe pattern unity-ai_grafana uses (see :928 note).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      labels:
+        vibemind.service: "grafana-vibemind"
+        vibemind.tier: "infra"
+        vibemind.component: "dashboard"
+        vibemind.space: ""
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+      restart_policy:
+        condition: on-failure
+
+  # === Supabase (10 Services) =================================================
+  # Migrated from external `supabase`-CLI Local Stack (eigenes
+  # supabase_network_supabase Bridge-Network) into this Swarm-Stack 2026-05-20.
+  # Vector container deliberately ABSENT (Windows-Docker-Socket-Bug — siehe
+  # vibemind-os/supabase/heal.sh). Demo-JWT-Keys aus der CLI 1:1 übernommen
+  # (siehe scripts/swarm_secrets_init.ps1 $SUPABASE_VALUES); Rotation =
+  # eigene Security-Story (OPENSOURCE_RELEASE_CHECKLIST.md).
+  # Brain SUPABASE_URL bleibt host.docker.internal:54321 (kein Code-Change —
+  # Voice/Electron sind außerhalb des Overlay, gleiche Adresse für alle).
+
+  supabase-db:
+    image: public.ecr.aws/supabase/postgres:17.6.1.106@sha256:21ab971149317ea9cd12a8126fe4ebb34def08c8972956b0958cba0924409dab
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+      # PGPASSWORD: damit 00-bootstrap.sql `\set pgpass `echo "$PGPASSWORD"``
+      # die Demo-Passwords für authenticator/auth_admin/storage_admin setzt.
+      # Ohne PGPASSWORD bleibt der `authenticator` User passwordless → REST/
+      # Auth/Storage Container scheitern mit "password authentication failed".
+      PGPASSWORD: postgres
+      JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      JWT_EXP: "3600"
+    secrets:
+      - source: supabase_jwt_secret
+        target: jwt_secret
+    ports:
+      - "54322:5432"
+    volumes:
+      - supabase_db:/var/lib/postgresql/data
+    configs:
+      - source: supabase_bootstrap_v1
+        target: /docker-entrypoint-initdb.d/00-bootstrap.sql
+        mode: 0444
+      - source: supabase_restore_v1
+        target: /docker-entrypoint-initdb.d/01-restore.sql
+        mode: 0444
+      - source: supabase_restore_internal_v1
+        target: /docker-entrypoint-initdb.d/02-restore-internal.sql
+        mode: 0444
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -h 127.0.0.1 -p 5432"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks:
+      - vibemind-shared
+    deploy:
+      labels:
+        vibemind.service: "supabase-db"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  supabase-auth:
+    image: public.ecr.aws/supabase/gotrue:v2.188.1@sha256:87db8c737af49a64236c461882ed3925f8b1e5c2c47176c64694dedc65153573
+    # Swarm IGNORIERT depends_on → gotrue verliert beim Stack-Restart das DNS-
+    # Rennen um supabase-db und fatalt SOFORT ohne Migrations-Retry:
+    # "running db migrations: ... lookup supabase-db ... no such host" → Exit 1
+    # → on-failure-Restart-Loop bis db-DNS da ist (Race-Fenster ~60s wegen
+    # db start_period). Wait-Gate als depends_on-Ersatz: blockt bis db:5432
+    # auflösbar+offen (nc), dann exec der Original-CMD. Cap 90s → danach exec
+    # trotzdem (echtes db-Down fällt wie bisher laut, aber gedrosselt via
+    # restart delay). $$ = literal $ (docker stack deploy interpoliert $ sonst).
+    entrypoint: ["/bin/sh", "-c", "n=0; until nc -z supabase-db 5432; do n=$$((n+1)); [ $$n -ge 90 ] && break; echo \"wait-for supabase-db:5432 ($$n)\"; sleep 1; done; exec \"$$@\"", "--"]
+    command: ["auth"]
+    environment:
+      API_EXTERNAL_URL: http://127.0.0.1:54321
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: "9999"
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgresql://supabase_auth_admin:postgres@supabase-db:5432/postgres
+      GOTRUE_SITE_URL: http://127.0.0.1:3000
+      # GoTrue 2.188.1 unterstützt das _FILE-Pattern nicht stabil (Live-Test
+      # 2026-05-20: "Failed to load configuration: required key GOTRUE_JWT_SECRET
+      # missing value"). Direkt-env mit dem supabase-CLI Demo-Default — gleicher
+      # Inhalt wie /run/secrets/supabase_jwt_secret.
+      GOTRUE_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: "3600"
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_SMTP_HOST: supabase-inbucket
+      GOTRUE_SMTP_PORT: "2500"
+      GOTRUE_SMTP_ADMIN_EMAIL: admin@email.com
+      GOTRUE_SMTP_SENDER_NAME: Admin
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_SMS_AUTOCONFIRM: "true"
+    secrets:
+      - source: supabase_jwt_secret
+        target: jwt_secret
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+    deploy:
+      labels:
+        vibemind.service: "supabase-auth"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  supabase-rest:
+    image: public.ecr.aws/supabase/postgrest:v14.8@sha256:4173b72e0be29cf15349dc827798c3e464c5f2cc7f9c1697022f9cd1874b4c36
+    environment:
+      PGRST_DB_URI: postgresql://authenticator:postgres@supabase-db:5432/postgres
+      PGRST_DB_SCHEMAS: public,graphql_public
+      PGRST_DB_EXTRA_SEARCH_PATH: public,extensions
+      PGRST_DB_MAX_ROWS: "1000"
+      PGRST_DB_ANON_ROLE: anon
+      # PostgREST 14.8 _FILE-Support uneinheitlich — env-var direkt.
+      PGRST_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      PGRST_ADMIN_SERVER_PORT: "3001"
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+    deploy:
+      labels:
+        vibemind.service: "supabase-rest"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  supabase-realtime:
+    image: public.ecr.aws/supabase/realtime:v2.82.0@sha256:e3a9a49c92d1fe7decf5bceda84c036dd8ecdedb145a94d39fc9433becb0b989
+    # Wie supabase-auth: Swarm-depends_on no-op → realtime fatalt beim Boot mit
+    # "Failed to detect IP version for DB_HOST: nxdomain" (runtime.exs) → Exit 1
+    # → Crash-Loop bis db-DNS da ist. Wait-Gate (kein nc im Image → bash
+    # /dev/tcp), dann exec der Original-ENTRYPOINT-Kette tini -s -g -- run.sh
+    # mit der Original-CMD. $$ = literal $.
+    entrypoint: ["/bin/bash", "-c", "n=0; until (exec 3<>/dev/tcp/supabase-db/5432) 2>/dev/null; do n=$$((n+1)); [ $$n -ge 90 ] && break; echo \"wait-for supabase-db:5432 ($$n)\"; sleep 1; done; exec /usr/bin/tini -s -g -- /app/run.sh \"$$@\"", "--"]
+    command: ["/app/bin/server"]
+    environment:
+      PORT: "4000"
+      DB_HOST: supabase-db
+      DB_PORT: "5432"
+      DB_USER: supabase_admin
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY: supabaserealtime
+      # Realtime 2.82 — env-var direkt.
+      API_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      METRICS_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      APP_NAME: realtime
+      SECRET_KEY_BASE: EAx3IQ/wRG1v47ZD4NE4/9RzBI8Jmil3x0yhcW4V2NHBP6c2iPIzwjofi2Ep4HIG
+      ERL_AFLAGS: "-proto_dist inet_tcp"
+      RUN_JANITOR: "true"
+      SEED_SELF_HOST: "true"
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+    deploy:
+      labels:
+        vibemind.service: "supabase-realtime"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  supabase-storage:
+    image: public.ecr.aws/supabase/storage-api:v1.48.28@sha256:38850bce7c3056ef76acdc4c6357aa474b3124b22d383ed86843b765a1efe242
+    # Wie supabase-auth/realtime: Swarm-depends_on no-op → storage-api fatalt
+    # beim Boot mit "getaddrinfo ENOTFOUND supabase-db" → "Server not started"
+    # → Exit 1 Crash-Loop. Wait-Gate (sh + nc), dann exec der Original-
+    # ENTRYPOINT docker-entrypoint.sh mit Original-CMD. $$ = literal $.
+    entrypoint: ["/bin/sh", "-c", "n=0; until nc -z supabase-db 5432; do n=$$((n+1)); [ $$n -ge 90 ] && break; echo \"wait-for supabase-db:5432 ($$n)\"; sleep 1; done; exec /usr/local/bin/docker-entrypoint.sh \"$$@\"", "--"]
+    command: ["node", "dist/start/server.js"]
+    environment:
+      # storage-api 1.48 — env-vars direkt (Werte identisch zu den Demo-Secrets).
+      ANON_KEY: <YOUR_SUPABASE_JWT>
+      SERVICE_KEY: <YOUR_SUPABASE_JWT>
+      AUTH_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      DATABASE_URL: postgresql://supabase_storage_admin:postgres@supabase-db:5432/postgres
+      FILE_SIZE_LIMIT: "52428800"
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /mnt
+      TENANT_ID: stub
+      REGION: local
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - supabase_storage:/mnt
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+      - supabase-rest
+    deploy:
+      labels:
+        vibemind.service: "supabase-storage"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  supabase-pg-meta:
+    image: public.ecr.aws/supabase/postgres-meta:v0.96.4@sha256:4dd3e0ff3e9a0f9f62dd1a1a827f124645549b439ddb2a53598575744585e32d
+    environment:
+      PG_META_PORT: "8080"
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PORT: "5432"
+      PG_META_DB_PASSWORD: postgres
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+    deploy:
+      labels:
+        vibemind.service: "supabase-pg-meta"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  supabase-analytics:
+    image: public.ecr.aws/supabase/logflare:1.37.1@sha256:b4fb7983d12bad8bcb7c504d5e84bd815b0756a179b4dff96c1404ee68d800f4
+    environment:
+      DB_DATABASE: _supabase
+      DB_HOSTNAME: supabase-db
+      DB_PORT: "5432"
+      DB_SCHEMA: _analytics
+      DB_USERNAME: supabase_admin
+      DB_PASSWORD: postgres
+      LOGFLARE_MIN_CLUSTER_SIZE: "1"
+      LOGFLARE_SINGLE_TENANT: "true"
+      LOGFLARE_SUPABASE_MODE: "true"
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: api-key
+      LOGFLARE_PUBLIC_ACCESS_TOKEN: public-api-key
+      LOGFLARE_LOG_LEVEL: warn
+      LOGFLARE_NODE_HOST: "127.0.0.1"
+      POSTGRES_BACKEND_URL: postgresql://postgres:postgres@supabase-db:5432/_supabase
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-db
+    deploy:
+      labels:
+        vibemind.service: "supabase-analytics"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  supabase-kong:
+    image: public.ecr.aws/supabase/kong:2.8.1@sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: "64 160k"
+      KONG_LOG_LEVEL: warn
+    configs:
+      - source: supabase_kong_yml_v1
+        target: /home/kong/kong.yml
+        mode: 0444
+    ports:
+      - "54321:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "kong health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-auth
+      - supabase-rest
+      - supabase-storage
+      - supabase-realtime
+      - supabase-analytics
+    deploy:
+      labels:
+        vibemind.service: "supabase-kong"
+        vibemind.tier: "gateway"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      # Gateway MUSS immer laufen. condition: on-failure ließ kong nach einem
+      # graceful SIGTERM-Shutdown (Exit 0 "Complete") als 0/1 hängen — Swarm
+      # restartet bei on-failure keinen Exit-0-Task. condition: any restartet
+      # unabhängig vom Exit-Code (2026-06-24: kong stand nach Stack-Churn 0/1).
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  supabase-studio:
+    image: public.ecr.aws/supabase/studio:2026.04.08-sha-205cbe7@sha256:6df01717260781224d6e5fc24532511a184d43b705be39ba592b4958ccf4109d
+    environment:
+      STUDIO_PG_META_URL: http://supabase-pg-meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: Vibemind
+      DEFAULT_PROJECT_NAME: vibemind
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_PUBLIC_URL: http://127.0.0.1:54321
+      # Studio: env-vars direkt (Next.js Build-Time-Embedded — _FILE wird ignoriert).
+      AUTH_JWT_SECRET: <YOUR_JWT_SECRET_AT_LEAST_32_CHARS>
+      SUPABASE_ANON_KEY: <YOUR_SUPABASE_JWT>
+      SUPABASE_SERVICE_KEY: <YOUR_SUPABASE_JWT>
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: api-key
+      LOGFLARE_URL: http://supabase-analytics:4000
+      NEXT_PUBLIC_ENABLE_LOGS: "true"
+      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
+      # Next.js Studio bindet per Default auf den container-hostname,
+      # nicht auf 0.0.0.0 → 127.0.0.1-Probes scheitern mit ECONNREFUSED.
+      # HOSTNAME=0.0.0.0 zwingt Next.js auf wildcard-bind.
+      HOSTNAME: 0.0.0.0
+    ports:
+      - "54323:3000"
+    networks:
+      - vibemind-shared
+    depends_on:
+      - supabase-kong
+      - supabase-pg-meta
+      - supabase-analytics
+    healthcheck:
+      # Override Studio's built-in healthcheck (node fetch :3000/api/platform/profile
+      # — die Route gibt es im Local-Setup nicht → "TypeError: fetch failed").
+      # Plain GET / liefert 200 (Login-Redirect oder Dashboard) wenn der Server lebt.
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3000/', r => process.exit(r.statusCode < 500 ? 0 : 1)).on('error', () => process.exit(1))\""]
+      interval: 30s
+      timeout: 8s
+      retries: 5
+      start_period: 45s
+    deploy:
+      labels:
+        vibemind.service: "supabase-studio"
+        vibemind.tier: "gateway"
+        vibemind.space: "supabase"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  supabase-inbucket:
+    image: public.ecr.aws/supabase/mailpit:v1.22.3@sha256:f7f7c31de4de59540ad6515a0ca057a77525bca2069b6e747d873ca66c10fe08
+    environment:
+      MP_SMTP_DISABLE_RDNS: "true"
+      VIBEMIND_RESTART_NONCE: "2026-07-14a"
+    ports:
+      - "54324:8025"
+      # NOTE: Mailpit's SMTP listener (1025) is intentionally NOT host-
+      # published. Reason: Swarm-mode does not support hostip binding,
+      # so any "54325:1025" mapping would expose an auth-less SMTP sink
+      # on 0.0.0.0 -- LAN-reachable, an unauthenticated injection point
+      # into the Mailpit UI. The send-worker's SHADOW mode reaches
+      # Mailpit via the internal overlay network (service DNS name
+      # `supabase-inbucket:1025`) when the worker runs as a containerised
+      # peer of this stack. For native-host development, start an extra
+      # local Mailpit container with `docker run -p 127.0.0.1:54325:1025`
+      # via a dev-only override file -- do NOT add it to this manifest.
+    networks:
+      - vibemind-shared
+    deploy:
+      labels:
+        vibemind.service: "supabase-inbucket"
+        vibemind.tier: "data"
+        vibemind.space: "supabase"
+        vibemind.restart-nonce: "2026-07-14a"
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+# === Configs ================================================================
+# Swarm config object for the nginx media vhost. `file:` is resolved
+# relative to THIS stack file (infra/swarm/), hence ../../ back to repo root.
+configs:
+  embedding_service_llm_config_v1:
+    file: ../../vibemind-os/llm_config.yml.example
+  nginx_media_conf_v2:
+    file: ../../vibemind-os/spaces/video/nginx-media.conf
+  # Phase 11.U.H — capabilities.yaml is IMMUTABLE repo config, but the
+  # brain_data volume mounts over ALL of /app/data and hid the migrated
+  # file (volume copy = stale 41 direct:spaces). Shipping it as a Swarm
+  # config bind-mounted onto exactly /app/data/capabilities.yaml makes
+  # the repo the single source of truth WITHOUT giving up the volume for
+  # the rest of /app/data (checkpoints, episodic_memory, *.jsonl). Same
+  # pattern as nginx_media_conf_v2; `file:` is relative to THIS stack file.
+  # Bump the config NAME (…_vN) on every content change — Swarm configs
+  # are immutable; an unchanged name keeps serving the old content.
+  brain_capabilities_v9:
+    file: ../../vibemind-os/brain/the_brain/data/capabilities.yaml
+  # coding-engine Phase 1: the tinyproxy egress-firewall config files,
+  # converted from host bind-mounts to swarm configs (server-grade — the
+  # content ships with the stack instead of depending on a host path).
+  # Bump _vN on content change (Swarm configs are immutable).
+  coding_tinyproxy_conf:
+    file: ../../vibemind-os/coding-engine/infra/egress-proxy/tinyproxy.conf
+  coding_tinyproxy_filter:
+    file: ../../vibemind-os/coding-engine/infra/egress-proxy/filter
+  # Phase 2c: frontend nginx vhost (SPA fallback + /api/v1 lazy-resolve
+  # proxy + WS upgrade). Server-grade — content ships with the stack, not
+  # a host path. Bump _vN on content change (swarm configs are immutable).
+  coding_frontend_nginx:
+    file: ../../vibemind-os/coding-engine/web-app/front/nginx-frontend.conf
+
+  # === Logging Stack configs (Phase 11.V) ===
+  # Loki + Promtail + Grafana provisioning. Bump _vN on content change
+  # (swarm configs are immutable — an old name keeps the old content).
+  loki_config_v1:
+    file: ../../infra/swarm/logging/loki-config.yml
+  promtail_config_v2:
+    file: ../../infra/swarm/logging/promtail-config.yml
+  grafana_datasources_v2:
+    file: ../../infra/swarm/logging/grafana-datasources.yml
+  grafana_dashboards_v1:
+    file: ../../infra/swarm/logging/grafana-dashboards.yml
+  grafana_dash_brain_v2:
+    file: ../../infra/swarm/logging/dashboards/brain-overview.json
+  grafana_dash_services_v2:
+    file: ../../infra/swarm/logging/dashboards/vibemind-services.json
+  grafana_dash_incident_v2:
+    file: ../../infra/swarm/logging/dashboards/incident-timeline.json
+
+  # === Supabase configs (Phase 11.U.H.2 — 2026-05-20) ===
+  # 3× initdb-SQL + Kong declarative config + Postgres custom.conf.
+  # Bump _vN auf jeder Inhalts-Änderung (Swarm-Configs sind immutable;
+  # unverändert Name → alter Inhalt bleibt). `file:` relativ zu DIESEM
+  # Stack-File (= infra/swarm/), darum `./supabase/...`.
+  supabase_bootstrap_v1:
+    file: ./supabase/initdb/00-bootstrap.sql
+  supabase_restore_v1:
+    file: ./supabase/initdb/01-restore.sql
+  supabase_restore_internal_v1:
+    file: ./supabase/initdb/02-restore-internal.sql
+  supabase_kong_yml_v1:
+    file: ./supabase/kong.yml
+  supabase_pg_conf_v1:
+    file: ./supabase/postgresql.custom.conf
+
+# === Secrets (external — provisioned by scripts/swarm_secrets_init.ps1) ======
+# Names match coding-engine/infra/docker/docker-stack.yml AND what Phase C
+# core/config.get_secret() resolves (/run/secrets/<name lowercased>).
+secrets:
+  openrouter_api_key:
+    external: true
+  anthropic_api_key:
+    external: true
+  openfang_api_key:
+    external: true
+  # Phase 11.U.H — Groq (primary LLM path, groq:: direct) + OpenAI
+  # (fallback, api.openai.com direct). Both already exist as external
+  # Swarm secrets (docker secret ls; verify content against the currently
+  # active keys before relying on them).
+  groq_api_key:
+    external: true
+  openai_api_key:
+    external: true
+  # === Supabase JWT/anon/service-role (Phase 11.U.H.2 — 2026-05-20) ===
+  # Hardcoded supabase-CLI Demo-Defaults, übernommen 1:1 aus den alten
+  # supabase_*_supabase Containern (docker inspect). Provisioniert von
+  # scripts/swarm_secrets_init.ps1 $SUPABASE_VALUES Hash (NICHT aus .env —
+  # die Demo-Werte sind öffentlich / dokumentiert). Rotation auf
+  # nicht-Demo-Keys = eigene Security-Story (Open-Source-Release).
+  supabase_jwt_secret:
+    external: true
+  supabase_anon_key:
+    external: true
+  supabase_service_role_key:
+    external: true
+
+# === Networks ================================================================
+# ONE overlay so every service reaches the others by service name. Existing
+# per-compose bridge networks stay independent until a service is migrated in.
+networks:
+  vibemind-shared:
+    driver: overlay
+    attachable: true   # lets `docker run --network` debug containers attach
+  # coding-engine Phase 2a/b: the egress-firewall network. `internal: true`
+  # removes the default route → a service on ONLY this net cannot reach the
+  # internet directly; it must go via coding-egress-proxy (which also joins
+  # vibemind-shared = the bridge out). api/openclaude join BOTH
+  # (shared for DNS to brain/qdrant/datastores, egress for controlled
+  # outbound). Honest scope: internal:true fails non-proxied egress closed
+  # at the routing layer; the tinyproxy filter is the actual allowlist.
+  coding-egress:
+    driver: overlay
+    internal: true
+
+# === Volumes =================================================================
+volumes:
+  qdrant_storage:
+    driver: local
+  brain_data:
+    driver: local
+  n8n_data:
+    driver: local
+  # rowboat persistence. rowboat_mongo replaces the standalone ./data/mongo
+  # bind-mount — the 314MB live data is migrated INTO this named volume at
+  # cutover (Phase 4), not lost. rowboat_uploads = per-user RAG uploads.
+  rowboat_mongo:
+    driver: local
+  rowboat_uploads:
+    driver: local
+  # mirofish Neo4j: SHARED store (mirofish KG + Brain decision history).
+  # Backup verified restorable; 3103 nodes restored into this vol at cutover.
+  neo4j_mirofish_data:
+    driver: local
+  neo4j_mirofish_plugins:
+    driver: local
+  # coding-engine Phase 1: all EMPTY today (verified 0 files) — fresh named
+  # volumes, no data migration. coding_generated is the shared generated-
+  # project workspace (Phase 2 api/openclaude write here; vscode reads it).
+  coding_postgres:
+    driver: local
+  coding_redis:
+    driver: local
+  coding_gitea:
+    driver: local
+  # 2026-05-21: dedicated Postgres data volume for Gitea (own DB instance).
+  gitea_postgres:
+    driver: local
+  coding_generated:
+    driver: local
+  # Phase 2a/b: api+worker share the generated-code artifact store
+  # (compose `artifact_data`). EMPTY today (Phase-1 inventory: 0 files) →
+  # fresh named volume, no migration.
+  coding_artifact:
+    driver: local
+  # (coding_vscode_ext removed — code-server runs as uid 1000 and a fresh
+  # root-owned named volume causes an EACCES crash; the dir was empty so
+  # there is nothing to persist. See the coding-vscode volumes: comment.)
+  # External — already created by the legacy media compose (video assets).
+  # Declared external so the stack uses the existing data, not a fresh vol.
+  rowboat-videos:
+    external: true
+    name: rowboat-videos
+  # === Logging Stack volumes (Phase 11.V) ===
+  # loki_data            — chunks + tsdb-index + rules. The whole point:
+  #                        survives `docker stack rm` so brain/rowboat
+  #                        crash logs are still queryable post-redeploy.
+  # promtail_positions   — promtail tail offsets; restart-friendly.
+  # grafana_vibemind_data — dashboard state, plugin DB, etc.
+  loki_data:
+    driver: local
+  promtail_positions:
+    driver: local
+  grafana_vibemind_data:
+    driver: local
+  # === Supabase volumes (Phase 11.U.H.2 — 2026-05-20) ===
+  # supabase_db = Postgres-Daten (kritisch — initdb-Scripts laufen NUR auf
+  # leerem Volume; bei Cutover wird das alte supabase_db_supabase mit pg_dump
+  # extrahiert und über infra/swarm/supabase/initdb/01-restore.sql restored).
+  # supabase_storage = File-uploads (von Storage-API genutzt; bei Cutover
+  # mit `docker run --rm -v supabase_storage_supabase:/from -v
+  # vibemind_supabase_storage:/to alpine cp -a /from/. /to/`).
+  supabase_db:
+    driver: local
+  supabase_storage:
+    driver: local
+
+# =============================================================================
+# WHAT IS NOT IN THE STACK — and why
+# =============================================================================
+# Live status: 23 services 1/1 in the stack (brain×3 + brain-learner/inference
+# 0/0 opt-in for Phase D; coding-engine×10; rowboat×5; mirofish+neo4j; media;
+# n8n; qdrant). Live backlog of all remaining gaps is in tasks/gaps.md at the
+# repo root — that is the single source of truth, this comment is the in-place
+# pointer for what's intentionally absent here.
+#
+# Deliberately NOT in this stack (each has a real reason, not a TODO):
+#
+#   sandbox     — coding-engine sandbox needs `privileged: true` + /dev/kvm,
+#                 which `docker stack deploy` silently DROPS (compose-only
+#                 keys). Stays permanently per-compose / native. api degrades
+#                 gracefully without it (src/api/routes/dashboard.py wraps the
+#                 sandbox call in try/except → "sandbox unreachable").
+#   openfang    — pre-built Rust binary, self-daemonising, host-coupled. Image
+#                 build is 10–30 min and loses the host-coupling that makes it
+#                 useful. Permanently native; the Launcher's Phase-1 OpenFang
+#                 block starts it in BOTH stack-default and -Legacy modes.
+#   minibook    — BLOCKED: `external/minibook` git submodule is empty (0 files),
+#                 no image is buildable until source is restored. tasks/gaps.md
+#                 B1 tracks this.
+#   bridge, la-fungus, automation-ui (backend)
+#               — native venv services started by Vibemind.debug.ps1. Phase-2
+#                 containerisation is on the backlog (tasks/gaps.md B4) but not
+#                 a blocker — they work and the Launcher owns their lifecycle.
+#   ideas       — exists as an HTTP service (BRAIN_URL-driven) but has no
+#                 Dockerfile yet. tasks/gaps.md B2.
+#
+# Brain-learner / brain-inference are IN the stack but `replicas: 0` — opt-in
+# Phase-D topology (`docker service scale vibemind_brain-learner=1
+# vibemind_brain-inference=2` activates the split). See the brain block above.
+# =============================================================================

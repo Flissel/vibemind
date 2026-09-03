@@ -1,0 +1,62 @@
+{
+  "schema_version": "vibemind.image-determinism-policy.v1",
+  "contract": "docs/contracts/proxmox-image-determinism-v1.md",
+  "runbook": "docs/runbooks/proxmox-image-pinning.md",
+  "manifests": {
+    "required": [
+      "infra/proxmox/phase1-docker-compose.yml",
+      "infra/proxmox/phase2a-docker-compose.yml",
+      "infra/proxmox/phase2b-docker-compose.yml",
+      "infra/swarm/vibemind-stack.yml"
+    ],
+    "discovery_patterns": [
+      "infra/proxmox/*-docker-compose.yml"
+    ]
+  },
+  "waivers": [
+    {
+      "image": "vibemind-brain-core:latest",
+      "reason": "built on the deployment host from this repository; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-embedding-service:latest",
+      "reason": "built on the deployment host from this repository; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-n8n:latest",
+      "reason": "built on the deployment host from this repository; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-rowboat-rowboat:latest",
+      "reason": "built on the deployment host from the Rowboat compose project; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-rowboat-rowboat_agents:latest",
+      "reason": "built on the deployment host from the Rowboat compose project; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-rowboat-jobs-worker:latest",
+      "reason": "built on the deployment host from the Rowboat compose project; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-mirofish-mirofish:latest",
+      "reason": "built on the deployment host from the Mirofish compose project; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-coding-worker:latest",
+      "reason": "built on the deployment host from the coding-engine submodule; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "vibemind-coding-frontend:static",
+      "reason": "built on the deployment host from the coding-engine submodule; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "davefelix-coding-engine-api:latest",
+      "reason": "built on the deployment host from the coding-engine submodule; never pushed to a registry, so no manifest digest exists to pin"
+    },
+    {
+      "image": "davefelix-coding-engine-openclaude-service:latest",
+      "reason": "built on the deployment host from the coding-engine submodule; never pushed to a registry, so no manifest digest exists to pin"
+    }
+  ]
+}

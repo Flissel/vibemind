@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0002-space-definition-contract-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0002-space-definition-contract-v1",
+  "objective": "Implement decisions E11, E12 and E13 as a contract draft in the superproject: define the research space as a two-service-level space (synchronous lookup versus asynchronous deep research carried by the bundled OpenFang researcher hand), specify the subject model topic/idea/bubble that replaces today's ad-hoc parameters, specify the event cut for both levels, bind depth and output_style to the settings the hand already declares rather than inventing new ones, and record the fail-open-on-context and fail-closed-on-evidence rule for the Rowboat reference source. Prepare two explicit decision templates for the user: where a deep research report physically lives, and whether a bubble subject yields one overarching report or one per idea. Contract draft and catalog documentation with tests only - expressly no registry change, no runtime wiring, no behavior change.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/spaces/research/", "docs/contracts/", "docs/operations/", "shared/contracts/", "tests/contracts/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-16T15:45:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0002-space-definition-contract-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 2
+}

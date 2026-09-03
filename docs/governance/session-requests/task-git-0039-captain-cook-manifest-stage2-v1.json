@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0039-captain-cook-manifest-stage2-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0039-captain-cook-manifest-stage2-v1",
+  "objective": "MASTER IS RED AND THIS TASK CLOSES IT. A foreign change lifted the superproject vibemind-os gitlink from da2a29a to 760da81 without advancing repo-manifest.yaml, so manifest validate now reports pin-mismatch on vibemind-os and two governance tests fail on unmodified master. This is stage 2 of the established two-stage pin pattern, arriving after someone else did stage 1; complete their work rather than reverting it, and do not touch the gitlink itself. Verify every value below yourself rather than trusting this brief. Measured by the orchestrator at superproject 9d92c92: the interval da2a29a..760da81 is six vibemind-os commits carrying the Captain Cook rewire, and the mode-filtered gitlink diff shows the child count going from twelve to thirteen with exactly one ADDITION and no moves - spaces/captain_cook at 644a5c3b827ea8345c29a5256425117f8e117cc4. That addition is what makes this more than a pin bump. It is declared in vibemind-os .gitmodules at 760da81 with url https://github.com/Flissel/Captain_cook.git, and that remote is reachable, but the orchestrator did NOT confirm that the pinned commit 644a5c3 is reachable on it - HEAD there is 5aa409c. Establish reachability by git ls-remote ref-tip comparison or merge-base --is-ancestor, never by fetch-by-SHA, which decides nothing across a fork network; if 644a5c3 is not reachable on any ref, FAIL CLOSED and report it, because declaring an unreachable pin in the manifest would encode a broken checkout. The repair, as ONE coherent commit because the suite stays red until every part lands: advance vibemind-os expected_gitlink_pin to 760da81; advance evidence.parent_pin for every vibemind-os child to 760da81; add a repository entry for the new spaces/captain_cook gitlink so the coverage validator from task-governance-0034 does not report it as an undeclared gitlink - derive its fields from the existing sibling entries rather than inventing a shape; update tests/v1_governance/fixtures/observed_gitlinks.yaml, whose vibemind-os record carries both the parent_pin and the child list that is now one entry short; and update the pin literals in tests/v1_governance/test_manifest.py together with any comment that the change falsifies. Count the children yourself with awk '$1==\"160000\"', never grep 160000, because a blob SHA can contain those digits. Report as findings rather than acting on them: whether the eleven unchanged children are byte-identical across the interval, and whether the Captain Cook rename that the charter names as pending is now complete or still partial - the interval contains a commit moving captain_cook out of spaces/music, so the naming directive may have advanced without the canonical rename task ever running.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["repo-manifest.yaml", "tests/v1_governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "standing-autonomy:v1",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0039-captain-cook-manifest-stage2-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 19
+}

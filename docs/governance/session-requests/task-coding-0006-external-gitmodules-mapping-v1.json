@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0006-external-gitmodules-mapping-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0006-external-gitmodules-mapping-v1",
+  "objective": "Close the mapping half of finding B2 in the Flissel/DaveFelix-Coding-Engine repository, under request-specific user authority granted for exactly this scope. task-git-0034 measured that coding-engine carries four gitlinks under external/ while its .gitmodules maps only la_fungus_search, which is why recursive submodule init has aborted in three consecutive pin chains. The user chose the evidenced recommendation: map external/Automation_ui to https://github.com/Flissel/Automation_ui.git and external/minibook to https://github.com/Flissel/minibook.git, and retire the gitlinks external/NemoClaw and external/free-llm-api-resources. Re-verify every upstream claim against the repository before writing rather than trusting the brief, and stop fail-closed on any that does not hold. The two retirements remove gitlinks and are destructive, which is why this request carries risk class destructive and a durable authority reference that the handoff must cite. Expressly excluded from this task by user decision: the dangling la_fungus_search pin f731c19a is NOT re-pinned and its mapping is left untouched, because the upstream is being updated right now - so a recursive init will still fail there afterwards, and the handoff must say so plainly instead of claiming the gate is green. Also out of scope: the coding-engine gitlink in vibemind-os and the superproject pin, which follow as their own pin chain.",
+  "repositories": ["vibemind-v1", "coding-engine"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-17T09:35:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0006-external-gitmodules-mapping-v1",
+  "risk_class": "destructive",
+  "dependencies": ["task-git-0034-coding-engine-external-gitlink-coverage-v1"],
+  "merge_position": 7
+}

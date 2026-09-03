@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0023-authority-normative-document-agreement-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0023-authority-normative-document-agreement-v1",
+  "objective": "Close the half of the task-openfang-0022 repair that a scope boundary left open, and close the class rather than only the instance. task-openfang-0022 corrected shared/contracts/openfang-mcp-authority-v1.json so that spaces-minibook and n8n read registered, but docs/contracts/openfang-mcp-authority-v1.md - which the JSON itself names as its normative_document - still declares both unregistered at line 58 in the state table and at lines 219-220 in the conflict register, where the text reads that there is no registration entry anywhere in the checkout. Both places should now name vibemind alone. Verify that against the JSON on the branch you cut from rather than against this description, and read the whole markdown for any further statement the 0022 change falsified, because two locations is what one session found while forbidden from opening the file, not a count anyone has confirmed from inside it. The more important half is the detection gap: no test reads the markdown at all, so the JSON and its own declared normative document can disagree with nothing going red - a grep for openfang-mcp-authority-v1.md and for normative_document across the Python tree returns nothing. Add a test under tests/contracts/ that asserts the two documents agree about registration status, derived from the JSON as the machine-readable side rather than from a hardcoded list, so that the next registration change cannot silently desynchronise them either. Make it RED FIRST against the current markdown and say so in the handoff with the failure output; a test that is green from birth here would repeat precisely the mistake being closed. Deliberately out of scope, because task-openfang-0024 owns them on the same JSON and the two must not collide: the source_pins block, the sources line references, and anything under shared/contracts/. Also out of scope: the research-space contract-versus-registry drift that task-openfang-0022 found and left red, and the CI scope question - the required checks run only tests/architecture/test_v1_ci_contract.py and tests/v1_governance/test_manifest.py, so a new test under tests/contracts/ will NOT be collected by CI, and you should say plainly in the handoff that the guard you added is local-only rather than implying it gates anything.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/contracts/", "tests/contracts/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0023-authority-normative-document-agreement-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0022-authority-contract-repair-v1"],
+  "merge_position": 13
+}

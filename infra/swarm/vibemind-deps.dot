@@ -1,0 +1,146 @@
+digraph vibemind {
+  rankdir=LR;
+  node [shape=box,style="rounded,filled",fontname="Segoe UI",fontsize=10];
+  graph [fontname="Segoe UI",fontsize=11,compound=true];
+
+  subgraph cluster_brain {
+    label="Brain (conditional)"; style=filled; color="#ffe0cc"; fillcolor="#ffe0cc";
+    "brain-api";
+    "brain-autotrain-drain";
+    "brain-core";
+    "brain-inference";
+    "brain-learner";
+    "brain-loops";
+  }
+  subgraph cluster_coding {
+    label="Coding / SWE / Gitea"; style=filled; color="#f0d5ff"; fillcolor="#f0d5ff";
+    "coding-api";
+    "coding-clawcode-router";
+    "coding-egress-proxy";
+    "coding-frontend";
+    "coding-gitea";
+    "coding-openclaude";
+    "coding-postgres";
+    "coding-redis";
+    "coding-stack";
+    "coding-worker";
+    "gitea-postgres";
+  }
+  subgraph cluster_host {
+    label="Host (external)"; style=filled; color="#eeeeee"; fillcolor="#eeeeee";
+    "ollama";
+    "openfang";
+  }
+  subgraph cluster_logging {
+    label="Observability"; style=filled; color="#e0e0e0"; fillcolor="#e0e0e0";
+    "grafana-vibemind";
+    "loki";
+    "promtail";
+  }
+  subgraph cluster_marketing {
+    label="Marketing / n8n"; style=filled; color="#d6f0f0"; fillcolor="#d6f0f0";
+    "mailcow";
+    "marketing";
+    "n8n";
+  }
+  subgraph cluster_mirofish {
+    label="MiroFish"; style=filled; color="#fff0b3"; fillcolor="#fff0b3";
+    "mirofish";
+    "neo4j-mirofish";
+  }
+  subgraph cluster_rowboat {
+    label="Rowboat (always)"; style=filled; color="#cfe8ff"; fillcolor="#cfe8ff";
+    "rowboat";
+    "rowboat-agents";
+    "rowboat-jobs-worker";
+    "rowboat-mongo";
+    "rowboat-rag-worker";
+    "rowboat-redis";
+  }
+  subgraph cluster_shared {
+    label="Shared infra"; style=filled; color="#ffffcc"; fillcolor="#ffffcc";
+    "qdrant";
+  }
+  subgraph cluster_supabase_bubbles {
+    label="Supabase / Bubbles (always)"; style=filled; color="#d5f5d5"; fillcolor="#d5f5d5";
+    "bubbles";
+    "supabase-analytics";
+    "supabase-auth";
+    "supabase-db";
+    "supabase-inbucket";
+    "supabase-kong";
+    "supabase-pg-meta";
+    "supabase-realtime";
+    "supabase-rest";
+    "supabase-storage";
+    "supabase-studio";
+  }
+  subgraph cluster_video {
+    label="Video / Media"; style=filled; color="#ffd6e7"; fillcolor="#ffd6e7";
+    "media";
+  }
+
+  "rowboat" -> "qdrant";
+  "rowboat" -> "rowboat-mongo";
+  "rowboat" -> "rowboat-redis";
+  "rowboat-jobs-worker" -> "rowboat-mongo";
+  "rowboat-jobs-worker" -> "rowboat-redis";
+  "rowboat-agents" -> "rowboat-mongo";
+  "rowboat-agents" -> "rowboat-redis";
+  "rowboat-agents" -> "qdrant";
+  "rowboat-rag-worker" -> "rowboat-mongo";
+  "rowboat-rag-worker" -> "rowboat-redis";
+  "rowboat-rag-worker" -> "qdrant";
+  "supabase-kong" -> "supabase-auth";
+  "supabase-kong" -> "supabase-rest";
+  "supabase-kong" -> "supabase-storage";
+  "supabase-kong" -> "supabase-realtime";
+  "supabase-kong" -> "supabase-analytics";
+  "supabase-auth" -> "supabase-db";
+  "supabase-rest" -> "supabase-db";
+  "supabase-realtime" -> "supabase-db";
+  "supabase-storage" -> "supabase-db";
+  "supabase-storage" -> "supabase-rest";
+  "supabase-pg-meta" -> "supabase-db";
+  "supabase-analytics" -> "supabase-db";
+  "supabase-studio" -> "supabase-kong";
+  "supabase-studio" -> "supabase-pg-meta";
+  "supabase-studio" -> "supabase-analytics";
+  "supabase-auth" -> "supabase-inbucket";
+  "bubbles" -> "supabase-rest";
+  "brain-core" -> "qdrant";
+  "brain-core" -> "brain-api";
+  "brain-api" -> "qdrant";
+  "brain-autotrain-drain" -> "brain-api";
+  "brain-loops" -> "qdrant";
+  "brain-inference" -> "qdrant";
+  "brain-inference" -> "brain-learner";
+  "brain-learner" -> "qdrant";
+  "brain-core" -> "openfang";
+  "brain-core" -> "ollama";
+  "brain-core" -> "supabase-kong";
+  "coding-api" -> "coding-postgres";
+  "coding-api" -> "coding-redis";
+  "coding-api" -> "coding-gitea";
+  "coding-api" -> "coding-clawcode-router";
+  "coding-api" -> "coding-openclaude";
+  "coding-api" -> "coding-egress-proxy";
+  "coding-worker" -> "coding-postgres";
+  "coding-worker" -> "coding-redis";
+  "coding-worker" -> "coding-gitea";
+  "coding-worker" -> "coding-clawcode-router";
+  "coding-worker" -> "coding-openclaude";
+  "coding-gitea" -> "gitea-postgres";
+  "coding-clawcode-router" -> "coding-egress-proxy";
+  "coding-openclaude" -> "coding-egress-proxy";
+  "coding-frontend" -> "coding-api";
+  "coding-stack" -> "brain-core";
+  "mirofish" -> "neo4j-mirofish";
+  "media" -> "mirofish";
+  "media" -> "rowboat";
+  "marketing" -> "n8n";
+  "marketing" -> "supabase-kong";
+  "marketing" -> "mailcow";
+  "promtail" -> "loki";
+  "grafana-vibemind" -> "loki";
+}

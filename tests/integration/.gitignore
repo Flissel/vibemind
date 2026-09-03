@@ -1,0 +1,3 @@
+# The root .gitignore excludes session-scratch `test_*.py` globally; the
+# integration test suite is versioned source, so re-include it here.
+!test_*.py

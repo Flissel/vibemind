@@ -1,0 +1,22 @@
+{
+  "contract_version": "v1",
+  "execution_mode": "cognitive",
+  "execution_boundary": "openfang",
+  "correlation_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "lifecycle_revision": 3,
+  "brain_task_node_id": "research-sources",
+  "space_id": "research",
+  "roles": [
+    {
+      "role": "researcher",
+      "required_agent_count": 1
+    }
+  ],
+  "approval_ref": "approval:opaque-openfang-boundary",
+  "cost_ref": "cost:opaque-openfang-boundary",
+  "retry": {
+    "classification": "transient",
+    "max_attempts": 3
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "snapshot_version": "v1",
+  "source": {
+    "repository": "vibemind-os",
+    "gitlink_commit": "227f7e6edf2ce6cbec9bcdab45498364dbe9cdfd",
+    "path": "config/space_agent_registry.yml",
+    "captured_on": "2026-08-01"
+  },
+  "canonical_space_ids": [
+    "bubbles",
+    "ideas",
+    "coding",
+    "desktop",
+    "research",
+    "rowboat",
+    "minibook",
+    "schedule",
+    "n8n",
+    "agentfarm",
+    "video",
+    "flowzen",
+    "mirofish"
+  ],
+  "rejected_ingress_aliases": [
+    "autogen",
+    "roarboot",
+    "shuttles"
+  ]
+}

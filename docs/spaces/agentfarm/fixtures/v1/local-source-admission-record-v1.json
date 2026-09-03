@@ -1,0 +1,99 @@
+{
+  "record_version": "v1",
+  "verification_scope": "offline_local_git_only",
+  "source_candidate": {
+    "canonical_identity": "github.com/Flissel/Autogen_AgentFarm",
+    "commit_sha": "9ac6fe9fa2f2a2b48baafacc50b35781218d7b07",
+    "tree_sha": "527ed102753869ec03c759b84fb71e15d3b65a37"
+  },
+  "admission_bundle": {
+    "agent-team-request": {
+      "contract_version": "v1",
+      "request_id": "request_v1_00000000000000000000000000",
+      "brain_plan_ref": "plan_v1_00000000000000000000000000",
+      "task_ref": "task_v1_00000000000000000000000000",
+      "project_ref": "project_v1_00000000000000000000000000",
+      "trace_id": "trace_v1_00000000000000000000000000",
+      "space_id": "agentfarm",
+      "objective": "Verify the existing local AgentFarm source candidate only; do not activate a runtime.",
+      "requested_at": "2026-08-04T15:20:00Z",
+      "clarification": {
+        "status": "resolved",
+        "questions": [],
+        "resolved_at": "2026-08-04T15:20:00Z"
+      },
+      "risk_class": "medium",
+      "hard_bounds": {
+        "timeout_seconds": 300,
+        "max_steps": 1,
+        "max_retries": 0,
+        "max_cost_minor": 0,
+        "currency": "EUR",
+        "max_concurrency": 1,
+        "max_team_members": 1
+      },
+      "quote_ref": "quote_v1_00000000000000000000000000",
+      "approval_ref": "approval_v1_00000000000000000000000000",
+      "idempotency_key": "agentfarm-local-source-admission-0005"
+    },
+    "agentfarm-runtime-source-provenance": {
+      "contract_version": "v1",
+      "provenance_id": "source_v1_00000000000000000000000000",
+      "request_id": "request_v1_00000000000000000000000000",
+      "space_id": "agentfarm",
+      "repository": {
+        "repository_id": "repository_v1_00000000000000000000000000",
+        "canonical_identity": "github.com/Flissel/Autogen_AgentFarm",
+        "identity_digest": "sha256:45aea0a112fef8998b06116bc3f1f881186e8faff62c8333471199cc99162f8f"
+      },
+      "revision": {
+        "kind": "commit",
+        "commit_sha": "9ac6fe9fa2f2a2b48baafacc50b35781218d7b07",
+        "tree_sha": "527ed102753869ec03c759b84fb71e15d3b65a37",
+        "source_tree_digest": "sha256:f0ba80fcf865dca6ad9adf91ccac3739e260ce60f87f0731e42e189d93610d01"
+      },
+      "entrypoint": {
+        "path": "minibook/autogen_swarm.py",
+        "digest": "sha256:b59a14f3fec01303d57d456380ad6f9678174ec0c31e2b0eb27bb523d0a619cf"
+      },
+      "build_manifest": {
+        "path": "requirements-agentfarm.txt",
+        "digest": "sha256:1ae506c60bfbe86c33f90174e31896026f77b5d6e6d1a81b43339c0dc1978f12"
+      },
+      "record_digest": "sha256:1e410fbd1385ddacec1ac6a288e2eed23af9d0433144a3fa73761ca47d6c139a",
+      "captured_at": "2026-08-04T15:21:00Z"
+    }
+  },
+  "claims": [
+    "verified_local_source"
+  ],
+  "nonclaims": [
+    "runtime_enabled",
+    "built",
+    "routed",
+    "deployed",
+    "reachable",
+    "approved",
+    "executed",
+    "identity_ownership",
+    "remote_freshness",
+    "sibling_reconciliation"
+  ],
+  "unreconciled_siblings": [
+    {
+      "commit_sha": "73b00888d31486df3e3fad3dfc5cd953bbd26bd4",
+      "status": "unreconciled_non_authoritative"
+    },
+    {
+      "commit_sha": "fab103447bfff0e9c49cf9c9e0249ee9d33cbaf9",
+      "status": "unreconciled_non_authoritative"
+    }
+  ],
+  "rejected_preobservations": [
+    {
+      "archive_digest": "sha256:2fbc5def528a8411a8fd9097b930d8f3593c9f284aac421e32340caced42a8b6",
+      "reason": "system_config_autocrlf_dependent",
+      "status": "rejected_noncanonical"
+    }
+  ]
+}

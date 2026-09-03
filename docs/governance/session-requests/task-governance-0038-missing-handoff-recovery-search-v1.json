@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-governance-0038-missing-handoff-recovery-search-v1",
+  "session_type": "task",
+  "space": "governance",
+  "parent_cockpit": "cockpit-observability",
+  "request_reference": "task-request:task-governance-0038-missing-handoff-recovery-search-v1",
+  "objective": "Settle, per task and mechanically, whether the nine merged implementation tasks that carry NO findable handoff have one somewhere else or genuinely have none. task-governance-0036 measured success condition 6 as not holding, and this is one of its two failing limbs: 42 of 54 requests have a handoff artefact, and after removing the never-started task-coding-0008 and the then-in-flight sessions, NINE merged tasks are left without one - task-deployment-0016, task-deployment-0018, task-git-0026, task-git-0027, task-git-0028, task-integration-0005a, task-integration-0005b, task-observability-0012, task-openfang-0008. Section 11 of the portfolio design says a result without a complete handoff is not merge-ready, so each of these was merged against the spec's own rule. SEARCH EXHAUSTIVELY, NOT BY FILENAME. The one thing already known to defeat a filename search is in the measurement: task-governance-0034 DOES have a handoff, but named 2026-08-17-task-governance-0034-validator-gitlink-coverage-handoff.md, which breaks the otherwise consistent <date>-<task-id>-handoff.* pattern. Treat that as proof that the naming is not reliable and search by CONTENT and by HISTORY as well: git log --all over every ref rather than the working tree only, git log --diff-filter=A and --diff-filter=D to catch files that were added and later removed, git grep over history for the task id, and the same in the vibemind-os and openfang clones - task-git-0028 merged in vibemind-os#139 and task-openfang-0008 in openfang#17, so their evidence may never have been in the superproject at all. Report per task, in a table: FOUND with the exact path and the commit that introduced it, or NOT FOUND with the list of searches actually run, so a later reader can see what was ruled out rather than trusting a verdict. DO NOT RECONSTRUCT, DO NOT WRITE, DO NOT BACKFILL A SINGLE HANDOFF. Writing a handoff today for a task that ran days ago would fabricate evidence, which is the exact failure the whole provenance convention exists to prevent. If a task genuinely has none, that is a finding and a user question (accept the gap, or commission a reconstruction that is labelled as such) - not a licence. Second, narrower question, answerable in the same pass: for each of the nine, is the substance recorded ANYWHERE else - the completed-task register in section 3.3 of docs/governance/session-request-queue-v1.md carries PR number and merge commit for 33 rows, and a PR body may carry what a handoff would have. Distinguish clearly between 'a handoff exists', 'no handoff but the result is otherwise evidenced', and 'nothing'. The three are different answers to condition 6 and only the first one satisfies section 11. Deliberately out of scope: writing or amending any handoff; repo-manifest.yaml and the gitlinks; shared/contracts/ in every form, including the three false agentfarm assertions which are an authorization decision waiting on the user; the worktree limb of condition 6, which needs a schema field and is a design change (F6); and every workflow file.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["docs/governance/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "standing-autonomy:v1",
+  "base_ref": "origin/master",
+  "branch": "codex/governance/task-governance-0038-missing-handoff-recovery-search-v1",
+  "risk_class": "docs",
+  "dependencies": [],
+  "merge_position": 24
+}

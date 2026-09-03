@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0007-test-suite-repair-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0007-test-suite-repair-v1",
+  "objective": "Stage 1 of repairing what task-coding-0006 surfaced: the Flissel/DaveFelix-Coding-Engine test suite is substantially broken on unmodified master, and its CI hides that. Repair the suite so that its real state becomes visible and defensible. The hard blocker first: tests/orchestrator/conftest.py:15 imports run_orchestrator, which was moved to _archive/old_runners/run_orchestrator.py and is not importable, and because it is a conftest failure it aborts the entire pytest session rather than one directory. Then triage what that abort has been hiding - 49 failures and 9 collection errors at baseline when the orchestrator directory is ignored. For each, determine repo-first whether it is a stale import or moved-module problem that this task should fix, a genuine product defect that needs its own task, or an environment-only failure. Fix the first category, and deliver an evidenced per-item disposition for the rest rather than a bulk claim. Expressly staged: this task does NOT touch .github/workflows/ci.yml, because removing the continue-on-error masking while the suite is still red would make CI permanently red, which is worse than the masking. Un-masking is stage 2 and depends on the outcome here. Do not weaken, skip, xfail or delete a test to reach green - if a test encodes a real expectation the code no longer meets, that is a finding to report, not an assertion to relax.",
+  "repositories": ["vibemind-v1", "coding-engine"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-17T11:36:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0007-test-suite-repair-v1",
+  "risk_class": "code",
+  "dependencies": ["task-coding-0006-external-gitmodules-mapping-v1"],
+  "merge_position": 7
+}

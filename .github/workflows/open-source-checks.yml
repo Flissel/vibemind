@@ -1,0 +1,83 @@
+name: Open-source checks
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  secret-hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository (root only)
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 0
+
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tracked-file hygiene rules
+        shell: bash
+        run: |
+          fail=0
+          # 1. No real .env files may ever be tracked (examples are fine).
+          bad=$(git ls-files | grep -E '(^|/)\.env(\.[A-Za-z0-9_-]+)?$' | grep -v -E '\.example$|\.sanitized$' || true)
+          if [ -n "$bad" ]; then echo "::error::tracked .env file(s): $bad"; fail=1; fi
+          # 2. No tracked backup/dump artifacts.
+          bad=$(git ls-files | grep -E '\.(bak|stackdump)$|(^|/)testResults\.xml$' || true)
+          if [ -n "$bad" ]; then echo "::error::tracked backup/debug artifact(s): $bad"; fail=1; fi
+          # 3. No German mobile numbers in tracked text (placeholder-safe).
+          bad=$(git grep -nIE '\+49[ -]?1[5-7][0-9][ -/]?[0-9]{3,}' -- . ':!THIRD_PARTY.md' ':!.github/workflows' || true)
+          if [ -n "$bad" ]; then echo "::error::phone-number-like literal(s):"; echo "$bad"; fail=1; fi
+          # 4. No real Supabase project refs (20-char subdomains) — placeholders allowed.
+          bad=$(git grep -nIE 'https://[a-z0-9]{20}\.supabase\.co' -- . ':!.github/workflows' || true)
+          if [ -n "$bad" ]; then echo "::error::hardcoded Supabase project ref(s):"; echo "$bad"; fail=1; fi
+          # 5. No private key blocks.
+          bad=$(git grep -nI -- '-----BEGIN .*PRIVATE KEY-----' -- . ':!.github/workflows' || true)
+          if [ -n "$bad" ]; then echo "::error::private key material:"; echo "$bad"; fail=1; fi
+          exit $fail
+
+  root-checks:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install root test dependency
+        run: python -m pip install pytest
+
+      - name: Run dependency-light root tests
+        run: python -m pytest tools/mcp_sync -q
+
+      - name: Parse PowerShell entrypoints
+        shell: pwsh
+        run: |
+          $failed = $false
+          foreach ($path in @('setup.ps1', 'Vibemind.debug.ps1', 'scripts/vibemind-start.ps1', 'scripts/vibemind-stop.ps1')) {
+            $errors = $null
+            $tokens = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path $path),
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List
+              $failed = $true
+            }
+          }
+          if ($failed) { exit 1 }

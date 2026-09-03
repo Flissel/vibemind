@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-deployment-0016-proxmox-compose-image-determinism-v1",
+  "session_type": "task",
+  "space": "deployment",
+  "parent_cockpit": "cockpit-deployment",
+  "request_reference": "task-request:task-deployment-0016-proxmox-compose-image-determinism-v1",
+  "objective": "Make image references in the versioned Proxmox compose manifests deterministic (explicit pins instead of floating tags), extend the deployment readiness checks to fail closed on non-deterministic references, and document the change. Repository configuration and tests only: no live Proxmox, Docker, or runtime mutation of any kind.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["infra/", "docs/contracts/", "docs/runbooks/", "tests/deployment/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/deployment/task-deployment-0016-proxmox-compose-image-determinism-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 9
+}

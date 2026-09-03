@@ -1,0 +1,3 @@
+{
+  "contract_version": "v1", "result_id": "result_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "request_id": "request_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "job_id": "job_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "trace_id": "trace_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "status": "succeeded", "claims": [], "source_evidence": [], "citations": [], "artifact_refs": [], "evidence_refs": [], "cost": {"currency": "EUR", "estimated_cost_minor": 500, "actual_cost_minor": 245, "quote_ref": "quote_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF", "approval_ref": "approval_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF"}
+}

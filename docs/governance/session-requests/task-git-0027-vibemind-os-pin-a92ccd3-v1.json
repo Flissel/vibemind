@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0027-vibemind-os-pin-a92ccd3-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0027-vibemind-os-pin-a92ccd3-v1",
+  "objective": "Raise the superproject gitlink and repo-manifest.yaml expected pin for vibemind-os from 9ee1cc42401185824a4f4c624c33a8bde1dc92b8 to a92ccd3114a25f5bfd7b1a878ba68cff3e225895 (merge of vibemind-os PR 137), as a dedicated pin commit per the submodule policy. Re-derive every dependent evidence parent_pin in the manifest from the actual new tree instead of assuming child pins are unchanged, keep the manifest validator and governance tests green, and record the verification evidence. No other submodule pins, no deletions, no force operations.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["repo-manifest.yaml", "vibemind-os", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0027-vibemind-os-pin-a92ccd3-v1",
+  "risk_class": "code",
+  "dependencies": ["task-integration-0005b-openfang-mcp-live-registration-v1"],
+  "merge_position": 7
+}

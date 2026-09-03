@@ -1,0 +1,34 @@
+schema_version: 2
+session_id: task-governance-0031-activation-evidence-recording-v1
+branch: codex/governance/task-governance-0031-activation-evidence-recording-v1
+parent_cockpit: cockpit-observability
+request_reference: task-request:task-governance-0031-activation-evidence-recording-v1
+approval_reference: claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-14T13:45:00Z
+commits:
+  - sha: 391fab7cf43b999e0b84da41b5ee6f31b1111c3c
+    subject: "test(governance): add red tests for recordable activation-evidence classes"
+  - sha: a780b2053868a1ac99d1c2671fc95c3a5cc59f53
+    subject: "feat(governance): recordable activation-evidence classes with durable references"
+tests:
+  - command: python -m pytest tests/v1_governance -q
+    status: passed
+    summary: "239 passed (red state before implementation: 4 failed, 21 passed in the new recording tests)"
+evidence:
+  - kind: validator
+    path: tools/v1_governance/portfolio.py
+  - kind: tests
+    path: tests/v1_governance/test_activation_evidence_recording.py
+  - kind: lifted-contract-tests
+    path: tests/v1_governance/test_cockpit_activation_evidence.py
+  - kind: lifted-contract-tests
+    path: tests/v1_governance/test_cockpit_portfolio_status_check.py
+  - kind: ledger
+    path: docs/governance/cockpit-activation-evidence-v1.json
+  - kind: runbook
+    path: docs/runbooks/v1-session-lifecycle.md
+  - kind: session-request
+    path: docs/governance/session-requests/task-governance-0031-activation-evidence-recording-v1.json
+dependencies: []
+merge_position: 1
+deployment_status: not_required
+remaining_blockers: []

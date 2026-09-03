@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:task-event:v1",
+  "title": "TaskEventV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "event_id", "task_id", "event_type", "occurred_at", "actor", "summary"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "event_id": {"$ref": "#/$defs/eventId"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "event_type": {
+      "type": "string",
+      "pattern": "^task\\.(brief|handoff|approval|todo|evidence)\\.(referenced|noted)$"
+    },
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "actor": {"type": "string", "minLength": 1, "maxLength": 200},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 4000}
+  },
+  "$defs": {
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "eventId": {"type": "string", "pattern": "^event_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}
+  }
+}

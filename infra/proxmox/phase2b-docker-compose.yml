@@ -1,0 +1,214 @@
+services:
+  supabase-db:
+    image: public.ecr.aws/supabase/postgres:17.6.1.106@sha256:21ab971149317ea9cd12a8126fe4ebb34def08c8972956b0958cba0924409dab
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXP: '3600'
+    ports:
+    - 54322:5432
+    volumes:
+    - supabase_db:/var/lib/postgresql/data
+    - ./configs/supabase_bootstrap_v1.sql:/docker-entrypoint-initdb.d/z0-bootstrap.sql:ro
+    - ./configs/supabase_restore_v1.sql:/docker-entrypoint-initdb.d/z1-restore.sql:ro
+    - ./configs/supabase_restore_internal_v1.sql:/docker-entrypoint-initdb.d/z2-restore-internal.sql:ro
+    restart: unless-stopped
+  supabase-auth:
+    image: public.ecr.aws/supabase/gotrue:v2.188.1@sha256:87db8c737af49a64236c461882ed3925f8b1e5c2c47176c64694dedc65153573
+    entrypoint:
+    - /bin/sh
+    - -c
+    - n=0; until nc -z supabase-db 5432; do n=$$((n+1)); [ $$n -ge 90 ] && break;
+      echo "wait-for supabase-db:5432 ($$n)"; sleep 1; done; exec "$$@"
+    - --
+    command:
+    - auth
+    environment:
+      API_EXTERNAL_URL: http://192.168.178.65:54321
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: '9999'
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgresql://supabase_auth_admin:postgres@supabase-db:5432/postgres
+      GOTRUE_SITE_URL: http://127.0.0.1:3000
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: '3600'
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_MAILER_AUTOCONFIRM: 'true'
+      GOTRUE_SMTP_HOST: supabase-inbucket
+      GOTRUE_SMTP_PORT: '2500'
+      GOTRUE_SMTP_ADMIN_EMAIL: admin@email.com
+      GOTRUE_SMTP_SENDER_NAME: Admin
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+      GOTRUE_EXTERNAL_PHONE_ENABLED: 'false'
+      GOTRUE_SMS_AUTOCONFIRM: 'true'
+      PGOPTIONS: -c search_path=auth
+    depends_on:
+    - supabase-db
+    restart: unless-stopped
+  supabase-rest:
+    image: public.ecr.aws/supabase/postgrest:v14.8@sha256:4173b72e0be29cf15349dc827798c3e464c5f2cc7f9c1697022f9cd1874b4c36
+    environment:
+      PGRST_DB_URI: postgresql://authenticator:postgres@supabase-db:5432/postgres
+      PGRST_DB_SCHEMAS: public,graphql_public
+      PGRST_DB_EXTRA_SEARCH_PATH: public,extensions
+      PGRST_DB_MAX_ROWS: '1000'
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      PGRST_ADMIN_SERVER_PORT: '3001'
+    depends_on:
+    - supabase-db
+    restart: unless-stopped
+  supabase-realtime:
+    image: public.ecr.aws/supabase/realtime:v2.82.0@sha256:e3a9a49c92d1fe7decf5bceda84c036dd8ecdedb145a94d39fc9433becb0b989
+    entrypoint:
+    - /bin/bash
+    - -c
+    - n=0; until (exec 3<>/dev/tcp/supabase-db/5432) 2>/dev/null; do n=$$((n+1));
+      [ $$n -ge 90 ] && break; echo "wait-for supabase-db:5432 ($$n)"; sleep 1; done;
+      exec /usr/bin/tini -s -g -- /app/run.sh "$$@"
+    - --
+    command:
+    - /app/bin/server
+    environment:
+      PORT: '4000'
+      DB_HOST: supabase-db
+      DB_PORT: '5432'
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: SET search_path TO _realtime
+      DB_ENC_KEY: ${DB_ENC_KEY:?DB_ENC_KEY is required}
+      API_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      METRICS_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      APP_NAME: realtime
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?SECRET_KEY_BASE is required}
+      ERL_AFLAGS: -proto_dist inet_tcp
+      RUN_JANITOR: 'true'
+      SEED_SELF_HOST: 'true'
+    depends_on:
+    - supabase-db
+    restart: unless-stopped
+  supabase-storage:
+    image: public.ecr.aws/supabase/storage-api:v1.48.28@sha256:38850bce7c3056ef76acdc4c6357aa474b3124b22d383ed86843b765a1efe242
+    entrypoint:
+    - /bin/sh
+    - -c
+    - n=0; until nc -z supabase-db 5432; do n=$$((n+1)); [ $$n -ge 90 ] && break;
+      echo "wait-for supabase-db:5432 ($$n)"; sleep 1; done; exec /usr/local/bin/docker-entrypoint.sh
+      "$$@"
+    - --
+    command:
+    - node
+    - dist/start/server.js
+    environment:
+      ANON_KEY: ${ANON_KEY:?ANON_KEY is required}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY:?SERVICE_ROLE_KEY is required}
+      AUTH_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      DATABASE_URL: postgresql://supabase_storage_admin:postgres@supabase-db:5432/postgres?search_path=storage,public,extensions
+      FILE_SIZE_LIMIT: '52428800'
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /mnt
+      TENANT_ID: stub
+      REGION: local
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+    - supabase_storage:/mnt
+    depends_on:
+    - supabase-db
+    - supabase-rest
+    restart: unless-stopped
+  supabase-pg-meta:
+    image: public.ecr.aws/supabase/postgres-meta:v0.96.4@sha256:4dd3e0ff3e9a0f9f62dd1a1a827f124645549b439ddb2a53598575744585e32d
+    environment:
+      PG_META_PORT: '8080'
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PORT: '5432'
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    depends_on:
+    - supabase-db
+    restart: unless-stopped
+  supabase-analytics:
+    image: public.ecr.aws/supabase/logflare:1.37.1@sha256:b4fb7983d12bad8bcb7c504d5e84bd815b0756a179b4dff96c1404ee68d800f4
+    environment:
+      DB_DATABASE: _supabase
+      DB_HOSTNAME: supabase-db
+      DB_PORT: '5432'
+      DB_SCHEMA: _analytics
+      DB_USERNAME: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      LOGFLARE_MIN_CLUSTER_SIZE: '1'
+      LOGFLARE_SINGLE_TENANT: 'true'
+      LOGFLARE_SUPABASE_MODE: 'true'
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN:?LOGFLARE_PRIVATE_ACCESS_TOKEN is required}
+      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN:?LOGFLARE_PUBLIC_ACCESS_TOKEN is required}
+      LOGFLARE_LOG_LEVEL: warn
+      LOGFLARE_NODE_HOST: 127.0.0.1
+      POSTGRES_BACKEND_URL: postgresql://postgres:postgres@supabase-db:5432/_supabase
+      POSTGRES_BACKEND_SCHEMA: _analytics
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+    depends_on:
+    - supabase-db
+    restart: unless-stopped
+  supabase-kong:
+    image: public.ecr.aws/supabase/kong:2.8.1@sha256:1b53405d8680a09d6f44494b7990bf7da2ea43f84a258c59717d4539abf09f6d
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+      KONG_LOG_LEVEL: warn
+    ports:
+    - 54321:8000
+    depends_on:
+    - supabase-auth
+    - supabase-rest
+    - supabase-storage
+    - supabase-realtime
+    - supabase-analytics
+    restart: unless-stopped
+    volumes:
+    - ./configs/supabase_kong_yml_v1.yml:/home/kong/kong.yml:ro
+  supabase-studio:
+    image: public.ecr.aws/supabase/studio:2026.04.08-sha-205cbe7@sha256:6df01717260781224d6e5fc24532511a184d43b705be39ba592b4958ccf4109d
+    environment:
+      STUDIO_PG_META_URL: http://supabase-pg-meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      DEFAULT_ORGANIZATION_NAME: Vibemind
+      DEFAULT_PROJECT_NAME: vibemind
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_PUBLIC_URL: http://192.168.178.65:54321
+      AUTH_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      SUPABASE_ANON_KEY: ${ANON_KEY:?ANON_KEY is required}
+      SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY:?SERVICE_ROLE_KEY is required}
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN:?LOGFLARE_PRIVATE_ACCESS_TOKEN is required}
+      LOGFLARE_URL: http://supabase-analytics:4000
+      NEXT_PUBLIC_ENABLE_LOGS: 'true'
+      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
+      HOSTNAME: 0.0.0.0
+    ports:
+    - 54323:3000
+    depends_on:
+    - supabase-kong
+    - supabase-pg-meta
+    - supabase-analytics
+    restart: unless-stopped
+  supabase-inbucket:
+    image: public.ecr.aws/supabase/mailpit:v1.22.3@sha256:f7f7c31de4de59540ad6515a0ca057a77525bca2069b6e747d873ca66c10fe08
+    environment:
+      MP_SMTP_DISABLE_RDNS: 'true'
+      VIBEMIND_RESTART_NONCE: 2026-07-14a
+    ports:
+    - 54324:8025
+    restart: unless-stopped
+volumes:
+  supabase_db: {}
+  supabase_storage: {}

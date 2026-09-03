@@ -1,0 +1,96 @@
+# Promtail — Loki log shipper using docker_sd_configs.
+#
+# Why docker-socket-mode (not file-tailing /var/lib/docker/containers/):
+#   * auto-discovery via Docker API → new containers picked up live,
+#     including swarm task replacements after `stack deploy`.
+#   * rich metadata: container labels, image, swarm-task IDs come for
+#     free; no manual cont-id → service-name mapping (which would be a
+#     boilerplate-heavy footgun).
+#   * the user explicitly chose this in the planning Q&A:
+#       "was wäre das beste?" → Docker-Socket-Mode.
+#
+# Scope (user choice): ALL host containers are scraped; filter happens
+# in Grafana via LogQL (`{vibemind_service=~"brain.*"}`,
+# `{container=~"vibemind_.*"}`, etc). This gives max flexibility — we
+# can correlate VibeMind events with e.g. mail / pathfinder / etc. when
+# debugging.
+#
+# Positions file lives on a named volume (promtail_positions) so a
+# Promtail restart doesn't re-ship the last N days of logs.
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  # Loki now runs on the Proxmox homelab VM (192.168.178.65), not locally —
+  # see docs/superpowers/specs/2026-07-13-proxmox-homelab-offload-design.md.
+  - url: http://192.168.178.65:3102/loki/api/v1/push
+    # Send what we read — Loki rejects out-of-order pushes by default,
+    # but Docker timestamps are monotonic per container.
+    batchwait: 1s
+    batchsize: 1048576           # 1 MB
+    # backoff if Loki is slow / restarting
+    backoff_config:
+      min_period: 500ms
+      max_period: 5m
+      max_retries: 10
+
+scrape_configs:
+  # Every container the Docker daemon knows about.
+  - job_name: docker_containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      # Promote the most useful Docker metadata to first-class labels
+      # so LogQL queries are readable. KEEP THE LABEL CARDINALITY LOW —
+      # don't add per-request-id stuff here; do that in pipeline_stages.
+      #
+      # container = the docker container name (vibemind_brain-core.1.xyz).
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/?(.*)'
+        target_label: 'container'
+      # image (debugging "which version is running")
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'logstream'           # stdout / stderr
+      # vibemind.service label → vibemind_service (the main filter axis)
+      - source_labels: ['__meta_docker_container_label_vibemind_service']
+        target_label: 'vibemind_service'
+      - source_labels: ['__meta_docker_container_label_vibemind_tier']
+        target_label: 'vibemind_tier'
+      - source_labels: ['__meta_docker_container_label_vibemind_component']
+        target_label: 'vibemind_component'
+      - source_labels: ['__meta_docker_container_label_vibemind_space']
+        target_label: 'vibemind_space'
+      # Swarm metadata (when a swarm task is running)
+      - source_labels: ['__meta_docker_container_label_com_docker_swarm_service_name']
+        target_label: 'swarm_service'
+      - source_labels: ['__meta_docker_container_label_com_docker_swarm_task_name']
+        target_label: 'swarm_task'
+    pipeline_stages:
+      # Pipeline-stage: try to parse a JSON log line; if Brain emitted
+      # JSON via brain_logger.py we extract level/request_id/bubble_id
+      # into structured labels for sharp LogQL queries
+      # (e.g. {vibemind_service="brain-core"} | json | level="error").
+      # If a line is NOT JSON, this stage is a no-op (the line still
+      # ships fine as a plain log entry).
+      - match:
+          selector: '{vibemind_service=~"brain.*"}'
+          stages:
+            - json:
+                expressions:
+                  level: level
+                  request_id: request_id
+                  bubble_id: bubble_id
+                  capability: capability
+            - labels:
+                level:
+                # request_id / bubble_id / capability stay as extracted
+                # FIELDS (not labels) — they're high-cardinality. Loki
+                # rule of thumb: labels low-card (≤100 vals), fields
+                # high-card (request_ids etc.). Misuse here = index bloat.

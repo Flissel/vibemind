@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:schedule-chat-boundary:v1",
+  "title": "ScheduleChatBoundaryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "intent_ref", "trace_id", "operation"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "request_id": {"$ref": "#/$defs/requestRef"},
+    "intent_ref": {"$ref": "#/$defs/intentRef"},
+    "trace_id": {"$ref": "#/$defs/traceRef"},
+    "operation": {"enum": ["create", "list", "modify", "cancel", "snooze", "status"]},
+    "selector": {"$ref": "#/$defs/selector"},
+    "expected_revision": {"type": "integer", "minimum": 1, "maximum": 999999},
+    "approval_ref": {"$ref": "#/$defs/approvalRef"},
+    "idempotency_key": {"$ref": "#/$defs/idempotencyKey"},
+    "snooze_for_seconds": {"type": "integer", "minimum": 1, "maximum": 2592000}
+  },
+  "allOf": [
+    {"if": {"properties": {"operation": {"const": "create"}}, "required": ["operation"]}, "then": {"required": ["approval_ref", "idempotency_key"], "not": {"anyOf": [{"required": ["selector"]}, {"required": ["expected_revision"]}, {"required": ["snooze_for_seconds"]}]}}},
+    {"if": {"properties": {"operation": {"const": "list"}}, "required": ["operation"]}, "then": {"not": {"anyOf": [{"required": ["expected_revision"]}, {"required": ["approval_ref"]}, {"required": ["idempotency_key"]}, {"required": ["snooze_for_seconds"]}]}}},
+    {"if": {"properties": {"operation": {"const": "modify"}}, "required": ["operation"]}, "then": {"required": ["selector", "expected_revision", "approval_ref", "idempotency_key"], "not": {"required": ["snooze_for_seconds"]}}},
+    {"if": {"properties": {"operation": {"const": "cancel"}}, "required": ["operation"]}, "then": {"required": ["selector", "expected_revision", "approval_ref", "idempotency_key"], "not": {"required": ["snooze_for_seconds"]}}},
+    {"if": {"properties": {"operation": {"const": "snooze"}}, "required": ["operation"]}, "then": {"required": ["selector", "expected_revision", "approval_ref", "idempotency_key", "snooze_for_seconds"]}},
+    {"if": {"properties": {"operation": {"const": "status"}}, "required": ["operation"]}, "then": {"required": ["selector"], "not": {"anyOf": [{"required": ["expected_revision"]}, {"required": ["approval_ref"]}, {"required": ["idempotency_key"]}, {"required": ["snooze_for_seconds"]}]}}}
+  ],
+  "$defs": {
+    "requestRef": {"type": "string", "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "intentRef": {"type": "string", "pattern": "^intent_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceRef": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "scheduleRef": {"type": "string", "pattern": "^schedule_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskRef": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "approvalRef": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "idempotencyKey": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"},
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"schedule_id": {"$ref": "#/$defs/scheduleRef"}, "task_brief_ref": {"$ref": "#/$defs/taskRef"}},
+      "oneOf": [{"required": ["schedule_id"]}, {"required": ["task_brief_ref"]}]
+    }
+  }
+}

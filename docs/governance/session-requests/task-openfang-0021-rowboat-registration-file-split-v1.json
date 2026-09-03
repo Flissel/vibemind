@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0021-rowboat-registration-file-split-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0021-rowboat-registration-file-split-v1",
+  "objective": "Ground the openfang.vibemind.toml / openfang.vibemind.toml.template file split, then close the spaces-rowboat registration gap only if the grounding shows the fix is mechanical. task-git-0037 measured, and the orchestrator re-checked, that spaces-rowboat is registered in the TEMPLATE but not in the EFFECTIVE openfang.vibemind.toml, at both 75067d8 and ef9d73f, while the binding is live on the vibemind-os side: capabilities.yaml binds execution_target mcp:rowboat-chat:spaces-rowboat:rowboat_status, space_agent_registry.yml declares mcp_servers including spaces-rowboat, and spaces/rowboat/mcp_server.py exists. This is the same failure class task-openfang-0011 just closed for minibook - a registry binding pointing at a server openfang never registers - except that this time the template already has it and only the effective file does not. FIRST, establish which file is authoritative and how they relate, because that determines whether a fix is mechanical or architectural: look for any generator, script, CI step, render step or documented procedure that produces one file from the other; compare the two files in full rather than only at the rowboat block, and report every divergence you find, not just this one; and determine whether the effective file is hand-maintained, generated, or environment-specific. SECOND, and only if the grounding establishes that the effective file is hand-maintained and that nothing regenerates or overwrites it, add the missing spaces-rowboat [[mcp_servers]] entry to the effective file in the shape task-openfang-0011 used, remembering that env is an entry-level key BEFORE the [mcp_servers.<name>.transport] table and carries variable NAMES ONLY, never values, because openfang spawns stdio servers with a cleared environment. Derive the entry from what spaces/rowboat/mcp_server.py actually reads rather than from the template's copy or from any orchestrator claim: the orchestrator's four MINIBOOK_* variables in the task-openfang-0011 brief were all wrong, and one of them was a credential that had no business in an allowlist whose purpose is to keep values out. FAIL CLOSED and change nothing if a generator exists, if the effective file turns out to be environment-specific rather than a copy, or if the two files diverge in ways that make a single-block addition incoherent - report the finding and let the user decide. THIRD, independent of whether you change the toml, characterise the deeper defect: brain/the_brain/core/mcp_discovery.py resolves _OPENFANG_TOML to the EFFECTIVE file while brain/the_brain/tests/test_openfang_agent_manifest.py reads the TEMPLATE, so the test reads the file that has the server and the runtime reads the file that does not, and the gap is masked. That is the same shape as the validator blind spot task-governance-0034 closed. Say plainly whether a test could have caught this, and what such a test would have to read. Do not add or change a test unless you can make it red first against the current state.",
+  "repositories": ["vibemind-v1", "openfang", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0021-rowboat-registration-file-split-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 9
+}

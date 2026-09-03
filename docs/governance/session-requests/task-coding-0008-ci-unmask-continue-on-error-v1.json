@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-coding-0008-ci-unmask-continue-on-error-v1",
+  "session_type": "task",
+  "space": "coding",
+  "parent_cockpit": "cockpit-coding",
+  "request_reference": "task-request:task-coding-0008-ci-unmask-continue-on-error-v1",
+  "objective": "Stage 2 of the coding-engine repair, and the part that changes gating behaviour: .github/workflows/ci.yml in Flissel/DaveFelix-Coding-Engine carries continue-on-error: true on its lint, test and security jobs, so docker-validate is the only job that can actually fail a pull request. That masking is why a substantially broken test suite went unnoticed. Remove it so those jobs gate for real. Two preconditions this task must verify itself rather than assume, and stop fail-closed if either fails: the suite must actually be green after task-coding-0007, and the lint and security jobs must be independently assessed, because they were masked too and their true state was never measured. If a job cannot be made green within this task, do NOT un-mask it silently and do NOT leave the masking in place silently either - report which jobs were un-masked, which were not, and exactly why. A second, separate defect to fix while here: the workflow checks out with actions/checkout@v4 without submodules: recursive, which is why CI never detected the unmapped-gitlink bug that task-coding-0006 fixed. Note the known consequence, and do not paper over it: coding-engine/la_fungus_search still pins a dangling commit, so enabling recursive submodule checkout will fail until that pin is resolved - which is a user-gated matter outside this task. Sequence the two changes so CI is never left permanently red by this task's own hand.",
+  "repositories": ["vibemind-v1", "coding-engine"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-17T11:36:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/coding/task-coding-0008-ci-unmask-continue-on-error-v1",
+  "risk_class": "code",
+  "dependencies": ["task-coding-0007-test-suite-repair-v1"],
+  "merge_position": 8
+}

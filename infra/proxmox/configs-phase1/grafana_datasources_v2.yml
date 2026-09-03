@@ -1,0 +1,27 @@
+# Grafana auto-provisioned datasource — Loki (VibeMind).
+# Mounted at /etc/grafana/provisioning/datasources/loki.yml by Swarm config.
+# Grafana picks this up on startup; no manual click-through.
+
+apiVersion: 1
+
+datasources:
+  - name: Loki-VibeMind
+    # Explicit uid — dashboards reference {"datasource":{"uid":"loki"}};
+    # without this Grafana auto-generates a random uid and the
+    # auto-provisioned dashboards silently lose their datasource binding.
+    uid: loki
+    type: loki
+    access: proxy
+    # Overlay DNS: from grafana-vibemind container, "loki" resolves
+    # to the loki service on vibemind-shared.
+    url: http://loki:3100
+    isDefault: true
+    editable: false       # provisioned-only; UI edits would drift from repo
+    jsonData:
+      # Faster queries: tell Grafana the max series per range query so
+      # accidental broad queries fail fast instead of pegging Loki.
+      maxLines: 5000
+      timeout: 60
+      # Derived fields: clickable links from log lines to e.g. trace IDs.
+      # Phase W extension — leave empty for now.
+      derivedFields: []

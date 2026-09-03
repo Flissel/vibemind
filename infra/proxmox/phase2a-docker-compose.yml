@@ -1,0 +1,96 @@
+services:
+  rowboat-mongo:
+    image: mongo:latest@sha256:d6566e93e6a913cdb622ebe34e0ae7937d50efa60e92363fb4a84404dc890415
+    ports:
+    - 127.0.0.1:27017:27017
+    volumes:
+    - rowboat_mongo:/data/db
+    restart: unless-stopped
+  rowboat-redis:
+    image: redis:latest@sha256:0c341492924cad6f5483f9133e43bd6c51ecdecbcadfac5b51657393b6a7936c
+    restart: unless-stopped
+  rowboat:
+    image: vibemind-rowboat-rowboat:latest
+    ports:
+    - 3100:3000
+    environment:
+    - PORT=3000
+    - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+    - REDIS_URL=redis://rowboat-redis:6379
+    - QDRANT_URL=http://192.168.178.50:6730
+    volumes:
+    - rowboat_uploads:/app/uploads
+    depends_on:
+    - rowboat-mongo
+    - rowboat-redis
+    restart: unless-stopped
+  rowboat-jobs-worker:
+    image: vibemind-rowboat-jobs-worker:latest
+    command:
+    - npm
+    - run
+    - jobs-worker
+    environment:
+    - PORT=3000
+    - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+    - REDIS_URL=redis://rowboat-redis:6379
+    - QDRANT_URL=http://192.168.178.50:6730
+    depends_on:
+    - rowboat-mongo
+    - rowboat-redis
+    restart: unless-stopped
+  rowboat-rag-worker:
+    image: vibemind-rowboat-jobs-worker:latest
+    command:
+    - sh
+    - -c
+    - cd /app && (npm run setupQdrant || true) && npm run rag-worker
+    environment:
+    - PORT=3000
+    - MONGODB_CONNECTION_STRING=mongodb://rowboat-mongo:27017/rowboat
+    - REDIS_URL=redis://rowboat-redis:6379
+    - QDRANT_URL=http://192.168.178.50:6730
+    - EMBEDDING_MODEL=text-embedding-3-small
+    - EMBEDDING_VECTOR_SIZE=1536
+    depends_on:
+    - rowboat-mongo
+    - rowboat-redis
+    restart: unless-stopped
+  neo4j-mirofish:
+    image: neo4j:5.18-community@sha256:8f01f7bb053e5564eb84a3f1824e4ca2202d29dd415d196cf8e27c8f7e6b611e
+    ports:
+    - 7475:7474
+    - 7688:7687
+    environment:
+    - NEO4J_AUTH=${MIROFISH_NEO4J_USER:-neo4j}/${MIROFISH_NEO4J_PASSWORD:-mirofish}
+    - NEO4J_PLUGINS=["apoc"]
+    - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    - NEO4J_server_memory_heap_initial__size=2G
+    - NEO4J_server_memory_heap_max__size=2G
+    - NEO4J_server_memory_pagecache_size=1G
+    volumes:
+    - neo4j_mirofish_data:/data
+    - neo4j_mirofish_plugins:/plugins
+    restart: unless-stopped
+  n8n:
+    image: vibemind-n8n:latest
+    ports:
+    - 127.0.0.1:15678:5678
+    environment:
+    - N8N_API_DISABLED=false
+    - N8N_PUBLIC_API_DISABLED=false
+    - N8N_PERSONALIZATION_ENABLED=false
+    - N8N_API_KEY=${N8N_API_KEY:-vibemind-dev-api-key}
+    - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-vibemind-dev-key-change-in-prod}
+    - GENERIC_TIMEZONE=Europe/Berlin
+    - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+    - N8N_TEMPLATES_ENABLED=true
+    volumes:
+    - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+volumes:
+  rowboat_mongo: {}
+  rowboat_uploads: {}
+  neo4j_mirofish_data: {}
+  neo4j_mirofish_plugins: {}
+  n8n_data: {}

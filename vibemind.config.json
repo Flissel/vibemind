@@ -1,0 +1,105 @@
+{
+  "modules": {
+    "voice": {
+      "enabled": true,
+      "path": "vibemind-os/voice"
+    },
+    "automation_ui": {
+      "enabled": true,
+      "path": "vibemind-os/spaces/desktop/Automation_ui"
+    },
+    "coding_engine": {
+      "enabled": true,
+      "path": "vibemind-os/coding-engine"
+    },
+    "brain": {
+      "enabled": true,
+      "path": "vibemind-os/brain/the_brain"
+    },
+    "openfang": {
+      "enabled": true,
+      "path": "vibemind-os/openfang"
+    },
+    "la_fungus": {
+      "enabled": true,
+      "path": "vibemind-os/la-fungus-search"
+    },
+    "openclaw": {
+      "enabled": true,
+      "path": "vibemind-os/openclaw"
+    },
+    "bridge": {
+      "enabled": true,
+      "path": "vibemind-os/bridge"
+    },
+    "n8n": {
+      "enabled": true,
+      "path": "vibemind-os/voice"
+    },
+    "agentfarm": {
+      "enabled": false,
+      "path": "vibemind-os/voice",
+      "_disabled_reason": "Docker build references vibemind-os/voice/python/spaces/autogen/server which doesn't exist; needs source restore before re-enabling"
+    },
+    "rowboat": {
+      "enabled": true,
+      "path": "vibemind-os/spaces/rowboat/rowboat"
+    }
+  },
+  "ports": {
+    "brain_dashboard": 5000,
+    "brain_api": 5001,
+    "brain_unified": 5003,
+    "brain_memory": 8001,
+    "bridge": 5150,
+    "openfang": 4200,
+    "moire_server": 8766,
+    "electron_devtools": 9223,
+    "minibook_backend": 3480,
+    "minibook_frontend": 3481,
+    "mirofish": 5101,
+    "redis_voice": 6379,
+    "automation_backend": 8007,
+    "automation_frontend": 3003,
+    "automation_voice": 8765,
+    "coding_api": 8000,
+    "coding_frontend": 5173,
+    "coding_vnc": 6090,
+    "coding_postgres": 5432,
+    "coding_redis": 6382,
+    "coding_gitea": 3000,
+    "la_fungus_api": 8011,
+    "openclaw_gateway": 18789,
+    "n8n": 15678,
+    "agentfarm_server": 8085,
+    "agentfarm_ui": 3457,
+    "rowboat": 3000,
+    "media_server": 8977,
+    "mailcow_http": 8080,
+    "mailcow_https": 8443
+  },
+  "docker": {
+    "voice_minibook": "vibemind-os/voice/docker-compose.minibook.yml",
+    "voice_mirofish": "vibemind-os/voice/docker-compose.mirofish.yml",
+    "coding_engine": "vibemind-os/coding-engine/docker-compose.yml",
+    "brain": "vibemind-os/brain/the_brain/docker-compose.yml",
+    "openfang": "vibemind-os/openfang/docker-compose.yml",
+    "automation_ui": "vibemind-os/spaces/desktop/Automation_ui/docker-compose.yml",
+    "n8n": "vibemind-os/voice/docker-compose.n8n.yml",
+    "agentfarm": "vibemind-os/voice/docker-compose.agentfarm.yml",
+    "rowboat": "vibemind-os/spaces/rowboat/rowboat/docker-compose.yml"
+  },
+  "venvs": {
+    "voice": "vibemind-os/voice/.venv312",
+    "shared": ".venv"
+  },
+  "apiKeys": {
+    "configured": [
+      "OPENROUTER_API_KEY",
+      "OPENAI_API_KEY",
+      "GROQ_API_KEY",
+      "SUPERMEMORY_API_KEY",
+      "GOOGLE_API_KEY"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:research-request:v1",
+  "title": "ResearchRequestV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "task_id", "trace_id", "intent", "question", "clarification", "source_policy", "collection_limits", "budget"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "request_id": {"$ref": "#/$defs/requestId"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "trace_id": {"$ref": "#/$defs/traceId"},
+    "intent": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "question": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "clarification": {"$ref": "#/$defs/clarification"},
+    "source_policy": {"$ref": "#/$defs/sourcePolicy"},
+    "collection_limits": {"$ref": "#/$defs/collectionLimits"},
+    "budget": {"$ref": "#/$defs/budget"}
+  },
+  "$defs": {
+    "requestId": {"type": "string", "pattern": "^request_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "traceId": {"type": "string", "pattern": "^trace_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "approvalId": {"type": "string", "pattern": "^approval_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "quoteId": {"type": "string", "pattern": "^quote_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "clarification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["required", "questions"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "questions": {"type": "array", "maxItems": 20, "items": {"type": "string", "minLength": 1, "maxLength": 1000}}
+      }
+    },
+    "sourcePolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allowed_source_types", "allow_paywalled_sources"],
+      "properties": {
+        "allowed_source_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["primary", "secondary", "academic", "government", "standards"]}},
+        "allow_paywalled_sources": {"type": "boolean"}
+      }
+    },
+    "collectionLimits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_sources", "max_depth", "max_duration_seconds"],
+      "properties": {
+        "max_sources": {"type": "integer", "minimum": 1, "maximum": 50},
+        "max_depth": {"type": "integer", "minimum": 1, "maximum": 5},
+        "max_duration_seconds": {"type": "integer", "minimum": 1, "maximum": 3600}
+      }
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["currency", "max_cost_minor", "quote_ref", "approval_ref"],
+      "properties": {
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "max_cost_minor": {"type": "integer", "minimum": 0, "maximum": 100000000},
+        "quote_ref": {"$ref": "#/$defs/quoteId"},
+        "approval_ref": {"$ref": "#/$defs/approvalId"}
+      }
+    }
+  }
+}

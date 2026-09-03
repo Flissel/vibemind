@@ -1,0 +1,28 @@
+{
+  "contract_version": "v1",
+  "correlation_id": "event_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "plan_id": "plan_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "participating_space_ids": ["research", "coding"],
+  "revision": 3,
+  "status": "execution_deferred",
+  "updated_at": "2026-08-01T10:02:00Z",
+  "event_history": [
+    {
+      "revision": 1,
+      "status": "planned",
+      "occurred_at": "2026-08-01T10:00:00Z"
+    },
+    {
+      "revision": 2,
+      "status": "admitted",
+      "reason_code": "admission-validated",
+      "occurred_at": "2026-08-01T10:01:00Z"
+    },
+    {
+      "revision": 3,
+      "status": "execution_deferred",
+      "reason_code": "execution-engine-deferred",
+      "occurred_at": "2026-08-01T10:02:00Z"
+    }
+  ]
+}

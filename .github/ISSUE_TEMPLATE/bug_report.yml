@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible problem in VibeMind
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not report vulnerabilities or exposed credentials here. Follow SECURITY.md instead.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Root commit
+      description: Output of `git rev-parse HEAD`
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Windows, Python, Node.js, Docker, and PowerShell versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the smallest reproducible sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove tokens, personal data, private URLs, and `.env` content.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I initialized all required submodules recursively.
+          required: true
+        - label: I searched existing issues for this problem.
+          required: true
+        - label: This report contains no secrets or personal data.
+          required: true

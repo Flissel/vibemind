@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-integration-0005a-openfang-mcp-authority-static-v1",
+  "session_type": "task",
+  "space": "integration",
+  "parent_cockpit": "cockpit-integration",
+  "request_reference": "task-request:task-integration-0005a-openfang-mcp-authority-static-v1",
+  "objective": "Define and statically validate the durable OpenFang MCP server identity, per-agent scopes, tool allowlists and registration authority as a versioned contract, derived from the real vibemind-os source (registry, router, capabilities) checked out via the approved submodule workflow. Static half of task-integration-0005 only: no live MCP registration, no runtime activation, no OpenFang mutation of any kind.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/contracts/", "shared/contracts/", "tests/integration/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T19:00:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/integration/task-integration-0005a-openfang-mcp-authority-static-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 8
+}

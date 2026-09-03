@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0008-mcp-env-whitelist-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0008-mcp-env-whitelist-v1",
+  "objective": "Fix blocker B1 from the 0005b stage-2 evidence: add the entry-level env whitelists for the spaces-ideas and vibemind-db MCP server entries in openfang.vibemind.toml.template and the rendered openfang.vibemind.toml in the Flissel/openfang repository, exactly as specified in docs/runbooks/openfang-mcp-registration-activation.md step 0 (spaces-ideas: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY; vibemind-db: SUPABASE_URL, SUPABASE_ANON_KEY). Config values only, never secret values. Superproject writes limited to evidence documentation.",
+  "repositories": ["vibemind-v1", "openfang"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0008-mcp-env-whitelist-v1",
+  "risk_class": "code",
+  "dependencies": ["task-integration-0005b-openfang-mcp-live-registration-v1"],
+  "merge_position": 4
+}

@@ -1,0 +1,100 @@
+# .graphifyignore — was Graphify NICHT in den Knowledge-Graph aufnimmt.
+#
+# Ziel: NUR echter Vibemind-Code. Der erste Voll-Lauf zog 32.604 Dateien /
+# 425k Knoten / 531 MB ein — 97% davon vendored Fremdcode + venvs aus
+# vibemind-os/. Diese Datei grenzt das auf den tatsächlichen Eigen-Code ein.
+#
+# Patterns die nachweislich greifen: Top-Level-Dir, "/segment/", "*.ext".
+# Tief verschachtelte **-Globs sind unzuverlässig → lieber Pfad-Präfixe.
+
+# ── Secrets (Pflicht) ────────────────────────────────────────────────────────
+.env
+.env.*
+*.env
+*secret*
+*credentials*
+*.key
+*.pem
+
+# ── Sozialdaten / Marketing-PII (Datenartefakte, nicht Code) ─────────────────
+Buergergeld-Pipeline/data
+Buergergeld-Pipeline/akte
+*.akte
+spaces/marketing/curator
+spaces/marketing/db
+*.csv
+*.sql
+
+# ── Python/Rust/Node Build- & venv-Artefakte ────────────────────────────────
+.venv
+.venv312
+venv
+__pycache__
+node_modules
+target
+dist
+build
+*.pyc
+*.pyo
+*.so
+*.pyd
+*.h
+*.c
+site-packages
+
+# ── Vendored Fremdprojekte in vibemind-os/ (nicht unser Code) ────────────────
+# Externe Klone, mehrfach eingebettet — größte Lärmquelle.
+voice/external
+external
+openclaw
+openclaude
+clawcode
+coding-engine
+Coding_engine
+insightface
+igraph
+
+# ── Vendored Spaces (Fremdprojekte / generierte UIs) ─────────────────────────
+spaces/coding/Coding_engine
+electron-app
+
+# ── Vendored / Neben-Spaces (verwässern query-Treffer, nicht Kerncode) ───────
+# rowboat = vendored Rowboat-UI; swe_desgine/ai_scientist = vendored AI-Scientist;
+# autogen/shuttles = Experiment-Spaces; desktop = eyeTerm (separates Subsystem).
+rowboat
+swe_desgine
+ai_scientist
+spaces/autogen
+spaces/shuttles
+spaces/desktop
+spaces/mirofish
+spaces/video
+
+# ── Automation_ui = eigenständige Insel (siehe Memory), nicht Vibemind-Kern ──
+Automation_ui
+
+# ── Lärm / nicht-Code-Artefakte aus dem aktuellen Arbeitsstand ───────────────
+backups
+graphify-out
+*.bak
+*.bak.*
+dom_*.txt
+qa_*.txt
+bg_context.txt
+dead_code_report.md
+*.log
+
+# ── Bilder / Binär (kein Code-Graph-Wert, würden sonst ans LLM gehen) ────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.zip
+*.tar
+*.gz
+*.bin
+*.onnx
+*.safetensors
+*.pkl

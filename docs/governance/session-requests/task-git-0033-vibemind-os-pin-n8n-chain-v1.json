@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0033-vibemind-os-pin-n8n-chain-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0033-vibemind-os-pin-n8n-chain-v1",
+  "objective": "Stage 2 of the n8n pin chain, following the task-git-0031 pattern: lift the vibemind-os gitlink in the superproject from a9a48af to the vibemind-os master commit that carries both the research report artifact migration and the lifted openfang gitlink from stage 1, and update repo-manifest.yaml accordingly - expected_gitlink_pin for vibemind-os and for openfang, plus the evidence.parent_pin chain across the vibemind-os children. Determine the exact target commit repo-first rather than assuming it, verify it is reachable on the vibemind-os remote master before pinning, and advance the pin consistency contract test deliberately. Evidence: manifest validate exit 0 and a green governance suite.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["vibemind-os", "repo-manifest.yaml", "docs/operations/", "tests/v1_governance/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0033-vibemind-os-pin-n8n-chain-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0032-openfang-pin-75067d8-v1"],
+  "merge_position": 8
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-git-0026-submodule-readiness-workflow-v1",
+  "session_type": "task",
+  "space": "git",
+  "parent_cockpit": "cockpit-git",
+  "request_reference": "task-request:task-git-0026-submodule-readiness-workflow-v1",
+  "objective": "Define and prove a safe, reproducible, non-destructive submodule checkout workflow for the vibemind-os submodule so the read-only submodule readiness gate reports ready, and record the workflow as a runbook with exact command evidence. No submodule deletion, no force operations, no pin changes.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/runbooks/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/git/task-git-0026-submodule-readiness-workflow-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 1
+}

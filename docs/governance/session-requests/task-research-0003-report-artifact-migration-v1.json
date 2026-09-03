@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0003-report-artifact-migration-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0003-report-artifact-migration-v1",
+  "objective": "Stage 1 of decision E14: author the database migration that gives deep research reports their own artifact table, so a report lives as a linked artifact instead of as a long body in ideas.description. Write the migration file, the schema and contract follow-up and the tests, and deliver a documented rollback path. Determine repo-first what the existing schema and the sole comparable artifact table swe_design_artifacts imply for shape and naming, and deliver an evidenced proposal on whether the artifact participates in the existing ideas-Rowboat sync chain or deliberately stays outside it. Expressly stage 1 only: the migration is written, never applied - no execution against any database, no PostgREST or psql call, no seed data. Applying it is a user action outside this request.",
+  "repositories": ["vibemind-v1", "vibemind-os"],
+  "allowed_paths": ["docs/operations/", "docs/spaces/research/", "shared/contracts/", "tests/contracts/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-17T07:02:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0003-report-artifact-migration-v1",
+  "risk_class": "database-migration",
+  "dependencies": ["task-research-0002-space-definition-contract-v1"],
+  "merge_position": 2
+}

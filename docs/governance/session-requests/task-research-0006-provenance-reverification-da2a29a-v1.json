@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0006-provenance-reverification-da2a29a-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0006-provenance-reverification-da2a29a-v1",
+  "objective": "Run the verification pass that tests/contracts/research/test_research_provenance_pins_v1.py::test_the_checked_pins_are_the_live_gitlinks is demanding, and append it to the verifications list in shared/contracts/research/v1/research-service-tiers-v1.json. That gate compares the most recent pass's checked_pins against repo-manifest.yaml expected_gitlink_pin and has been RED since task-git-0036 moved vibemind-os from 731288b4 to d2c92d0; task-git-0038 moves it again to da2a29a and openfang to ef9d73f, so measure the live pins yourself at the master you branch from rather than trusting these values. Nobody noticed the gate was red because the orchestrator was running only tests/v1_governance and calling it the suite, and because the required CI checks run only tests/architecture/test_v1_ci_contract.py and tests/v1_governance/test_manifest.py - so this gate is in neither. Say in the handoff whether that CI gap should be closed and what it would cost; do not change any workflow file. This is NOT a pin bump. The mechanism task-research-0004 built is append-only: add a NEW entry to verifications with verified_by_task, verified_on, checked_pins, checked_pin_origin, method, the outcome_vocabulary, and a real per-reference outcome for every reference the previous pass covered. Earn each outcome the way the existing method line describes - blob-hash comparison of the cited path between the observed pin and the checked pin, then a direct read of the cited locator at the checked pin - and use holds, holds_with_locator_drift or diverged as the evidence actually warrants. Do not edit the previous pass, do not rewrite any observed pin, and do not rewrite a reference's assertion to make it fit: under docs/governance/provenance-pin-convention-v1.md and the file's own vocabulary, diverged is a finding, not a licence. Note for the orchestrator's own record: in the task-git-0038 brief these same pins were described as frozen at observation, which is only half the convention. The observed pin and the assertion are frozen; checked_pins is precisely what a new pass must advance. If any reference turns out to have diverged, report it and leave the assertion alone. Also confirm or refute one thing the orchestrator has not verified: there are two convention documents, docs/governance/provenance-pin-convention-v1.md and docs/spaces/research/provenance-pin-convention-v1.md, and the test's failure message cites the second while the orchestrator wrote the first. Establish whether they agree, whether one supersedes the other, and report it - do not merge or delete either.",
+  "repositories": ["vibemind-v1", "vibemind-os", "openfang"],
+  "allowed_paths": ["shared/contracts/research/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0006-provenance-reverification-da2a29a-v1",
+  "risk_class": "code",
+  "dependencies": ["task-git-0038-superproject-pin-minibook-chain-v1"],
+  "merge_position": 10
+}

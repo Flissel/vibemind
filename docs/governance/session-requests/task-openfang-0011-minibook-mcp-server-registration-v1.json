@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-openfang-0011-minibook-mcp-server-registration-v1",
+  "session_type": "task",
+  "space": "openfang",
+  "parent_cockpit": "cockpit-openfang",
+  "request_reference": "task-request:task-openfang-0011-minibook-mcp-server-registration-v1",
+  "objective": "Close a registration gap of exactly the class task-openfang-0009 closed for n8n, surfaced by the openfang-mcp-authority contract and grounded repo-first by the orchestrator before admission. vibemind-os/config/space_agent_registry.yml:236-246 scopes the server spaces-minibook for the minibook agent and binds minibook.status to the tool minibook_status with execution kind mcp and server spaces-minibook, but openfang.vibemind.toml and its template carry no registration entry for that server, so the bound event has no target. Unlike the n8n case the implementation already exists in-repo at vibemind-os/spaces/minibook/mcp_server.py, so this is a pure registration entry rather than a third-party launch to research: model it on the adjacent spaces-ideas and spaces-rowboat entries. Determine the launch command, the transport and the environment allowlist repo-first rather than from this brief - the orchestrator observed MINIBOOK_URL, MINIBOOK_API_KEY, MINIBOOK_PROJECT_ID and MINIBOOK_TIMEOUT_S in spaces/minibook/tools/minibook_tools.py, but the session must verify which of those the server actually requires and which have working defaults, and must not widen the allowlist beyond what is needed. The env key is an entry-level key placed before the transport header, following the B1 fix, and carries variable NAMES only, never values. Expressly no live registration, no runtime start, no registry change, and no secret values in the repository.",
+  "repositories": ["vibemind-v1", "openfang", "vibemind-os"],
+  "allowed_paths": ["docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/openfang/task-openfang-0011-minibook-mcp-server-registration-v1",
+  "risk_class": "code",
+  "dependencies": ["task-openfang-0009-n8n-mcp-server-registration-config-v1"],
+  "merge_position": 6
+}

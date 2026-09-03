@@ -1,0 +1,3 @@
+# Re-include test files here; the repo-root .gitignore ignores test_*.py globally,
+# but the docker MCP server's tests are first-class source and must be tracked.
+!test_*.py

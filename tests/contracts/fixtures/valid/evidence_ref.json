@@ -1,0 +1,11 @@
+{
+  "contract_version": "v1",
+  "evidence_id": "evidence_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "task_id": "task_v1_01J8Q3Z4R5T6V7W8X9Y0ABCDEF",
+  "evidence_type": "test-result",
+  "location": "tests/contracts/fixtures/valid/task_brief.json",
+  "captured_at": "2026-07-31T09:10:00Z",
+  "producer": "contract-validator",
+  "summary": "A valid fixture was accepted.",
+  "content_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+}

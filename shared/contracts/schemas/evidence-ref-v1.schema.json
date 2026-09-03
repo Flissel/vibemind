@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:vibemind:shared:contracts:evidence-ref:v1",
+  "title": "EvidenceRefV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "evidence_id", "task_id", "evidence_type", "location", "captured_at", "producer", "summary", "content_digest"],
+  "properties": {
+    "contract_version": {"const": "v1"},
+    "evidence_id": {"$ref": "#/$defs/evidenceId"},
+    "task_id": {"$ref": "#/$defs/taskId"},
+    "evidence_type": {"enum": ["test-result", "artifact", "log", "external-record", "human-attestation"]},
+    "location": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "captured_at": {"type": "string", "format": "date-time"},
+    "producer": {"type": "string", "minLength": 1, "maxLength": 200},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "content_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "taskId": {"type": "string", "pattern": "^task_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"},
+    "evidenceId": {"type": "string", "pattern": "^evidence_v1_[0-9A-HJKMNPQRSTVWXYZ]{26}$"}
+  }
+}

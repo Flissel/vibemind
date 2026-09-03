@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-n8n-0001-space-declaration-correction-v1",
+  "session_type": "task",
+  "space": "n8n",
+  "parent_cockpit": "cockpit-n8n",
+  "request_reference": "task-request:task-n8n-0001-space-declaration-correction-v1",
+  "objective": "Implement architecture decision E7 (n8n is MCP-only): align the n8n declarations in docs/SPACES.md and the space catalogs with the verified reality that n8n has no own space application, no own space directory and no own data authority, while the eight n8n.* registry events remain the canonical tool surface bound directly to MCP tools. Verify repo-first which claims are unfounded (own application, space-n8n Swarm profile, ownership of integration code) and correct exactly those, with contract tests advanced deliberately. No registry changes, no event removals, no runtime actions.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/SPACES.md", "docs/spaces/", "docs/operations/", "shared/contracts/", "tests/contracts/", "tests/integration/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-15T11:38:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/n8n/task-n8n-0001-space-declaration-correction-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 2
+}

@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-research-0004-provenance-pin-convention-v1",
+  "session_type": "task",
+  "space": "research",
+  "parent_cockpit": "cockpit-research",
+  "request_reference": "task-request:task-research-0004-provenance-pin-convention-v1",
+  "objective": "The research contract family cites the submodule pins at which its claims were read - shared/contracts/research/v1/research-service-tiers-v1.json carries provenance pins c5cba96, 5d38662 and a9a48af, and tests/contracts/research/ asserts two of them - while the live pins have since advanced to vibemind-os 731288b and openfang 75067d8. The list of superseded pins has grown at every link of two pin chains. Settle the convention before touching a single SHA: a provenance citation records where and when an observation was made, so bulk-replacing the pins would silently assert a re-verification that never happened, while leaving them frozen makes the citation honest but progressively harder to follow. Determine repo-first which claims each cited pin actually carries, decide between frozen-at-observation and refreshed-with-re-verification, and document the chosen convention so future pin chains have a rule instead of a judgement call. If the decision is to refresh, each cited claim must actually be re-read at the current pin and the re-verification recorded; a pin may not be advanced on a claim that was not re-checked. Expressly not a bulk find-and-replace, and expressly no change to what any contract asserts - only to how its provenance is expressed. Tests stay green throughout.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["shared/contracts/research/", "tests/contracts/research/", "docs/spaces/research/", "docs/operations/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-13T13:09:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/research/task-research-0004-provenance-pin-convention-v1",
+  "risk_class": "docs",
+  "dependencies": ["task-git-0033-vibemind-os-pin-n8n-chain-v1"],
+  "merge_position": 9
+}

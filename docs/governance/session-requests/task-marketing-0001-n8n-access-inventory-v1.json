@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "session_id": "task-marketing-0001-n8n-access-inventory-v1",
+  "session_type": "task",
+  "space": "marketing",
+  "parent_cockpit": "cockpit-marketing",
+  "request_reference": "task-request:task-marketing-0001-n8n-access-inventory-v1",
+  "objective": "Stage 1 of architecture decision E8 (marketing routes through the canonical n8n path): produce a complete repo-first inventory of every direct marketing-to-n8n access — webhook subscriptions, URLs written by db migration 038, the marketing n8n API key usage, OAuth redirect URLs and any direct HTTP call — and map each one onto the corresponding n8n.* registry event, explicitly recording where no event exists. Deliver a migration plan with ordering, rollback path and a separate finding on inbound triggers, which the eight outbound events do not cover. Expressly no behavior change: no edits to webhook subscriptions, database rows, credentials or workflows; the actual migration is stage 2 and stays user-gated.",
+  "repositories": ["vibemind-v1"],
+  "allowed_paths": ["docs/operations/", "spaces/marketing/docs/"],
+  "writes_allowed": true,
+  "approval_status": "approved",
+  "approval_reference": "claude-user-message:session_01SdA3ftgP3wciDbcFzKw4uk@2026-08-15T11:38:00Z",
+  "base_ref": "origin/master",
+  "branch": "codex/marketing/task-marketing-0001-n8n-access-inventory-v1",
+  "risk_class": "code",
+  "dependencies": [],
+  "merge_position": 2
+}
