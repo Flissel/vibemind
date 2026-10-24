@@ -1,16 +1,58 @@
-# VibeMind V1
+# VibeMind
 
-[![Open-source checks](https://github.com/Flissel/vibemind/actions/workflows/open-source-checks.yml/badge.svg?branch=master)](https://github.com/Flissel/vibemind/actions/workflows/open-source-checks.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Open-source checks](https://github.com/Flissel/vibemind/actions/workflows/open-source-checks.yml/badge.svg?branch=main)](https://github.com/Flissel/vibemind/actions/workflows/open-source-checks.yml)
+[![License: MIT core](https://img.shields.io/badge/License-MIT%20core-yellow.svg)](#license)
 
-VibeMind is a modular, open-source AI operating system that connects a cognitive
-routing layer, agent runtimes, voice and desktop interfaces, automation tools,
-and domain-specific workspaces in one repository.
+VibeMind is a **voice-first agentic OS**: an open operating system for a fleet
+of AI agents – Spaces where you work, agents that do the work, on your own
+hardware.
+
+**Every agent platform is a walled garden. This one isn't.**
+
+Open beta since October 2026 · self-hosted · MIT core, some optional
+components under other licenses ([details](#license))
+
+[Website](https://vibemind.space) ·
+[Discord](https://discord.gg/TWbbPJU9ce) ·
+[Bluesky](https://bsky.app/profile/vibemind.bsky.social) ·
+[Mastodon](https://mastodon.social/@VibeMind)
 
 > [!IMPORTANT]
-> VibeMind is under active development. The complete stack is intended for
-> Windows 11 and includes optional services that require Docker, API keys, and
-> substantial local resources. Start with the dry-run commands below.
+> VibeMind is in open beta and under active development. The complete stack
+> currently targets Windows 11 and includes optional services that require
+> Docker, API keys, and substantial local resources. Read
+> [Known limitations](#known-limitations) and start with the dry-run commands
+> below.
+
+## What works today
+
+- **Setup wizard** that checks prerequisites, lets you pick modules, creates
+  local virtual environments, and writes ignored `.env` files.
+- **Dry-run previews** for both start paths, so you can see what will run
+  before anything starts.
+- **The Brain → OpenFang chain**: Brain classifies intent and routes, OpenFang
+  resolves and executes the agent, and a request that cannot follow this chain
+  fails closed instead of silently falling back.
+- **MCP tool hub** for allowlisted tools and agent interoperability.
+- **Catalog of 13 Spaces** with source-backed documentation. An enabled Space
+  is configured for routing; that alone is not proof of live operation (see
+  [docs/SPACES.md](docs/SPACES.md) for the status of each one).
+
+## Known limitations
+
+- **Windows 11 only for now.** All entrypoints are PowerShell scripts
+  (`setup.ps1`, `Vibemind.debug.ps1`, `scripts/vibemind-start.ps1`). Linux and
+  macOS are not supported yet.
+- **Heavy full stack.** The integrated Docker Swarm stack defines 41 services,
+  36 of them enabled by default; their memory limits add up to about 39 GB.
+  It is not laptop-scale.
+- **An LLM API key is required** for the documented quick start (see
+  [Prerequisites](#1-prerequisites)). Ollama is optional for local models.
+- **Not every Space is live-ready.** AgentFarm is disabled until a persistent
+  runtime exists; check each Space's status before relying on it.
+- **Mixed licensing.** Some optional submodules use AGPL-3.0, non-commercial
+  (CC BY-NC 4.0), use-restricted, or other non-OSI licenses — see
+  [License](#license).
 
 ## What is included
 
@@ -25,13 +67,6 @@ and domain-specific workspaces in one repository.
 The root repository is the orchestration and operations layer. Most product
 components live in the `vibemind-os` Git submodule, which contains additional
 submodules. Clone recursively so that the complete source tree is available.
-
-> [!NOTE]
-> Publication is still being prepared. At the documentation audit on
-> 2026-08-09, the root repository and `vibemind-os` were private, so an
-> anonymous recursive clone and the default GitHub Actions checkout could not
-> yet fetch the full tree. See the
-> [documentation audit](docs/DOCUMENTATION_AUDIT.md#open-source-checkout).
 
 ## Architecture at a glance
 
@@ -74,6 +109,15 @@ Install the following before cloning:
 You also need at least one supported LLM API key: `OPENROUTER_API_KEY`,
 `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`.
 
+#### Hardware
+
+- Windows 11 host with Docker Desktop (WSL 2 backend) for the integrated stack.
+- The full stack in [`infra/swarm/vibemind-stack.yml`](infra/swarm/vibemind-stack.yml)
+  runs 36 services by default. Their memory limits add up to about 39 GB, so
+  plan for a workstation rather than a laptop, or start only selected Space
+  profiles (see [step 4](#4-preview-then-start)).
+- Measured minimums for a small profile are not published yet.
+
 ### 2. Clone the complete repository
 
 On Windows, enable long paths first — several submodules exceed the legacy
@@ -88,7 +132,7 @@ git clone --recurse-submodules https://github.com/Flissel/vibemind.git
 Set-Location vibemind
 ```
 
-Clone into a short path (for example `C:\srcibemind`); a deep target
+Clone into a short path (for example `C:\src\vibemind`); a deep target
 directory can still exceed the limit.
 
 If you already cloned without submodules:
@@ -249,12 +293,22 @@ private reporting process in [`SECURITY.md`](SECURITY.md). If a real credential
 was committed, revoke and rotate it immediately; removing it from the latest
 commit is not sufficient.
 
+## Community
+
+- Website: [vibemind.space](https://vibemind.space)
+- Discord: [discord.gg/TWbbPJU9ce](https://discord.gg/TWbbPJU9ce)
+- Bluesky: [@vibemind.bsky.social](https://bsky.app/profile/vibemind.bsky.social)
+- Mastodon: [@VibeMind@mastodon.social](https://mastodon.social/@VibeMind)
+- Questions and bugs: [GitHub issues](https://github.com/Flissel/vibemind/issues)
+  (see [SUPPORT.md](SUPPORT.md))
+
 ## License
 
-Root-level VibeMind V1 code and documentation are available under the
-[MIT License](LICENSE). Git submodules and vendored components retain their own
-licenses — including copyleft (AGPL-3.0) and non-commercial (CC BY-NC 4.0)
-subtrees — so the monorepo as a whole is **MIT with exceptions**. See
+**MIT core, some optional components under other licenses.** Root-level
+VibeMind code and documentation are available under the [MIT License](LICENSE).
+Git submodules and vendored components retain their own licenses — including
+copyleft (AGPL-3.0), non-commercial (CC BY-NC 4.0), use-restricted and other
+non-OSI subtrees — so the monorepo as a whole is **MIT with exceptions**. See
 [THIRD_PARTY.md](THIRD_PARTY.md) for the complete inventory, and review the
 license file in each component before redistribution.
 
