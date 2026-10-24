@@ -29,11 +29,11 @@ the note · ⏳ = being resolved before the v1.0.0 release.
 | `vibemind-os/openclaw` | fork of [openclaw/openclaw](https://github.com/openclaw/openclaw) (© Peter Steinberger) | MIT | ✅ |
 | `vibemind-os/coding-engine` | DaveFelix Coding Engine | Apache-2.0 | ✅ (authorization confirmation pending) |
 | `vibemind-os/openclaude` | fork of leaked proprietary source | **none** | ⚠️ being retired — not part of the v1 release (replaced by the engine's OpenRouter/Agent-SDK/official-CLI backends) |
-| `vibemind-os/brain/the_brain/tribe` | fork of facebookresearch/tribev2 | **CC BY-NC 4.0** | ⚠️ non-commercial — optional add-on, excluded from commercial use |
+| `vibemind-os/brain/the_brain/tribe` | fork of facebookresearch/tribev2 | **CC BY-NC 4.0** | ⚠️ non-commercial — optional add-on, excluded from commercial use; not cloned by default (`update = none`) |
 | `vibemind-os/spaces/shuttles/swe_desgine` | based on SakanaAI AI-Scientist | AI Scientist Source Code License v1.0 | ⚠️ non-OSI, commercial restrictions |
 | `vibemind-os/spaces/video/vibevideo` | first-party | MIT | ✅ |
 | `vibemind-os/spaces/video/laura` | first-party (Lauras_star) | MIT | ✅ public since 2026-08-30 |
-| `vibemind-os/spaces/video/vibevideo_deepfake` | first-party | VibeMind Synthetic Media Source Code License (based on [RAIL](http://licenses.ai/) v1.1) | ✅ public since 2026-08-30 — use-restricted: consent, labelling of synthetic output, no impersonation/NCII/surveillance |
+| `vibemind-os/spaces/video/vibevideo_deepfake` | first-party | VibeMind Synthetic Media Source Code License (based on [RAIL](http://licenses.ai/) v1.1) | ⚠️ private repository, not cloned by default (`update = none`) — use-restricted: consent, labelling of synthetic output, no impersonation/NCII/surveillance |
 | `vibemind-os/spaces/captain_cook` | first-party (+ nested [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) fork, MIT; minibook component Apache-2.0) | ⏳ root license to be selected | ⏳ |
 | `vibemind-os/spaces/sales` | first-party (aisalesorgcore) | ⏳ | ⏳ LICENSE to be added |
 | `vibemind-os/voice` | first-party (VibeMind-VoiceDialog) | MIT (badge) | ⏳ LICENSE file to be added |
@@ -41,6 +41,19 @@ the note · ⏳ = being resolved before the v1.0.0 release.
 | `vibemind-os/voice/external/minibook` | c4pt0r/minibook | Apache-2.0 | ✅ |
 | `vibemind-os/voice/electron-app/clawport-ui` | JohnRiceML/clawport-ui | MIT | ✅ |
 | `vibemind-os/la-fungus-search` | first-party | MIT | ⚠️ vendored EmbeddingGemma weights (Google **Gemma Terms**, gated) are being removed — weights load from Hugging Face at runtime instead |
+
+### Optional submodules that are not cloned by default
+
+`vibemind-os/.gitmodules` sets `update = none` for `brain/the_brain/tribe` and
+`spaces/video/vibevideo_deepfake`, so a recursive clone skips them. To add
+TriBE v2 (CC BY-NC 4.0, non-commercial use only), run from the `vibemind-os`
+directory:
+
+```bash
+git submodule update --init --checkout brain/the_brain/tribe
+```
+
+`vibevideo_deepfake` is a private repository and cannot be fetched anonymously.
 
 ## Model weights
 

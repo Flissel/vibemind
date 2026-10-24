@@ -17,6 +17,9 @@ when the public release process is adopted.
   private; every repository in the recursive tree is public.
 - Fixed the CI badge and the push trigger of the open-source checks to use the
   `main` branch.
+- The optional `vibevideo_deepfake` (private) and TriBE v2 (CC BY-NC 4.0)
+  submodules are no longer fetched by a recursive clone (`update = none` in
+  `vibemind-os/.gitmodules`).
 
 ## [0.1.0] - 2026-09-03
 

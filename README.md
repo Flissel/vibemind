@@ -135,6 +135,12 @@ Set-Location vibemind
 Clone into a short path (for example `C:\src\vibemind`); a deep target
 directory can still exceed the limit.
 
+Two optional modules are not cloned by default: the face-swap/lip-sync tools
+(`vibemind-os/spaces/video/vibevideo_deepfake`, private repository) and the
+TriBE v2 fMRI encoder (`vibemind-os/brain/the_brain/tribe`, CC BY-NC 4.0).
+VibeMind runs without them. See [THIRD_PARTY.md](THIRD_PARTY.md) for how to
+add TriBE v2 explicitly.
+
 If you already cloned without submodules:
 
 ```powershell
