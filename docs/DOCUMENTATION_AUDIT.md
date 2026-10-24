@@ -93,9 +93,9 @@ Action: regenerate the operational profile guide from `vibemind-stack.yml` and `
 
 ### Open-source checkout
 
-The recursive topology contains 19 repositories. An anonymous GitHub API check found 17 public repositories and two private repositories: the root repository and `vibemind-os`. The public-facing clone command is structurally correct, but anonymous users and the default GitHub Actions token cannot complete the private recursive checkout.
+Update 2026-10-25: the recursive topology now has 26 submodule paths backed by 24 distinct repositories. All of them, including the root repository and `vibemind-os`, answered an unauthenticated GitHub API request and an anonymous `git ls-remote`, and `git clone --recurse-submodules` completed. The private-checkout gap described below is closed.
 
-Action before announcing a public release: run a history/secret/license audit, decide which repositories can be public, configure CI credentials for any intentionally private dependency, and verify a clean anonymous recursive clone. This document does not authorize or perform visibility changes.
+Original finding (2026-08-09): the recursive topology contained 19 repositories. An anonymous GitHub API check found 17 public repositories and two private repositories: the root repository and `vibemind-os`. The public-facing clone command was structurally correct, but anonymous users and the default GitHub Actions token could not complete the private recursive checkout.
 
 ## Evidence vocabulary
 

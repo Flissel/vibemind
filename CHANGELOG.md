@@ -6,7 +6,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and release versions should follow [Semantic Versioning](https://semver.org/)
 when the public release process is adopted.
 
-## Planned for 0.1.0
+## [Unreleased]
+
+### Changed
+
+- README rewritten for the open beta: product summary, "What works today" and
+  "Known limitations" lists, hardware notes, community links and a clearer
+  license summary (MIT core, some optional components under other licenses).
+- Removed the outdated note that the root repository and `vibemind-os` were
+  private; every repository in the recursive tree is public.
+- Fixed the CI badge and the push trigger of the open-source checks to use the
+  `main` branch.
+- The optional `vibevideo_deepfake` (private) and TriBE v2 (CC BY-NC 4.0)
+  submodules are no longer fetched by a recursive clone (`update = none` in
+  `vibemind-os/.gitmodules`).
+
+## [0.1.0] - 2026-09-03
 
 First public release — an early one. The version says 0.1 on purpose:
 the system runs, but the public tree is a subset and several parts are still
@@ -39,7 +54,7 @@ Release-preparation changes since the last snapshot:
 - Removed personal data from the source tree; the Telegram send allowlist is
   now environment-configured and fails closed when unset.
 
-## [Unreleased]
+## Development history before 0.1.0
 
 ### Added
 
